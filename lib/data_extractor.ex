@@ -13,7 +13,8 @@ defmodule ApiBluefy.DataExtractor do
       body: conn.params,
       name: name,
       resp_body: conn.resp_body,
-      resp_headers: conn.resp_headers
+      resp_headers: conn.resp_headers,
+      status_code: conn.status
     }
   end
 

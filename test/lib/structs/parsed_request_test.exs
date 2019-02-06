@@ -9,12 +9,13 @@ defmodule ApiBluefy.Structs.ParsedRequestTest do
                resource_group: nil,
                resource: nil,
                action: nil,
-               paramters: [],
                name: nil,
+               paramters: [],
                body: nil,
                headers: [],
                resp_body: nil,
-               resp_headers: []
+               resp_headers: [],
+               status_code: nil
              } = %ParsedRequest{}
     end
   end

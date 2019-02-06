@@ -6,6 +6,7 @@ defmodule ApiBluefy.Structs.ParsedRequest do
     :name,
     :body,
     :resp_body,
+    :status_code,
     paramters: [],
     headers: [],
     resp_headers: []
