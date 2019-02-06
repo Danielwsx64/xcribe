@@ -1,7 +1,7 @@
 defmodule ApiBluefy.DataExtractorTest do
   use ApiBluefy.ConnCase, async: true
 
-  alias ApiBluefy.{DataExtractor, Structs.ParsedConn}
+  alias ApiBluefy.{DataExtractor, Structs.ParsedRequest}
 
   describe "from_conn/1" do
     test "extract request data from conn with no body", %{conn: conn} do
@@ -10,7 +10,7 @@ defmodule ApiBluefy.DataExtractorTest do
         |> put_req_header("authorization", "token")
         |> get(users_path(conn, :index))
 
-      assert DataExtractor.from_conn(conn) == %ParsedConn{
+      assert DataExtractor.from_conn(conn) == %ParsedRequest{
                paramters: [],
                action: :index,
                body: %{},

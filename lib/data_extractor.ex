@@ -1,10 +1,10 @@
 defmodule ApiBluefy.DataExtractor do
-  alias ApiBluefy.Structs.ParsedConn
+  alias ApiBluefy.Structs.ParsedRequest
 
   def from_conn(conn, name \\ "Request") do
     route = identify_route(conn)
 
-    %ParsedConn{
+    %ParsedRequest{
       resource_group: resource_group(route),
       resource: route.helper,
       action: route.opts,

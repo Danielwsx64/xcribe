@@ -1,4 +1,4 @@
-defmodule ApiBluefy.Structs.ParsedConn do
+defmodule ApiBluefy.Structs.ParsedRequest do
   defstruct [
     :resource_group,
     :resource,

@@ -1,7 +1,7 @@
-defmodule ApiBluefy.Structs.ParsedConnTest do
+defmodule ApiBluefy.Structs.ParsedRequestTest do
   use ExUnit.Case, async: true
 
-  alias ApiBluefy.Structs.ParsedConn
+  alias ApiBluefy.Structs.ParsedRequest
 
   describe "struct keys" do
     test "have keys" do
@@ -15,7 +15,7 @@ defmodule ApiBluefy.Structs.ParsedConnTest do
                headers: [],
                resp_body: nil,
                resp_headers: []
-             } = %ParsedConn{}
+             } = %ParsedRequest{}
     end
   end
 end
