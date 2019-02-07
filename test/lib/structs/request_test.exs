@@ -11,7 +11,8 @@ defmodule ApiBluefy.Structs.RequestTest do
                headers: [],
                resp_body: nil,
                resp_headers: [],
-               status_code: nil
+               status_code: nil,
+               path: nil
              } = %Request{}
     end
   end

@@ -6,12 +6,13 @@ defmodule ApiBluefy.DataExtractor do
 
     %ParsedRequest{
       resource_group: resource_group(route),
-      resource: route.helper,
+      resource: resource_name(route),
       action: route.opts,
       paramters: Map.keys(conn.params),
       headers: conn.req_headers,
       body: conn.params,
       name: name,
+      path: format_path(route.path, Map.keys(conn.params)),
       resp_body: conn.resp_body,
       resp_headers: conn.resp_headers,
       status_code: conn.status
@@ -50,5 +51,21 @@ defmodule ApiBluefy.DataExtractor do
 
   defp resource_group(%{pipe_through: [head | _rest]}), do: head
 
+  defp resource_name(%{helper: nil, plug: controller}),
+    do: resource_name_by_controller(controller)
+
+  defp resource_name_by_controller(controller) do
+    ~r/\.(\w+)Controller$/
+    |> Regex.run(to_string(controller))
+    |> List.last()
+    |> String.downcase()
+  end
+
+  defp resource_name(%{helper: name}), do: name
+
   defp verb_atom(%{method: verb}), do: verb |> String.downcase() |> String.to_atom()
+
+  defp format_path(path, params), do: Enum.reduce(params, path, &transform_param/2)
+
+  defp transform_param(param, path), do: String.replace(path, ":#{param}", "{#{param}}")
 end

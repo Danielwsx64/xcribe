@@ -14,4 +14,12 @@ defmodule ApiBluefy.UsersController do
     |> put_status(:created)
     |> json(params)
   end
+
+  def update(conn, params) do
+    params = Map.delete(params, "id")
+
+    conn
+    |> put_status(:ok)
+    |> json(params)
+  end
 end
