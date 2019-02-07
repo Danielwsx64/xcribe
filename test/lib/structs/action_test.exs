@@ -5,7 +5,7 @@ defmodule ApiBluefy.Structs.ActionTest do
 
   describe "struct keys" do
     test "have keys" do
-      assert %{name: nil, paramters: [], requests: []} = %Action{}
+      assert %{name: nil, verb: nil, paramters: [], requests: []} = %Action{}
     end
   end
 end

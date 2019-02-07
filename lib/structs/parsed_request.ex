@@ -3,6 +3,7 @@ defmodule ApiBluefy.Structs.ParsedRequest do
     :resource_group,
     :resource,
     :action,
+    :action_verb,
     :name,
     :body,
     :resp_body,

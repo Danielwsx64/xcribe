@@ -1,4 +1,4 @@
-defmodule ApiBluefy.UsersController do
+defmodule ApiBluefy.PostsController do
   use Phoenix.Controller, namespace: ApiBluefy
   import Plug.Conn
   alias ApiBluefy.Router.Helpers, as: Routes
@@ -6,13 +6,13 @@ defmodule ApiBluefy.UsersController do
   def index(conn, _params) do
     conn
     |> put_status(:ok)
-    |> json([%{id: 1, name: "user 1"}, %{id: 2, name: "user 2"}])
+    |> json([%{id: 1, title: "user 1"}, %{id: 2, title: "user 2"}])
   end
 
   def show(conn, _params) do
     conn
     |> put_status(:ok)
-    |> json(%{id: 1, name: "user 1"})
+    |> json(%{id: 1, title: "user 1"})
   end
 
   def create(conn, params) do

@@ -9,6 +9,7 @@ defmodule ApiBluefy.Structs.ParsedRequestTest do
                resource_group: nil,
                resource: nil,
                action: nil,
+               action_verb: nil,
                name: nil,
                paramters: [],
                body: nil,

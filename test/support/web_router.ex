@@ -11,6 +11,8 @@ defmodule ApiBluefy.WebRouter do
   scope "/", ApiBluefy do
     pipe_through(:api)
 
-    resources("/users", UsersController)
+    resources("/users", UsersController) do
+      resources("/posts", PostsController)
+    end
   end
 end

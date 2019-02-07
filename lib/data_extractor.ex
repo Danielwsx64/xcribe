@@ -8,11 +8,12 @@ defmodule ApiBluefy.DataExtractor do
       resource_group: resource_group(route),
       resource: resource_name(route),
       action: route.opts,
+      action_verb: route.verb,
       paramters: Map.keys(conn.params),
       headers: conn.req_headers,
-      body: conn.params,
+      body: conn.body_params,
       name: name,
-      path: format_path(route.path, Map.keys(conn.params)),
+      path: format_path(route.path, Map.keys(conn.path_params)),
       resp_body: conn.resp_body,
       resp_headers: conn.resp_headers,
       status_code: conn.status
@@ -54,14 +55,14 @@ defmodule ApiBluefy.DataExtractor do
   defp resource_name(%{helper: nil, plug: controller}),
     do: resource_name_by_controller(controller)
 
+  defp resource_name(%{helper: name}), do: name
+
   defp resource_name_by_controller(controller) do
     ~r/\.(\w+)Controller$/
     |> Regex.run(to_string(controller))
     |> List.last()
     |> String.downcase()
   end
-
-  defp resource_name(%{helper: name}), do: name
 
   defp verb_atom(%{method: verb}), do: verb |> String.downcase() |> String.to_atom()
 
