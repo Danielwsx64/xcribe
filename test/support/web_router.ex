@@ -1,4 +1,4 @@
-defmodule ApiBluefy.WebRouter do
+defmodule Xcribe.WebRouter do
   use Phoenix.Router
 
   import Plug.Conn
@@ -8,7 +8,7 @@ defmodule ApiBluefy.WebRouter do
     plug(:accepts, ["json"])
   end
 
-  scope "/", ApiBluefy do
+  scope "/", Xcribe do
     pipe_through(:api)
 
     resources("/users", UsersController) do

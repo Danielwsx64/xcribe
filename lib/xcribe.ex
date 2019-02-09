@@ -1,6 +1,6 @@
-defmodule ApiBluefy do
+defmodule Xcribe do
   @moduledoc """
-  Documentation for ApiBluefy.
+  Documentation for Xcribe.
   """
 
   @doc """
@@ -8,7 +8,7 @@ defmodule ApiBluefy do
 
   ## Examples
 
-      iex> ApiBluefy.hello()
+      iex> Xcribe.hello()
       :world
 
   """

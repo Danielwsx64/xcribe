@@ -1,9 +1,9 @@
-defmodule ApiBluefy.MixProject do
+defmodule Xcribe.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :api_bluefy,
+      app: :xcribe,
       version: "0.1.0",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
@@ -23,7 +23,7 @@ defmodule ApiBluefy.MixProject do
     ]
   end
 
-  defp application_mod(:test), do: {ApiBluefy.Application, []}
+  defp application_mod(:test), do: {Xcribe.Application, []}
   defp application_mod(_), do: []
 
   # Run "mix help deps" to learn about dependencies.

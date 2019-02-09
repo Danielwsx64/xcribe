@@ -1,3 +1,3 @@
-defmodule ApiBluefy.Structs.ResourceGroup do
+defmodule Xcribe.Structs.ResourceGroup do
   defstruct [:name, resources: []]
 end

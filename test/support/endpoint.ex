@@ -1,10 +1,10 @@
-defmodule ApiBluefy.Endpoint do
-  use Phoenix.Endpoint, otp_app: :api_bluefy
+defmodule Xcribe.Endpoint do
+  use Phoenix.Endpoint, otp_app: :xcribe
 
   plug(
     Plug.Static,
     at: "/",
-    from: :api_bluefy,
+    from: :xcribe,
     gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
   )
@@ -21,7 +21,7 @@ defmodule ApiBluefy.Endpoint do
   plug(Plug.MethodOverride)
   plug(Plug.Head)
 
-  plug(ApiBluefy.WebRouter)
+  plug(Xcribe.WebRouter)
 
   def init(_key, config), do: {:ok, config}
 end

@@ -1,5 +1,5 @@
-defmodule ApiBluefy.DataExtractor do
-  alias ApiBluefy.Structs.ParsedRequest
+defmodule Xcribe.DataExtractor do
+  alias Xcribe.Structs.ParsedRequest
 
   def from_conn(conn, name \\ "Request") do
     route = identify_route(conn)

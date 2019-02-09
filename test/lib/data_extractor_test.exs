@@ -1,7 +1,7 @@
-defmodule ApiBluefy.DataExtractorTest do
-  use ApiBluefy.ConnCase, async: true
+defmodule Xcribe.DataExtractorTest do
+  use Xcribe.ConnCase, async: true
 
-  alias ApiBluefy.{DataExtractor, Structs.ParsedRequest}
+  alias Xcribe.{DataExtractor, Structs.ParsedRequest}
 
   describe "from_conn/1" do
     test "extract request data from an index request", %{conn: conn} do

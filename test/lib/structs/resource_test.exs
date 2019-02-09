@@ -1,7 +1,7 @@
-defmodule ApiBluefy.Structs.ResourceTest do
+defmodule Xcribe.Structs.ResourceTest do
   use ExUnit.Case, async: true
 
-  alias ApiBluefy.Structs.Resource
+  alias Xcribe.Structs.Resource
 
   describe "struct keys" do
     test "have keys" do

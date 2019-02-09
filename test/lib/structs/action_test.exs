@@ -1,7 +1,7 @@
-defmodule ApiBluefy.Structs.ActionTest do
+defmodule Xcribe.Structs.ActionTest do
   use ExUnit.Case, async: true
 
-  alias ApiBluefy.Structs.Action
+  alias Xcribe.Structs.Action
 
   describe "struct keys" do
     test "have keys" do

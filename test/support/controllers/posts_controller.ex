@@ -1,7 +1,7 @@
-defmodule ApiBluefy.PostsController do
-  use Phoenix.Controller, namespace: ApiBluefy
+defmodule Xcribe.PostsController do
+  use Phoenix.Controller, namespace: Xcribe
   import Plug.Conn
-  alias ApiBluefy.Router.Helpers, as: Routes
+  alias Xcribe.Router.Helpers, as: Routes
 
   def index(conn, _params) do
     conn

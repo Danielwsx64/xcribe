@@ -1,12 +1,12 @@
-defmodule ApiBluefy.ConnCase do
+defmodule Xcribe.ConnCase do
   use ExUnit.CaseTemplate
 
   using do
     quote do
       use Phoenix.ConnTest
-      import ApiBluefy.WebRouter.Helpers
+      import Xcribe.WebRouter.Helpers
 
-      @endpoint ApiBluefy.Endpoint
+      @endpoint Xcribe.Endpoint
     end
   end
 
