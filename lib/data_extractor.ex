@@ -8,14 +8,15 @@ defmodule Xcribe.DataExtractor do
       resource_group: resource_group(route),
       resource: resource_name(route),
       action: route.opts,
-      action_verb: route.verb,
-      paramters: Map.keys(conn.params),
-      headers: conn.req_headers,
-      body: conn.body_params,
-      name: name,
       path: format_path(route.path, Map.keys(conn.path_params)),
-      resp_body: conn.resp_body,
+      verb: route.verb,
+      params: conn.params,
+      header_params: conn.req_headers,
+      query_params: conn.query_params,
+      path_params: conn.path_params,
+      request_body: conn.body_params,
       resp_headers: conn.resp_headers,
+      resp_body: conn.resp_body,
       status_code: conn.status
     }
   end

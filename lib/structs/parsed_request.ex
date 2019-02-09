@@ -3,14 +3,15 @@ defmodule Xcribe.Structs.ParsedRequest do
     :resource_group,
     :resource,
     :action,
-    :action_verb,
-    :name,
-    :body,
-    :resp_body,
-    :status_code,
     :path,
-    paramters: [],
-    headers: [],
-    resp_headers: []
+    :verb,
+    :params,
+    :header_params,
+    :query_params,
+    :path_params,
+    :request_body,
+    :resp_headers,
+    :resp_body,
+    :status_code
   ]
 end

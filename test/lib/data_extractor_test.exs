@@ -11,12 +11,13 @@ defmodule Xcribe.DataExtractorTest do
         |> get(users_path(conn, :index))
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               paramters: [],
                action: :index,
-               action_verb: :get,
-               body: %{},
-               headers: [{"authorization", "token"}],
-               name: "Request",
+               header_params: [{"authorization", "token"}],
+               params: %{},
+               path: "/users",
+               path_params: %{},
+               query_params: %{},
+               request_body: %{},
                resource: "users",
                resource_group: :api,
                resp_body: "[{\"id\":1,\"name\":\"user 1\"},{\"id\":2,\"name\":\"user 2\"}]",
@@ -25,7 +26,7 @@ defmodule Xcribe.DataExtractorTest do
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
                status_code: 200,
-               path: "/users"
+               verb: :get
              }
     end
 
@@ -36,12 +37,13 @@ defmodule Xcribe.DataExtractorTest do
         |> get(users_path(conn, :show, 1))
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               paramters: ["id"],
                action: :show,
-               action_verb: :get,
-               body: %{},
-               headers: [{"authorization", "token"}],
-               name: "Request",
+               header_params: [{"authorization", "token"}],
+               params: %{"id" => "1"},
+               path: "/users/{id}",
+               path_params: %{"id" => "1"},
+               query_params: %{},
+               request_body: %{},
                resource: "users",
                resource_group: :api,
                resp_body: "{\"id\":1,\"name\":\"user 1\"}",
@@ -50,7 +52,7 @@ defmodule Xcribe.DataExtractorTest do
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
                status_code: 200,
-               path: "/users/{id}"
+               verb: :get
              }
     end
 
@@ -61,24 +63,25 @@ defmodule Xcribe.DataExtractorTest do
         |> post(users_path(conn, :create), %{name: "teste", age: 5})
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               name: "Request",
+               action: :create,
+               header_params: [
+                 {"authorization", "token"},
+                 {"content-type", "multipart/mixed; boundary=plug_conn_test"}
+               ],
+               params: %{"age" => 5, "name" => "teste"},
+               path: "/users",
+               path_params: %{},
+               query_params: %{},
+               request_body: %{"age" => 5, "name" => "teste"},
                resource: "users",
                resource_group: :api,
+               resp_body: "{\"age\":5,\"name\":\"teste\"}",
                resp_headers: [
                  {"content-type", "application/json; charset=utf-8"},
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
-               action: :create,
-               action_verb: :post,
-               body: %{"age" => 5, "name" => "teste"},
-               headers: [
-                 {"authorization", "token"},
-                 {"content-type", "multipart/mixed; boundary=plug_conn_test"}
-               ],
-               paramters: ["age", "name"],
-               resp_body: "{\"age\":5,\"name\":\"teste\"}",
                status_code: 201,
-               path: "/users"
+               verb: :post
              }
     end
 
@@ -89,24 +92,25 @@ defmodule Xcribe.DataExtractorTest do
         |> put(users_path(conn, :update, 1), %{name: "teste", age: 5})
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               headers: [
+               action: :update,
+               header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
                ],
-               name: "Request",
+               params: %{"age" => 5, "id" => "1", "name" => "teste"},
+               path: "/users/{id}",
+               path_params: %{"id" => "1"},
+               query_params: %{},
+               request_body: %{"age" => 5, "name" => "teste"},
+               resource: "users",
                resource_group: :api,
                resp_body: "{\"age\":5,\"name\":\"teste\"}",
                resp_headers: [
                  {"content-type", "application/json; charset=utf-8"},
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
-               action: :update,
-               action_verb: :put,
-               body: %{"age" => 5, "name" => "teste"},
-               paramters: ["age", "id", "name"],
-               path: "/users/{id}",
-               resource: "users",
-               status_code: 200
+               status_code: 200,
+               verb: :put
              }
     end
 
@@ -117,24 +121,25 @@ defmodule Xcribe.DataExtractorTest do
         |> patch(users_path(conn, :update, 1), %{name: "teste", age: 5})
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               headers: [
+               action: :update,
+               header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
                ],
-               name: "Request",
+               params: %{"age" => 5, "id" => "1", "name" => "teste"},
+               path: "/users/{id}",
+               path_params: %{"id" => "1"},
+               query_params: %{},
+               request_body: %{"age" => 5, "name" => "teste"},
+               resource: "users",
                resource_group: :api,
                resp_body: "{\"age\":5,\"name\":\"teste\"}",
                resp_headers: [
                  {"content-type", "application/json; charset=utf-8"},
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
-               action: :update,
-               action_verb: :patch,
-               body: %{"age" => 5, "name" => "teste"},
-               paramters: ["age", "id", "name"],
-               path: "/users/{id}",
-               resource: "users",
-               status_code: 200
+               status_code: 200,
+               verb: :patch
              }
     end
 
@@ -145,22 +150,19 @@ defmodule Xcribe.DataExtractorTest do
         |> delete(users_path(conn, :delete, 1))
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               headers: [
-                 {"authorization", "token"}
-               ],
-               name: "Request",
+               action: :delete,
+               header_params: [{"authorization", "token"}],
+               params: %{"id" => "1"},
+               path: "/users/{id}",
+               path_params: %{"id" => "1"},
+               query_params: %{},
+               request_body: %{},
+               resource: "users",
                resource_group: :api,
                resp_body: "",
-               resp_headers: [
-                 {"cache-control", "max-age=0, private, must-revalidate"}
-               ],
-               action: :delete,
-               action_verb: :delete,
-               body: %{},
-               paramters: ["id"],
-               path: "/users/{id}",
-               resource: "users",
-               status_code: 204
+               resp_headers: [{"cache-control", "max-age=0, private, must-revalidate"}],
+               status_code: 204,
+               verb: :delete
              }
     end
 
@@ -171,12 +173,13 @@ defmodule Xcribe.DataExtractorTest do
         |> get(users_posts_path(conn, :index, 1))
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               paramters: ["users_id"],
                action: :index,
-               action_verb: :get,
-               body: %{},
-               headers: [{"authorization", "token"}],
-               name: "Request",
+               header_params: [{"authorization", "token"}],
+               params: %{"users_id" => "1"},
+               path: "/users/{users_id}/posts",
+               path_params: %{"users_id" => "1"},
+               query_params: %{},
+               request_body: %{},
                resource: "users_posts",
                resource_group: :api,
                resp_body: "[{\"id\":1,\"title\":\"user 1\"},{\"id\":2,\"title\":\"user 2\"}]",
@@ -185,7 +188,7 @@ defmodule Xcribe.DataExtractorTest do
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
                status_code: 200,
-               path: "/users/{users_id}/posts"
+               verb: :get
              }
     end
 
@@ -196,15 +199,16 @@ defmodule Xcribe.DataExtractorTest do
         |> post(users_posts_path(conn, :create, 1), %{title: "test"})
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               paramters: ["title", "users_id"],
                action: :create,
-               action_verb: :post,
-               body: %{"title" => "test"},
-               headers: [
+               header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
                ],
-               name: "Request",
+               params: %{"title" => "test", "users_id" => "1"},
+               path: "/users/{users_id}/posts",
+               path_params: %{"users_id" => "1"},
+               query_params: %{},
+               request_body: %{"title" => "test"},
                resource: "users_posts",
                resource_group: :api,
                resp_body: "{\"title\":\"test\",\"users_id\":\"1\"}",
@@ -213,7 +217,7 @@ defmodule Xcribe.DataExtractorTest do
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
                status_code: 201,
-               path: "/users/{users_id}/posts"
+               verb: :post
              }
     end
 
@@ -224,15 +228,16 @@ defmodule Xcribe.DataExtractorTest do
         |> patch(users_posts_path(conn, :update, 1, 2), %{title: "test"})
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               paramters: ["id", "title", "users_id"],
                action: :update,
-               action_verb: :patch,
-               body: %{"title" => "test"},
-               headers: [
+               header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
                ],
-               name: "Request",
+               params: %{"id" => "2", "title" => "test", "users_id" => "1"},
+               path: "/users/{users_id}/posts/{id}",
+               path_params: %{"id" => "2", "users_id" => "1"},
+               query_params: %{},
+               request_body: %{"title" => "test"},
                resource: "users_posts",
                resource_group: :api,
                resp_body: "{\"title\":\"test\",\"users_id\":\"1\"}",
@@ -241,7 +246,36 @@ defmodule Xcribe.DataExtractorTest do
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
                status_code: 200,
-               path: "/users/{users_id}/posts/{id}"
+               verb: :patch
+             }
+    end
+
+    test "extract request data from a nested update request with put", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("authorization", "token")
+        |> put(users_posts_path(conn, :update, 1, 2), %{title: "test"})
+
+      assert DataExtractor.from_conn(conn) == %ParsedRequest{
+               action: :update,
+               header_params: [
+                 {"authorization", "token"},
+                 {"content-type", "multipart/mixed; boundary=plug_conn_test"}
+               ],
+               params: %{"id" => "2", "title" => "test", "users_id" => "1"},
+               path: "/users/{users_id}/posts/{id}",
+               path_params: %{"id" => "2", "users_id" => "1"},
+               query_params: %{},
+               request_body: %{"title" => "test"},
+               resource: "posts",
+               resource_group: :api,
+               resp_body: "{\"title\":\"test\",\"users_id\":\"1\"}",
+               resp_headers: [
+                 {"content-type", "application/json; charset=utf-8"},
+                 {"cache-control", "max-age=0, private, must-revalidate"}
+               ],
+               status_code: 200,
+               verb: :put
              }
     end
   end
