@@ -5,7 +5,7 @@ defmodule Xcribe.Structs.SwaggerDataTest do
 
   describe "struct keys" do
     test "have keys" do
-      assert %{paths: []} = %SwaggerData{}
+      assert %{paths: %{}} = %SwaggerData{}
     end
   end
 end

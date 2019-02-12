@@ -7,9 +7,9 @@ defmodule Xcribe.DataExtractor do
     %ParsedRequest{
       resource_group: resource_group(route),
       resource: resource_name(route),
-      action: route.opts,
+      action: Atom.to_string(route.opts),
       path: format_path(route.path, Map.keys(conn.path_params)),
-      verb: route.verb,
+      verb: Atom.to_string(route.verb),
       params: conn.params,
       header_params: conn.req_headers,
       query_params: conn.query_params,

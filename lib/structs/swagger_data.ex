@@ -1,3 +1,3 @@
 defmodule Xcribe.Structs.SwaggerData do
-  defstruct paths: []
+  defstruct paths: %{}
 end

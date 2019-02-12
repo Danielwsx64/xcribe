@@ -11,7 +11,7 @@ defmodule Xcribe.DataExtractorTest do
         |> get(users_path(conn, :index))
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               action: :index,
+               action: "index",
                header_params: [{"authorization", "token"}],
                params: %{},
                path: "/users",
@@ -26,7 +26,7 @@ defmodule Xcribe.DataExtractorTest do
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
                status_code: 200,
-               verb: :get
+               verb: "get"
              }
     end
 
@@ -37,7 +37,7 @@ defmodule Xcribe.DataExtractorTest do
         |> get(users_path(conn, :show, 1))
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               action: :show,
+               action: "show",
                header_params: [{"authorization", "token"}],
                params: %{"id" => "1"},
                path: "/users/{id}",
@@ -52,7 +52,7 @@ defmodule Xcribe.DataExtractorTest do
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
                status_code: 200,
-               verb: :get
+               verb: "get"
              }
     end
 
@@ -63,7 +63,7 @@ defmodule Xcribe.DataExtractorTest do
         |> post(users_path(conn, :create), %{name: "teste", age: 5})
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               action: :create,
+               action: "create",
                header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
@@ -81,7 +81,7 @@ defmodule Xcribe.DataExtractorTest do
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
                status_code: 201,
-               verb: :post
+               verb: "post"
              }
     end
 
@@ -92,7 +92,7 @@ defmodule Xcribe.DataExtractorTest do
         |> put(users_path(conn, :update, 1), %{name: "teste", age: 5})
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               action: :update,
+               action: "update",
                header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
@@ -110,7 +110,7 @@ defmodule Xcribe.DataExtractorTest do
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
                status_code: 200,
-               verb: :put
+               verb: "put"
              }
     end
 
@@ -121,7 +121,7 @@ defmodule Xcribe.DataExtractorTest do
         |> patch(users_path(conn, :update, 1), %{name: "teste", age: 5})
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               action: :update,
+               action: "update",
                header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
@@ -139,7 +139,7 @@ defmodule Xcribe.DataExtractorTest do
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
                status_code: 200,
-               verb: :patch
+               verb: "patch"
              }
     end
 
@@ -150,7 +150,7 @@ defmodule Xcribe.DataExtractorTest do
         |> delete(users_path(conn, :delete, 1))
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               action: :delete,
+               action: "delete",
                header_params: [{"authorization", "token"}],
                params: %{"id" => "1"},
                path: "/users/{id}",
@@ -162,7 +162,7 @@ defmodule Xcribe.DataExtractorTest do
                resp_body: "",
                resp_headers: [{"cache-control", "max-age=0, private, must-revalidate"}],
                status_code: 204,
-               verb: :delete
+               verb: "delete"
              }
     end
 
@@ -173,7 +173,7 @@ defmodule Xcribe.DataExtractorTest do
         |> get(users_posts_path(conn, :index, 1))
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               action: :index,
+               action: "index",
                header_params: [{"authorization", "token"}],
                params: %{"users_id" => "1"},
                path: "/users/{users_id}/posts",
@@ -188,7 +188,7 @@ defmodule Xcribe.DataExtractorTest do
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
                status_code: 200,
-               verb: :get
+               verb: "get"
              }
     end
 
@@ -199,7 +199,7 @@ defmodule Xcribe.DataExtractorTest do
         |> post(users_posts_path(conn, :create, 1), %{title: "test"})
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               action: :create,
+               action: "create",
                header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
@@ -217,7 +217,7 @@ defmodule Xcribe.DataExtractorTest do
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
                status_code: 201,
-               verb: :post
+               verb: "post"
              }
     end
 
@@ -228,7 +228,7 @@ defmodule Xcribe.DataExtractorTest do
         |> patch(users_posts_path(conn, :update, 1, 2), %{title: "test"})
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               action: :update,
+               action: "update",
                header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
@@ -246,7 +246,7 @@ defmodule Xcribe.DataExtractorTest do
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
                status_code: 200,
-               verb: :patch
+               verb: "patch"
              }
     end
 
@@ -257,7 +257,7 @@ defmodule Xcribe.DataExtractorTest do
         |> put(users_posts_path(conn, :update, 1, 2), %{title: "test"})
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
-               action: :update,
+               action: "update",
                header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
@@ -275,7 +275,7 @@ defmodule Xcribe.DataExtractorTest do
                  {"cache-control", "max-age=0, private, must-revalidate"}
                ],
                status_code: 200,
-               verb: :put
+               verb: "put"
              }
     end
   end
