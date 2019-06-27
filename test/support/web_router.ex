@@ -1,7 +1,6 @@
 defmodule Xcribe.WebRouter do
   use Phoenix.Router
 
-  import Plug.Conn
   import Phoenix.Controller
 
   pipeline :api do

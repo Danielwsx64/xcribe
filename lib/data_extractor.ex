@@ -1,7 +1,7 @@
 defmodule Xcribe.DataExtractor do
   alias Xcribe.Structs.ParsedRequest
 
-  def from_conn(conn, name \\ "Request") do
+  def from_conn(conn, _name \\ "Request") do
     route = identify_route(conn)
 
     %ParsedRequest{

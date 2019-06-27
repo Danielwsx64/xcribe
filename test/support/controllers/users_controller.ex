@@ -1,7 +1,5 @@
 defmodule Xcribe.UsersController do
   use Phoenix.Controller, namespace: Xcribe
-  import Plug.Conn
-  alias Xcribe.Router.Helpers, as: Routes
 
   def index(conn, _params) do
     conn
