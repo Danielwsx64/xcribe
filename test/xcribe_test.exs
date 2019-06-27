@@ -1,8 +1,7 @@
 defmodule XcribeTest do
   use ExUnit.Case
-  doctest Xcribe
 
-  test "greets the world" do
-    assert Xcribe.hello() == :world
+  test "fake test" do
+    assert Xcribe.awesome() == nil
   end
 end
