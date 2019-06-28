@@ -5,19 +5,20 @@ defmodule Xcribe.DataExtractor do
     route = identify_route(conn)
 
     %ParsedRequest{
-      resource_group: resource_group(route),
-      resource: resource_name(route),
       action: Atom.to_string(route.opts),
-      path: format_path(route.path, Map.keys(conn.path_params)),
-      verb: Atom.to_string(route.verb),
-      params: conn.params,
       header_params: conn.req_headers,
-      query_params: conn.query_params,
+      controller: conn |> controller_module() |> Atom.to_string(),
+      params: conn.params,
+      path: format_path(route.path, Map.keys(conn.path_params)),
       path_params: conn.path_params,
+      query_params: conn.query_params,
       request_body: conn.body_params,
-      resp_headers: conn.resp_headers,
+      resource: resource_name(route),
+      resource_group: resource_group(route),
       resp_body: conn.resp_body,
-      status_code: conn.status
+      resp_headers: conn.resp_headers,
+      status_code: conn.status,
+      verb: Atom.to_string(route.verb)
     }
   end
 

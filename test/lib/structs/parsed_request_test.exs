@@ -5,21 +5,26 @@ defmodule Xcribe.Structs.ParsedRequestTest do
 
   describe "struct keys" do
     test "have keys" do
-      assert %{
-               resource_group: nil,
-               resource: nil,
-               action: nil,
-               path: nil,
-               verb: nil,
-               params: nil,
-               header_params: nil,
-               query_params: nil,
-               path_params: nil,
-               request_body: nil,
-               resp_headers: nil,
-               resp_body: nil,
-               status_code: nil
-             } = %ParsedRequest{}
+      struct = Map.from_struct(%ParsedRequest{})
+
+      expected_struct = %{
+        action: nil,
+        controller: nil,
+        header_params: nil,
+        params: nil,
+        path: nil,
+        path_params: nil,
+        query_params: nil,
+        request_body: nil,
+        resource: nil,
+        resource_group: nil,
+        resp_body: nil,
+        resp_headers: nil,
+        status_code: nil,
+        verb: nil
+      }
+
+      assert struct == expected_struct
     end
   end
 end

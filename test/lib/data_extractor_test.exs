@@ -12,6 +12,7 @@ defmodule Xcribe.DataExtractorTest do
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
                action: "index",
+               controller: "Elixir.Xcribe.UsersController",
                header_params: [{"authorization", "token"}],
                params: %{},
                path: "/users",
@@ -38,6 +39,7 @@ defmodule Xcribe.DataExtractorTest do
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
                action: "show",
+               controller: "Elixir.Xcribe.UsersController",
                header_params: [{"authorization", "token"}],
                params: %{"id" => "1"},
                path: "/users/{id}",
@@ -64,6 +66,7 @@ defmodule Xcribe.DataExtractorTest do
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
                action: "create",
+               controller: "Elixir.Xcribe.UsersController",
                header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
@@ -93,6 +96,7 @@ defmodule Xcribe.DataExtractorTest do
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
                action: "update",
+               controller: "Elixir.Xcribe.UsersController",
                header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
@@ -122,6 +126,7 @@ defmodule Xcribe.DataExtractorTest do
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
                action: "update",
+               controller: "Elixir.Xcribe.UsersController",
                header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
@@ -151,6 +156,7 @@ defmodule Xcribe.DataExtractorTest do
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
                action: "delete",
+               controller: "Elixir.Xcribe.UsersController",
                header_params: [{"authorization", "token"}],
                params: %{"id" => "1"},
                path: "/users/{id}",
@@ -174,6 +180,7 @@ defmodule Xcribe.DataExtractorTest do
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
                action: "index",
+               controller: "Elixir.Xcribe.PostsController",
                header_params: [{"authorization", "token"}],
                params: %{"users_id" => "1"},
                path: "/users/{users_id}/posts",
@@ -200,6 +207,7 @@ defmodule Xcribe.DataExtractorTest do
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
                action: "create",
+               controller: "Elixir.Xcribe.PostsController",
                header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
@@ -229,6 +237,7 @@ defmodule Xcribe.DataExtractorTest do
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
                action: "update",
+               controller: "Elixir.Xcribe.PostsController",
                header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}
@@ -258,6 +267,7 @@ defmodule Xcribe.DataExtractorTest do
 
       assert DataExtractor.from_conn(conn) == %ParsedRequest{
                action: "update",
+               controller: "Elixir.Xcribe.PostsController",
                header_params: [
                  {"authorization", "token"},
                  {"content-type", "multipart/mixed; boundary=plug_conn_test"}

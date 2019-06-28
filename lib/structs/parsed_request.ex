@@ -1,17 +1,18 @@
 defmodule Xcribe.Structs.ParsedRequest do
   defstruct [
-    :resource_group,
-    :resource,
     :action,
-    :path,
-    :verb,
-    :params,
+    :controller,
     :header_params,
-    :query_params,
+    :params,
+    :path,
     :path_params,
+    :query_params,
     :request_body,
-    :resp_headers,
+    :resource,
+    :resource_group,
     :resp_body,
-    :status_code
+    :resp_headers,
+    :status_code,
+    :verb
   ]
 end
