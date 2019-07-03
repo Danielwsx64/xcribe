@@ -1,7 +1,8 @@
 defmodule Xcribe.ApiBlueprint.Formatter do
   alias Xcribe.JSON
 
-  def resource_group(%{resource_group: name}), do: String.upcase("## #{name}\n")
+  def resource_group(%{resource_group: name}),
+    do: "## Group " <> String.upcase("#{name}\n")
 
   def resource(%{resource: resource, path: path}),
     do: "## #{capitalize(resource)} #{build_resource_path(path)}\n"

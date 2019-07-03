@@ -8,7 +8,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     test "return formatted resource group" do
       struct = %Request{resource_group: :api}
 
-      assert Formatter.resource_group(struct) == "## API\n"
+      assert Formatter.resource_group(struct) == "## Group API\n"
     end
   end
 

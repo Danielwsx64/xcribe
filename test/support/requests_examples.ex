@@ -89,7 +89,7 @@ defmodule Xcribe.RequestsExamples do
       ]
 
       @grouped_sample_requests [
-        {"## API\n",
+        {"## Group API\n",
          [
            {"## Users [/users/]\n",
             [
@@ -170,7 +170,7 @@ defmodule Xcribe.RequestsExamples do
                ]}
             ]}
          ]},
-        {"## MONITORING\n",
+        {"## Group MONITORING\n",
          [
            {"## Monitoring [/monitoring/]\n",
             [
@@ -201,7 +201,7 @@ defmodule Xcribe.RequestsExamples do
       ]
 
       @sample_requests_as_string """
-      ## API
+      ## Group API
       ## Users [/users/]
       ### Users create [POST /users/]
       + create an user
@@ -274,7 +274,7 @@ defmodule Xcribe.RequestsExamples do
                       "title": "user 2"
                     }
                   ]
-      ## MONITORING
+      ## Group MONITORING
       ## Monitoring [/monitoring/]
       ### Monitoring index [GET /monitoring/]
       + get monitoring info
