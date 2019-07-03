@@ -2,6 +2,7 @@ defmodule Xcribe.Structs.ParsedRequest do
   defstruct [
     :action,
     :controller,
+    :description,
     :header_params,
     :params,
     :path,

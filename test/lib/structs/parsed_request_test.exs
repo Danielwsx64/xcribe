@@ -10,6 +10,7 @@ defmodule Xcribe.Structs.ParsedRequestTest do
       expected_struct = %{
         action: nil,
         controller: nil,
+        description: nil,
         header_params: nil,
         params: nil,
         path: nil,
