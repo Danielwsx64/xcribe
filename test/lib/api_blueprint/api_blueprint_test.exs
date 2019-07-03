@@ -21,5 +21,9 @@ defmodule Xcribe.ApiBlueprintTest do
     test "parse requests to string" do
       assert ApiBlueprint.generate_doc(@sample_requests) == @sample_requests_as_string
     end
+
+    test "when list is empty" do
+      assert ApiBlueprint.generate_doc([]) == ""
+    end
   end
 end

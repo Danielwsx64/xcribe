@@ -31,18 +31,17 @@ defmodule Xcribe.MixProject do
   end
 
   defp application_mod(:test), do: {Xcribe.Support.Application, []}
-  defp application_mod(_), do: []
+  defp application_mod(_), do: {Xcribe, []}
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:jason, "~> 1.1"},
-      {:phoenix, "~> 1.4.0"},
-
       # Dev environment
       {:ex_doc, "~> 0.18.0", only: :dev, runtime: false},
 
       # Test environment
+      {:jason, "~> 1.1", only: [:dev, :test]},
+      {:phoenix, "~> 1.4.0", only: [:test]},
       {:excoveralls, "~> 0.10", only: :test},
       {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false}
     ]
