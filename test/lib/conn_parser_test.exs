@@ -328,5 +328,65 @@ defmodule Xcribe.ConnParserTest do
                verb: "put"
              }
     end
+
+    test "test group subject" do
+      incomplete_conn = %{
+        adapter:
+          {Plug.Adapters.Test.Conn,
+           %{
+             chunks: nil,
+             http_protocol: :"HTTP/1.1",
+             method: "POST",
+             owner: "",
+             params: %{},
+             peer_data: %{address: {127, 0, 0, 1}, port: 111_317, ssl_cert: nil},
+             ref: "",
+             req_body: "--plug_conn_test--"
+           }},
+        assigns: %{},
+        before_send: [],
+        body_params: %{},
+        cookies: %Plug.Conn.Unfetched{aspect: :cookies},
+        halted: true,
+        host: "www.example.com",
+        method: "POST",
+        owner: "",
+        params: %{},
+        path_info: ["api", "cards"],
+        path_params: %{},
+        peer: {{127, 0, 0, 1}, 111_317},
+        port: 80,
+        private: %{
+          Xcribe.WebRouter => {[], %{}},
+          :phoenix_endpoint => Xcribe.Endpoint,
+          :phoenix_format => "json",
+          :phoenix_pipelines => [:restrict_api],
+          :phoenix_recycled => false,
+          :phoenix_router => Xcribe.WebRouter,
+          :plug_session_fetch => "",
+          :plug_skip_csrf_protection => true
+        },
+        query_params: %{},
+        query_string: "",
+        remote_ip: {127, 0, 0, 1},
+        req_cookies: %Plug.Conn.Unfetched{aspect: :cookies},
+        req_headers: [{"content-type", "application/json"}],
+        request_path: "/api/cards",
+        resp_body: "{\"error\":\"not authorized\"}",
+        resp_cookies: %{},
+        resp_headers: [
+          {"cache-control", "max-age=0, private, must-revalidate"},
+          {"content-type", "application/json; charset=utf-8"}
+        ],
+        scheme: :http,
+        script_name: [],
+        secret_key_base: "",
+        state: :sent,
+        status: 401
+      }
+
+      assert 1 == 1
+      # TODO: fix this issue. The proble is i cant determine the route
+    end
   end
 end
