@@ -30,7 +30,7 @@ defmodule Xcribe.MixProject do
     ]
   end
 
-  defp application_mod(:test), do: {Xcribe.Application, []}
+  defp application_mod(:test), do: {Xcribe.Support.Application, []}
   defp application_mod(_), do: []
 
   # Run "mix help deps" to learn about dependencies.

@@ -1,4 +1,4 @@
-defmodule Xcribe.Application do
+defmodule Xcribe.Support.Application do
   use Application
 
   def start(_type, _args) do
@@ -8,7 +8,7 @@ defmodule Xcribe.Application do
       supervisor(Xcribe.Endpoint, [])
     ]
 
-    opts = [strategy: :one_for_one, name: Xcribe.Supervisor]
+    opts = [strategy: :one_for_one, name: Xcribe.Support.Supervisor]
     Supervisor.start_link(children, opts)
   end
 

@@ -1,13 +1,14 @@
 defmodule Xcribe.ConnParser do
   alias Xcribe.Request
 
-  def execute(conn, _name \\ "Request") do
+  def execute(conn, description \\ "sample request") do
     route = identify_route(conn)
 
     %Request{
       action: Atom.to_string(route.opts),
       header_params: conn.req_headers,
       controller: conn |> controller_module() |> Atom.to_string(),
+      description: description,
       params: conn.params,
       path: format_path(route.path, Map.keys(conn.path_params)),
       path_params: conn.path_params,
