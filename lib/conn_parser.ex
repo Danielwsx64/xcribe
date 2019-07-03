@@ -1,10 +1,10 @@
-defmodule Xcribe.DataExtractor do
-  alias Xcribe.Structs.ParsedRequest
+defmodule Xcribe.ConnParser do
+  alias Xcribe.Request
 
-  def from_conn(conn, _name \\ "Request") do
+  def execute(conn, _name \\ "Request") do
     route = identify_route(conn)
 
-    %ParsedRequest{
+    %Request{
       action: Atom.to_string(route.opts),
       header_params: conn.req_headers,
       controller: conn |> controller_module() |> Atom.to_string(),

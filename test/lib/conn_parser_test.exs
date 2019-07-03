@@ -1,16 +1,16 @@
-defmodule Xcribe.DataExtractorTest do
+defmodule Xcribe.ConnParserTest do
   use Xcribe.ConnCase, async: true
 
-  alias Xcribe.{DataExtractor, Structs.ParsedRequest}
+  alias Xcribe.{ConnParser, Request}
 
-  describe "from_conn/1" do
+  describe "parse/1" do
     test "extract request data from an index request", %{conn: conn} do
       conn =
         conn
         |> put_req_header("authorization", "token")
         |> get(users_path(conn, :index))
 
-      assert DataExtractor.from_conn(conn) == %ParsedRequest{
+      assert ConnParser.execute(conn) == %Request{
                action: "index",
                controller: "Elixir.Xcribe.UsersController",
                header_params: [{"authorization", "token"}],
@@ -37,7 +37,7 @@ defmodule Xcribe.DataExtractorTest do
         |> put_req_header("authorization", "token")
         |> get(users_path(conn, :show, 1))
 
-      assert DataExtractor.from_conn(conn) == %ParsedRequest{
+      assert ConnParser.execute(conn) == %Request{
                action: "show",
                controller: "Elixir.Xcribe.UsersController",
                header_params: [{"authorization", "token"}],
@@ -64,7 +64,7 @@ defmodule Xcribe.DataExtractorTest do
         |> put_req_header("authorization", "token")
         |> post(users_path(conn, :create), %{name: "teste", age: 5})
 
-      assert DataExtractor.from_conn(conn) == %ParsedRequest{
+      assert ConnParser.execute(conn) == %Request{
                action: "create",
                controller: "Elixir.Xcribe.UsersController",
                header_params: [
@@ -94,7 +94,7 @@ defmodule Xcribe.DataExtractorTest do
         |> put_req_header("authorization", "token")
         |> put(users_path(conn, :update, 1), %{name: "teste", age: 5})
 
-      assert DataExtractor.from_conn(conn) == %ParsedRequest{
+      assert ConnParser.execute(conn) == %Request{
                action: "update",
                controller: "Elixir.Xcribe.UsersController",
                header_params: [
@@ -124,7 +124,7 @@ defmodule Xcribe.DataExtractorTest do
         |> put_req_header("authorization", "token")
         |> patch(users_path(conn, :update, 1), %{name: "teste", age: 5})
 
-      assert DataExtractor.from_conn(conn) == %ParsedRequest{
+      assert ConnParser.execute(conn) == %Request{
                action: "update",
                controller: "Elixir.Xcribe.UsersController",
                header_params: [
@@ -154,7 +154,7 @@ defmodule Xcribe.DataExtractorTest do
         |> put_req_header("authorization", "token")
         |> delete(users_path(conn, :delete, 1))
 
-      assert DataExtractor.from_conn(conn) == %ParsedRequest{
+      assert ConnParser.execute(conn) == %Request{
                action: "delete",
                controller: "Elixir.Xcribe.UsersController",
                header_params: [{"authorization", "token"}],
@@ -178,7 +178,7 @@ defmodule Xcribe.DataExtractorTest do
         |> put_req_header("authorization", "token")
         |> get(users_posts_path(conn, :index, 1))
 
-      assert DataExtractor.from_conn(conn) == %ParsedRequest{
+      assert ConnParser.execute(conn) == %Request{
                action: "index",
                controller: "Elixir.Xcribe.PostsController",
                header_params: [{"authorization", "token"}],
@@ -205,7 +205,7 @@ defmodule Xcribe.DataExtractorTest do
         |> put_req_header("authorization", "token")
         |> post(users_posts_path(conn, :create, 1), %{title: "test"})
 
-      assert DataExtractor.from_conn(conn) == %ParsedRequest{
+      assert ConnParser.execute(conn) == %Request{
                action: "create",
                controller: "Elixir.Xcribe.PostsController",
                header_params: [
@@ -235,7 +235,7 @@ defmodule Xcribe.DataExtractorTest do
         |> put_req_header("authorization", "token")
         |> patch(users_posts_path(conn, :update, 1, 2), %{title: "test"})
 
-      assert DataExtractor.from_conn(conn) == %ParsedRequest{
+      assert ConnParser.execute(conn) == %Request{
                action: "update",
                controller: "Elixir.Xcribe.PostsController",
                header_params: [
@@ -265,7 +265,7 @@ defmodule Xcribe.DataExtractorTest do
         |> put_req_header("authorization", "token")
         |> put(users_posts_path(conn, :update, 1, 2), %{title: "test"})
 
-      assert DataExtractor.from_conn(conn) == %ParsedRequest{
+      assert ConnParser.execute(conn) == %Request{
                action: "update",
                controller: "Elixir.Xcribe.PostsController",
                header_params: [

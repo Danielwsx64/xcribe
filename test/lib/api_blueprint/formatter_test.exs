@@ -2,11 +2,11 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   use ExUnit.Case, async: true
 
   alias Xcribe.ApiBlueprint.Formatter
-  alias Xcribe.Structs.ParsedRequest
+  alias Xcribe.Request
 
   describe "resource_group/1" do
     test "return formatted resource group" do
-      struct = %ParsedRequest{resource_group: :api}
+      struct = %Request{resource_group: :api}
 
       assert Formatter.resource_group(struct) == "## API\n"
     end
@@ -14,19 +14,19 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
   describe "resource/1" do
     test "return formatted resource" do
-      struct = %ParsedRequest{resource: "users", path: "/users"}
+      struct = %Request{resource: "users", path: "/users"}
 
       assert Formatter.resource(struct) == "## Users [/users/]\n"
     end
 
     test "when path ends with forward slash" do
-      struct = %ParsedRequest{resource: "users", path: "/users/"}
+      struct = %Request{resource: "users", path: "/users/"}
 
       assert Formatter.resource(struct) == "## Users [/users/]\n"
     end
 
     test "when there is an arg in the path's end" do
-      struct = %ParsedRequest{resource: "users posts", path: "/users/{id}/posts/{post_id}"}
+      struct = %Request{resource: "users posts", path: "/users/{id}/posts/{post_id}"}
 
       assert Formatter.resource(struct) == "## Users Posts [/users/{id}/posts/]\n"
     end
@@ -34,13 +34,13 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
   describe "resource_action/1" do
     test "return formatted resource action" do
-      struct = %ParsedRequest{resource: "users", path: "/users", action: "index", verb: "get"}
+      struct = %Request{resource: "users", path: "/users", action: "index", verb: "get"}
 
       assert Formatter.resource_action(struct) == "### Users index [GET /users/]\n"
     end
 
     test "when there is an arg in the path's end" do
-      struct = %ParsedRequest{
+      struct = %Request{
         resource: "users posts",
         path: "/users/{id}/posts/{post_id}",
         action: "update",
@@ -54,7 +54,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
   describe "request_description/1" do
     test "return formatted request description" do
-      struct = %ParsedRequest{description: "create user with token"}
+      struct = %Request{description: "create user with token"}
 
       assert Formatter.request_description(struct) == "+ create user with token\n"
     end
@@ -62,7 +62,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
   describe "request_headers/1" do
     test "return formatted request headers" do
-      struct = %ParsedRequest{
+      struct = %Request{
         header_params: [
           {"authorization", "token"},
           {"content-type", "multipart/mixed; boundary=plug_conn_test"}
@@ -78,7 +78,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
 
     test "return empty string when no headers" do
-      struct = %ParsedRequest{
+      struct = %Request{
         header_params: []
       }
 
@@ -88,7 +88,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
   describe "request_body/1" do
     test "return formatted request body" do
-      struct = %ParsedRequest{
+      struct = %Request{
         request_body: %{"age" => 5, "name" => "teste"}
       }
 
@@ -103,7 +103,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
 
     test "return empty string when no body" do
-      struct = %ParsedRequest{
+      struct = %Request{
         request_body: %{}
       }
 
@@ -113,7 +113,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
   describe "response_description/1" do
     test "return formatted response description" do
-      struct = %ParsedRequest{
+      struct = %Request{
         status_code: 201
       }
 
@@ -123,7 +123,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
   describe "response_headers/1" do
     test "return formatted request headers" do
-      struct = %ParsedRequest{
+      struct = %Request{
         resp_headers: [
           {"authorization", "token"},
           {"content-type", "multipart/mixed; boundary=plug_conn_test"}
@@ -139,7 +139,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
 
     test "return empty string when no headers" do
-      struct = %ParsedRequest{
+      struct = %Request{
         resp_headers: []
       }
 
@@ -149,7 +149,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
   describe "response_body/1" do
     test "return formatted request body" do
-      struct = %ParsedRequest{
+      struct = %Request{
         resp_body: "{\"age\":5,\"name\":\"teste\"}"
       }
 
@@ -164,7 +164,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
 
     test "return empty string when no body" do
-      struct = %ParsedRequest{
+      struct = %Request{
         resp_body: %{}
       }
 
@@ -174,7 +174,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
   describe "full_request/1" do
     test "return full request" do
-      struct = %ParsedRequest{
+      struct = %Request{
         description: "create an user",
         header_params: [
           {"authorization", "token"},

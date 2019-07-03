@@ -1,4 +1,4 @@
-defmodule Xcribe.Structs.ParsedRequest do
+defmodule Xcribe.Request do
   defstruct [
     :action,
     :controller,

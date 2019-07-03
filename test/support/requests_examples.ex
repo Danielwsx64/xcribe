@@ -1,10 +1,10 @@
 defmodule Xcribe.RequestsExamples do
   defmacro __using__(_opts \\ []) do
     quote do
-      alias Xcribe.Structs.ParsedRequest
+      alias Xcribe.Request
 
       @sample_requests [
-        %ParsedRequest{
+        %Request{
           action: "index",
           controller: "Elixir.Xcribe.UsersController",
           description: "get all users",
@@ -24,7 +24,7 @@ defmodule Xcribe.RequestsExamples do
           status_code: 200,
           verb: "get"
         },
-        %ParsedRequest{
+        %Request{
           action: "create",
           controller: "Elixir.Xcribe.UsersController",
           description: "create an user",
@@ -47,7 +47,7 @@ defmodule Xcribe.RequestsExamples do
           status_code: 201,
           verb: "post"
         },
-        %ParsedRequest{
+        %Request{
           action: "index",
           controller: "Elixir.Xcribe.PostsController",
           description: "get all user posts",
@@ -67,7 +67,7 @@ defmodule Xcribe.RequestsExamples do
           status_code: 200,
           verb: "get"
         },
-        %ParsedRequest{
+        %Request{
           action: "index",
           controller: "Elixir.Xcribe.MonitoringController",
           description: "get monitoring info",
@@ -95,7 +95,7 @@ defmodule Xcribe.RequestsExamples do
             [
               {"### Users create [POST /users/]\n",
                [
-                 %Xcribe.Structs.ParsedRequest{
+                 %Request{
                    action: "create",
                    controller: "Elixir.Xcribe.UsersController",
                    description: "create an user",
@@ -121,7 +121,7 @@ defmodule Xcribe.RequestsExamples do
                ]},
               {"### Users index [GET /users/]\n",
                [
-                 %Xcribe.Structs.ParsedRequest{
+                 %Request{
                    action: "index",
                    controller: "Elixir.Xcribe.UsersController",
                    description: "get all users",
@@ -147,7 +147,7 @@ defmodule Xcribe.RequestsExamples do
             [
               {"### Users_posts index [GET /users/{users_id}/posts/]\n",
                [
-                 %Xcribe.Structs.ParsedRequest{
+                 %Request{
                    action: "index",
                    controller: "Elixir.Xcribe.PostsController",
                    description: "get all user posts",
@@ -176,7 +176,7 @@ defmodule Xcribe.RequestsExamples do
             [
               {"### Monitoring index [GET /monitoring/]\n",
                [
-                 %Xcribe.Structs.ParsedRequest{
+                 %Request{
                    action: "index",
                    controller: "Elixir.Xcribe.MonitoringController",
                    description: "get monitoring info",

@@ -1,11 +1,11 @@
-defmodule Xcribe.Structs.ParsedRequestTest do
+defmodule Xcribe.RequestTest do
   use ExUnit.Case, async: true
 
-  alias Xcribe.Structs.ParsedRequest
+  alias Xcribe.Request
 
   describe "struct keys" do
     test "have keys" do
-      struct = Map.from_struct(%ParsedRequest{})
+      struct = Map.from_struct(%Request{})
 
       expected_struct = %{
         action: nil,

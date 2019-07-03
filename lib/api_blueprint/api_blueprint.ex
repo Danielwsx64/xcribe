@@ -1,7 +1,7 @@
-defmodule Xcribe.ApiBlueprint.Writter do
+defmodule Xcribe.ApiBlueprint do
   alias Xcribe.ApiBlueprint.Formatter
 
-  def requests_to_string(requests) do
+  def generate_doc(requests) do
     requests
     |> group_requests()
     |> grouped_requests_to_string()
