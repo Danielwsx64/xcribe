@@ -8,6 +8,13 @@ defmodule Xcribe.MixProject do
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ],
       deps: deps()
     ]
   end
@@ -30,7 +37,14 @@ defmodule Xcribe.MixProject do
   defp deps do
     [
       {:jason, "~> 1.1"},
-      {:phoenix, "~> 1.4.0"}
+      {:phoenix, "~> 1.4.0"},
+
+      # Dev environment
+      {:ex_doc, "~> 0.18.0", only: :dev, runtime: false},
+
+      # Test environment
+      {:excoveralls, "~> 0.10", only: :test},
+      {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false}
     ]
   end
 end
