@@ -23,7 +23,8 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     |> Enum.join()
   end
 
-  def request_description(%{description: description}), do: "+ #{description}\n"
+  def request_description(%{description: description, header_params: headers}),
+    do: "+ Request #{description} (#{find_content_type(headers)})\n"
 
   def request_headers(%{header_params: []}), do: ""
   def request_headers(%{header_params: headers}), do: headers_section(headers)
@@ -38,6 +39,16 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   def response_body(%{resp_body: body}), do: body_section(body)
 
   def response_description(%{status_code: code}), do: "+ Response #{code}\n"
+
+  defp find_content_type(nil), do: "text/plain"
+
+  defp find_content_type(headers) do
+    headers
+    |> Enum.reduce("text/plain", &find_content_type_header/2)
+  end
+
+  defp find_content_type_header({"content-type", type}, _acc), do: type
+  defp find_content_type_header(_, acc), do: acc
 
   defp headers_section(headers) do
     title = "+ Headers\n\n" |> apply_tab(1)

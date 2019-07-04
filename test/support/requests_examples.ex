@@ -204,7 +204,7 @@ defmodule Xcribe.RequestsExamples do
       ## Group API
       ## Users [/users/]
       ### Users create [POST /users/]
-      + create an user
+      + Request create an user (multipart/mixed; boundary=plug_conn_test)
           + Headers
 
                   content-type: multipart/mixed; boundary=plug_conn_test
@@ -228,7 +228,7 @@ defmodule Xcribe.RequestsExamples do
                     "name": "teste"
                   }
       ### Users index [GET /users/]
-      + get all users
+      + Request get all users (text/plain)
           + Headers
 
                   authorization: token
@@ -252,7 +252,7 @@ defmodule Xcribe.RequestsExamples do
                   ]
       ## Users_posts [/users/{users_id}/posts/]
       ### Users_posts index [GET /users/{users_id}/posts/]
-      + get all user posts
+      + Request get all user posts (text/plain)
           + Headers
 
                   authorization: token
@@ -277,7 +277,7 @@ defmodule Xcribe.RequestsExamples do
       ## Group MONITORING
       ## Monitoring [/monitoring/]
       ### Monitoring index [GET /monitoring/]
-      + get monitoring info
+      + Request get monitoring info (text/plain)
           + Headers
 
                   authorization: token

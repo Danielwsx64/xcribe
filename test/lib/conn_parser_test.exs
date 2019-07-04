@@ -330,7 +330,7 @@ defmodule Xcribe.ConnParserTest do
     end
 
     test "test group subject" do
-      incomplete_conn = %{
+      _incomplete_conn = %{
         adapter:
           {Plug.Adapters.Test.Conn,
            %{

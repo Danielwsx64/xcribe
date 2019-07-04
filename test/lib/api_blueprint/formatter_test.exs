@@ -56,7 +56,21 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     test "return formatted request description" do
       struct = %Request{description: "create user with token"}
 
-      assert Formatter.request_description(struct) == "+ create user with token\n"
+      assert Formatter.request_description(struct) ==
+               "+ Request create user with token (text/plain)\n"
+    end
+
+    test "when content type is set" do
+      struct = %Request{
+        description: "create user with token",
+        header_params: [
+          {"content-type", "application/json; charset=utf-8"},
+          {"cache-control", "max-age=0, private, must-revalidate"}
+        ]
+      }
+
+      assert Formatter.request_description(struct) ==
+               "+ Request create user with token (application/json; charset=utf-8)\n"
     end
   end
 
@@ -191,7 +205,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       }
 
       assert Formatter.full_request(struct) == """
-             + create an user
+             + Request create an user (multipart/mixed; boundary=plug_conn_test)
                  + Headers
 
                          content-type: multipart/mixed; boundary=plug_conn_test
