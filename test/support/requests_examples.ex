@@ -207,7 +207,6 @@ defmodule Xcribe.RequestsExamples do
       + Request create an user (multipart/mixed; boundary=plug_conn_test)
           + Headers
 
-                  content-type: multipart/mixed; boundary=plug_conn_test
                   authorization: token
           + Body
 
@@ -216,11 +215,10 @@ defmodule Xcribe.RequestsExamples do
                     "name": "teste"
                   }
 
-      + Response 201
+      + Response 201 (application/json; charset=utf-8)
           + Headers
 
                   cache-control: max-age=0, private, must-revalidate
-                  content-type: application/json; charset=utf-8
           + Body
 
                   {
@@ -233,11 +231,10 @@ defmodule Xcribe.RequestsExamples do
 
                   authorization: token
 
-      + Response 200
+      + Response 200 (application/json; charset=utf-8)
           + Headers
 
                   cache-control: max-age=0, private, must-revalidate
-                  content-type: application/json; charset=utf-8
           + Body
 
                   [
@@ -257,11 +254,10 @@ defmodule Xcribe.RequestsExamples do
 
                   authorization: token
 
-      + Response 200
+      + Response 200 (application/json; charset=utf-8)
           + Headers
 
                   cache-control: max-age=0, private, must-revalidate
-                  content-type: application/json; charset=utf-8
           + Body
 
                   [
@@ -282,10 +278,7 @@ defmodule Xcribe.RequestsExamples do
 
                   authorization: token
 
-      + Response 200
-          + Headers
-
-                  content-type: application/json; charset=utf-8
+      + Response 200 (application/json; charset=utf-8)
           + Body
 
                   [

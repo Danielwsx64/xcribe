@@ -38,7 +38,8 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   def response_body(%{resp_body: body}) when body == %{}, do: ""
   def response_body(%{resp_body: body}), do: body_section(body)
 
-  def response_description(%{status_code: code}), do: "+ Response #{code}\n"
+  def response_description(%{status_code: code, resp_headers: headers}),
+    do: "+ Response #{code} (#{find_content_type(headers)})\n"
 
   defp find_content_type(nil), do: "text/plain"
 
@@ -54,7 +55,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     title = "+ Headers\n\n" |> apply_tab(1)
     headers = format_headers(headers)
 
-    title <> headers
+    if headers == "", do: "", else: title <> headers
   end
 
   def body_section(body) do
@@ -106,6 +107,8 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   defp concat_tab(_count, text), do: "    " <> text
 
   defp format_headers(headers), do: headers |> Enum.reduce("", &add_header/2)
+
+  defp add_header({"content-type", _}, acc), do: acc
 
   defp add_header({key, value}, acc),
     do: apply_tab("#{key}: #{value}\n", 3) <> acc

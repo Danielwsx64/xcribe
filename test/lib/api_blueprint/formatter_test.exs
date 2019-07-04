@@ -86,9 +86,18 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       assert Formatter.request_headers(struct) == """
                  + Headers
 
-                         content-type: multipart/mixed; boundary=plug_conn_test
                          authorization: token
              """
+    end
+
+    test "just content type" do
+      struct = %Request{
+        header_params: [
+          {"content-type", "multipart/mixed; boundary=plug_conn_test"}
+        ]
+      }
+
+      assert Formatter.request_headers(struct) == ""
     end
 
     test "return empty string when no headers" do
@@ -131,7 +140,18 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         status_code: 201
       }
 
-      assert Formatter.response_description(struct) == "+ Response 201\n"
+      assert Formatter.response_description(struct) == "+ Response 201 (text/plain)\n"
+    end
+
+    test "when has content type header" do
+      struct = %Request{
+        status_code: 201,
+        resp_headers: [
+          {"content-type", "multipart/mixed"}
+        ]
+      }
+
+      assert Formatter.response_description(struct) == "+ Response 201 (multipart/mixed)\n"
     end
   end
 
@@ -147,9 +167,18 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       assert Formatter.response_headers(struct) == """
                  + Headers
 
-                         content-type: multipart/mixed; boundary=plug_conn_test
                          authorization: token
              """
+    end
+
+    test "just content header" do
+      struct = %Request{
+        resp_headers: [
+          {"content-type", "multipart/mixed; boundary=plug_conn_test"}
+        ]
+      }
+
+      assert Formatter.response_headers(struct) == ""
     end
 
     test "return empty string when no headers" do
@@ -208,7 +237,6 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
              + Request create an user (multipart/mixed; boundary=plug_conn_test)
                  + Headers
 
-                         content-type: multipart/mixed; boundary=plug_conn_test
                          authorization: token
                  + Body
 
@@ -217,11 +245,10 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                            "name": "teste"
                          }
 
-             + Response 201
+             + Response 201 (application/json; charset=utf-8)
                  + Headers
 
                          cache-control: max-age=0, private, must-revalidate
-                         content-type: application/json; charset=utf-8
                  + Body
 
                          {
