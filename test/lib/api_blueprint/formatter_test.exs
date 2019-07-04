@@ -60,6 +60,13 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                "+ Request create user with token (text/plain)\n"
     end
 
+    test "clean description" do
+      struct = %Request{description: "POST /api/boletos [ create  ] add a boleto"}
+
+      assert Formatter.request_description(struct) ==
+               "+ Request POST api boletos create add a boleto (text/plain)\n"
+    end
+
     test "when content type is set" do
       struct = %Request{
         description: "create user with token",

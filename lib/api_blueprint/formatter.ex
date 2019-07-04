@@ -24,7 +24,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   end
 
   def request_description(%{description: description, header_params: headers}),
-    do: "+ Request #{description} (#{find_content_type(headers)})\n"
+    do: "+ Request #{clean_description(description)} (#{find_content_type(headers)})\n"
 
   def request_headers(%{header_params: []}), do: ""
   def request_headers(%{header_params: headers}), do: headers_section(headers)
@@ -92,6 +92,10 @@ defmodule Xcribe.ApiBlueprint.Formatter do
       nil -> path
       [capture | _] -> String.replace(path, capture, "")
     end
+  end
+
+  defp clean_description(description) do
+    description |> String.replace(~r/\W/, " ") |> String.replace(~r/\s+/, " ")
   end
 
   defp ident_lines(text, count) do
