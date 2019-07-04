@@ -6,14 +6,14 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   def resource(%{resource: resource, path: path}) do
     resource_name = resource |> remove_underline() |> capitalize()
-    resource_path = build_resource_path(path)
+    resource_path = build_path(path, last_argument: false)
 
     "## #{resource_name} #{resource_path}\n"
   end
 
   def resource_action(%{resource: resource, path: path, action: action, verb: verb}) do
     resource_name = resource |> remove_underline() |> capitalize()
-    resource_path = build_resource_path(path, verb)
+    resource_path = build_path(path, verb: verb, last_argument: true)
     resource_action = action |> remove_underline()
 
     "### #{resource_name} #{resource_action} #{resource_path}\n"
@@ -83,12 +83,15 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     |> Enum.join(" ")
   end
 
-  defp build_resource_path(path, verb \\ nil)
+  defp build_path(path, opts) do
+    options = Keyword.merge([verb: nil, last_argument: true], opts)
 
-  defp build_resource_path(path, verb) do
+    verb = Keyword.fetch!(options, :verb)
+    last_argument = Keyword.fetch!(options, :last_argument)
+
     path
     |> add_forward_slash()
-    |> remove_ending_argument()
+    |> remove_ending_argument(!last_argument)
     |> into_brackets(verb)
   end
 
@@ -98,7 +101,9 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   defp into_brackets(path, nil), do: "[#{path}]"
   defp into_brackets(path, verb), do: "[#{String.upcase(verb)} #{path}]"
 
-  defp remove_ending_argument(path) do
+  defp remove_ending_argument(path, false), do: path
+
+  defp remove_ending_argument(path, true) do
     case Regex.run(~r/({\w*}\/$)/, path) do
       nil -> path
       [capture | _] -> String.replace(path, capture, "")

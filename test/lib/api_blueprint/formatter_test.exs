@@ -60,7 +60,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       }
 
       assert Formatter.resource_action(struct) ==
-               "### Users Posts update [PUT /users/{id}/posts/]\n"
+               "### Users Posts update [PUT /users/{id}/posts/{post_id}/]\n"
     end
 
     test "when there is underline" do
