@@ -2,13 +2,22 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   alias Xcribe.JSON
 
   def resource_group(%{resource_group: name}),
-    do: "## Group " <> String.upcase("#{name}\n")
+    do: ("## Group " <> String.upcase("#{name}\n")) |> remove_underline()
 
-  def resource(%{resource: resource, path: path}),
-    do: "## #{capitalize(resource)} #{build_resource_path(path)}\n"
+  def resource(%{resource: resource, path: path}) do
+    resource_name = resource |> remove_underline() |> capitalize()
+    resource_path = build_resource_path(path)
 
-  def resource_action(%{resource: resource, path: path, action: action, verb: verb}),
-    do: "### #{capitalize(resource)} #{action} #{build_resource_path(path, verb)}\n"
+    "## #{resource_name} #{resource_path}\n"
+  end
+
+  def resource_action(%{resource: resource, path: path, action: action, verb: verb}) do
+    resource_name = resource |> remove_underline() |> capitalize()
+    resource_path = build_resource_path(path, verb)
+    resource_action = action |> remove_underline()
+
+    "### #{resource_name} #{resource_action} #{resource_path}\n"
+  end
 
   def full_request(struct) do
     [
@@ -40,6 +49,8 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   def response_description(%{status_code: code, resp_headers: headers}),
     do: "+ Response #{code} (#{find_content_type(headers)})\n"
+
+  defp remove_underline(text), do: String.replace(text, "_", " ")
 
   defp find_content_type(nil), do: "text/plain"
 

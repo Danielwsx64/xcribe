@@ -91,6 +91,32 @@ defmodule Xcribe.RequestsExamples do
       @grouped_sample_requests [
         {"## Group API\n",
          [
+           {"## Users Posts [/users/{users_id}/posts/]\n",
+            [
+              {"### Users Posts index [GET /users/{users_id}/posts/]\n",
+               [
+                 %Request{
+                   action: "index",
+                   controller: "Elixir.Xcribe.PostsController",
+                   description: "get all user posts",
+                   header_params: [{"authorization", "token"}],
+                   params: %{"users_id" => "1"},
+                   path: "/users/{users_id}/posts",
+                   path_params: %{"users_id" => "1"},
+                   query_params: %{},
+                   request_body: %{},
+                   resource: "users_posts",
+                   resource_group: :api,
+                   resp_body: "[{\"id\":1,\"title\":\"user 1\"},{\"id\":2,\"title\":\"user 2\"}]",
+                   resp_headers: [
+                     {"content-type", "application/json; charset=utf-8"},
+                     {"cache-control", "max-age=0, private, must-revalidate"}
+                   ],
+                   status_code: 200,
+                   verb: "get"
+                 }
+               ]}
+            ]},
            {"## Users [/users/]\n",
             [
               {"### Users create [POST /users/]\n",
@@ -142,32 +168,6 @@ defmodule Xcribe.RequestsExamples do
                    verb: "get"
                  }
                ]}
-            ]},
-           {"## Users_posts [/users/{users_id}/posts/]\n",
-            [
-              {"### Users_posts index [GET /users/{users_id}/posts/]\n",
-               [
-                 %Request{
-                   action: "index",
-                   controller: "Elixir.Xcribe.PostsController",
-                   description: "get all user posts",
-                   header_params: [{"authorization", "token"}],
-                   params: %{"users_id" => "1"},
-                   path: "/users/{users_id}/posts",
-                   path_params: %{"users_id" => "1"},
-                   query_params: %{},
-                   request_body: %{},
-                   resource: "users_posts",
-                   resource_group: :api,
-                   resp_body: "[{\"id\":1,\"title\":\"user 1\"},{\"id\":2,\"title\":\"user 2\"}]",
-                   resp_headers: [
-                     {"content-type", "application/json; charset=utf-8"},
-                     {"cache-control", "max-age=0, private, must-revalidate"}
-                   ],
-                   status_code: 200,
-                   verb: "get"
-                 }
-               ]}
             ]}
          ]},
         {"## Group MONITORING\n",
@@ -202,6 +202,29 @@ defmodule Xcribe.RequestsExamples do
 
       @sample_requests_as_string """
       ## Group API
+      ## Users Posts [/users/{users_id}/posts/]
+      ### Users Posts index [GET /users/{users_id}/posts/]
+      + Request get all user posts (text/plain)
+          + Headers
+
+                  authorization: token
+
+      + Response 200 (application/json; charset=utf-8)
+          + Headers
+
+                  cache-control: max-age=0, private, must-revalidate
+          + Body
+
+                  [
+                    {
+                      "id": 1,
+                      "title": "user 1"
+                    },
+                    {
+                      "id": 2,
+                      "title": "user 2"
+                    }
+                  ]
       ## Users [/users/]
       ### Users create [POST /users/]
       + Request create an user (multipart/mixed; boundary=plug_conn_test)
@@ -245,29 +268,6 @@ defmodule Xcribe.RequestsExamples do
                     {
                       "id": 2,
                       "name": "user 2"
-                    }
-                  ]
-      ## Users_posts [/users/{users_id}/posts/]
-      ### Users_posts index [GET /users/{users_id}/posts/]
-      + Request get all user posts (text/plain)
-          + Headers
-
-                  authorization: token
-
-      + Response 200 (application/json; charset=utf-8)
-          + Headers
-
-                  cache-control: max-age=0, private, must-revalidate
-          + Body
-
-                  [
-                    {
-                      "id": 1,
-                      "title": "user 1"
-                    },
-                    {
-                      "id": 2,
-                      "title": "user 2"
                     }
                   ]
       ## Group MONITORING

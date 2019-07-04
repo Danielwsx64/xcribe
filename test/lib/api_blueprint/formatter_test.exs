@@ -10,6 +10,12 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
       assert Formatter.resource_group(struct) == "## Group API\n"
     end
+
+    test "remove underlines" do
+      struct = %Request{resource_group: :awesome_api}
+
+      assert Formatter.resource_group(struct) == "## Group AWESOME API\n"
+    end
   end
 
   describe "resource/1" do
@@ -27,6 +33,12 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
     test "when there is an arg in the path's end" do
       struct = %Request{resource: "users posts", path: "/users/{id}/posts/{post_id}"}
+
+      assert Formatter.resource(struct) == "## Users Posts [/users/{id}/posts/]\n"
+    end
+
+    test "resource with underline" do
+      struct = %Request{resource: "users_posts", path: "/users/{id}/posts/{post_id}"}
 
       assert Formatter.resource(struct) == "## Users Posts [/users/{id}/posts/]\n"
     end
@@ -49,6 +61,12 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
       assert Formatter.resource_action(struct) ==
                "### Users Posts update [PUT /users/{id}/posts/]\n"
+    end
+
+    test "when there is underline" do
+      struct = %Request{resource: "users_posts", path: "/users", action: "new_index", verb: "get"}
+
+      assert Formatter.resource_action(struct) == "### Users Posts new index [GET /users/]\n"
     end
   end
 
