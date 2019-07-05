@@ -203,6 +203,9 @@ defmodule Xcribe.RequestsExamples do
       @sample_requests_as_string """
       ## Group API
       ## Users Posts [/users/{users_id}/posts/]
+      + Parameters
+
+          + users_id: `1` (required, string) - The users_id
       ### Users Posts index [GET /users/{users_id}/posts/]
       + Request get all user posts (text/plain)
           + Headers

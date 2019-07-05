@@ -28,12 +28,14 @@ defmodule Xcribe.ApiBlueprint do
   end
 
   defp resource_reducer({resource, reqs}, doc) do
-    description = reqs |> resource_request_example() |> Information.resource_description()
+    request_example = resource_request_example(reqs)
+    description = Information.resource_description(request_example)
+    parameters = Formatter.resource_parameters(request_example)
 
     resource_string =
       if(is_nil(description), do: resource, else: "#{resource <> description}\n\n")
 
-    doc <> resource_string <> actions_to_string(reqs)
+    doc <> resource_string <> parameters <> actions_to_string(reqs)
   end
 
   defp resource_request_example([{_, [request | _]} | _]), do: request

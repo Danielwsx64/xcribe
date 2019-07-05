@@ -11,6 +11,26 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     "## #{resource_name} #{resource_path}\n"
   end
 
+  def resource_parameters(%{path_params: params}) when params == %{}, do: ""
+
+  def resource_parameters(%{path_params: params, path: path}) do
+    ending_arg =
+      case Regex.run(~r/{(\w*)}$/, path) do
+        [_, arg] -> arg
+        _ -> nil
+      end
+
+    params_list =
+      params
+      |> Map.delete(ending_arg)
+      |> Enum.reduce("", fn {key, value}, acc ->
+        acc <> "+ #{key}: `#{value}` (required, string) - The #{key}\n"
+      end)
+      |> ident_lines(1)
+
+    if(params_list == "", do: "", else: "+ Parameters\n\n" <> params_list)
+  end
+
   def resource_action(%{resource: resource, path: path, action: action, verb: verb}) do
     resource_name = resource |> remove_underline() |> capitalize()
     resource_path = build_path(path, verb: verb, last_argument: true)
@@ -117,7 +137,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   defp ident_lines(text, count) do
     text
     |> String.split("\n")
-    |> Enum.map(&apply_tab(&1, count))
+    |> Enum.map(fn l -> if(l == "", do: "", else: apply_tab(l, count)) end)
     |> Enum.join("\n")
   end
 

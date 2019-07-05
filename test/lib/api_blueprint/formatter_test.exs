@@ -44,6 +44,38 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
   end
 
+  describe "resource_parameters/1" do
+    test "format resource URI parameters" do
+      struct = %Request{
+        path_params: %{"users_id" => "1", "id" => 5},
+        path: "/users/{users_id}/posts/{id}"
+      }
+
+      assert Formatter.resource_parameters(struct) == """
+             + Parameters
+
+                 + users_id: `1` (required, string) - The users_id
+             """
+    end
+
+    test "no path paramters" do
+      struct = %Request{
+        path_params: %{}
+      }
+
+      assert Formatter.resource_parameters(struct) == ""
+    end
+
+    test "with endind param" do
+      struct = %Request{
+        path_params: %{"id" => 1},
+        path: "/posts/{id}"
+      }
+
+      assert Formatter.resource_parameters(struct) == ""
+    end
+  end
+
   describe "resource_action/1" do
     test "return formatted resource action" do
       struct = %Request{resource: "users", path: "/users", action: "index", verb: "get"}
