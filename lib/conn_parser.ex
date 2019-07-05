@@ -8,7 +8,7 @@ defmodule Xcribe.ConnParser do
     %Request{
       action: Atom.to_string(route.opts),
       header_params: conn.req_headers,
-      controller: conn |> controller_module() |> Atom.to_string(),
+      controller: conn |> controller_module(),
       description: description,
       params: conn.params,
       path: path,

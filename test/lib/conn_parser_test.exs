@@ -12,7 +12,7 @@ defmodule Xcribe.ConnParserTest do
 
       assert ConnParser.execute(conn) == %Request{
                action: "index",
-               controller: "Elixir.Xcribe.UsersController",
+               controller: Elixir.Xcribe.UsersController,
                description: "sample request",
                header_params: [{"authorization", "token"}],
                params: %{},
@@ -42,7 +42,7 @@ defmodule Xcribe.ConnParserTest do
 
       assert ConnParser.execute(conn, description) == %Request{
                action: "index",
-               controller: "Elixir.Xcribe.UsersController",
+               controller: Elixir.Xcribe.UsersController,
                description: description,
                header_params: [{"authorization", "token"}],
                params: %{},
@@ -70,7 +70,7 @@ defmodule Xcribe.ConnParserTest do
 
       assert ConnParser.execute(conn) == %Xcribe.Request{
                action: "cancel",
-               controller: "Elixir.Xcribe.UsersController",
+               controller: Elixir.Xcribe.UsersController,
                description: "sample request",
                header_params: [{"authorization", "token"}],
                params: %{"users_id" => "1"},
@@ -97,7 +97,7 @@ defmodule Xcribe.ConnParserTest do
 
       assert ConnParser.execute(conn) == %Request{
                action: "show",
-               controller: "Elixir.Xcribe.UsersController",
+               controller: Elixir.Xcribe.UsersController,
                description: "sample request",
                header_params: [{"authorization", "token"}],
                params: %{"id" => "1"},
@@ -125,7 +125,7 @@ defmodule Xcribe.ConnParserTest do
 
       assert ConnParser.execute(conn) == %Request{
                action: "create",
-               controller: "Elixir.Xcribe.UsersController",
+               controller: Elixir.Xcribe.UsersController,
                description: "sample request",
                header_params: [
                  {"authorization", "token"},
@@ -156,7 +156,7 @@ defmodule Xcribe.ConnParserTest do
 
       assert ConnParser.execute(conn) == %Request{
                action: "update",
-               controller: "Elixir.Xcribe.UsersController",
+               controller: Elixir.Xcribe.UsersController,
                description: "sample request",
                header_params: [
                  {"authorization", "token"},
@@ -187,7 +187,7 @@ defmodule Xcribe.ConnParserTest do
 
       assert ConnParser.execute(conn) == %Request{
                action: "update",
-               controller: "Elixir.Xcribe.UsersController",
+               controller: Elixir.Xcribe.UsersController,
                description: "sample request",
                header_params: [
                  {"authorization", "token"},
@@ -218,7 +218,7 @@ defmodule Xcribe.ConnParserTest do
 
       assert ConnParser.execute(conn) == %Request{
                action: "delete",
-               controller: "Elixir.Xcribe.UsersController",
+               controller: Elixir.Xcribe.UsersController,
                description: "sample request",
                header_params: [{"authorization", "token"}],
                params: %{"id" => "1"},
@@ -243,7 +243,7 @@ defmodule Xcribe.ConnParserTest do
 
       assert ConnParser.execute(conn) == %Request{
                action: "index",
-               controller: "Elixir.Xcribe.PostsController",
+               controller: Elixir.Xcribe.PostsController,
                description: "sample request",
                header_params: [{"authorization", "token"}],
                params: %{"users_id" => "1"},
@@ -271,7 +271,7 @@ defmodule Xcribe.ConnParserTest do
 
       assert ConnParser.execute(conn) == %Request{
                action: "create",
-               controller: "Elixir.Xcribe.PostsController",
+               controller: Elixir.Xcribe.PostsController,
                description: "sample request",
                header_params: [
                  {"authorization", "token"},
@@ -302,7 +302,7 @@ defmodule Xcribe.ConnParserTest do
 
       assert ConnParser.execute(conn) == %Request{
                action: "update",
-               controller: "Elixir.Xcribe.PostsController",
+               controller: Elixir.Xcribe.PostsController,
                description: "sample request",
                header_params: [
                  {"authorization", "token"},
@@ -333,7 +333,7 @@ defmodule Xcribe.ConnParserTest do
 
       assert ConnParser.execute(conn) == %Request{
                action: "update",
-               controller: "Elixir.Xcribe.PostsController",
+               controller: Elixir.Xcribe.PostsController,
                description: "sample request",
                header_params: [
                  {"authorization", "token"},

@@ -6,7 +6,7 @@ defmodule Xcribe.RequestsExamples do
       @sample_requests [
         %Request{
           action: "index",
-          controller: "Elixir.Xcribe.UsersController",
+          controller: Elixir.Xcribe.UsersController,
           description: "get all users",
           header_params: [{"authorization", "token"}],
           params: %{},
@@ -26,7 +26,7 @@ defmodule Xcribe.RequestsExamples do
         },
         %Request{
           action: "create",
-          controller: "Elixir.Xcribe.UsersController",
+          controller: Elixir.Xcribe.UsersController,
           description: "create an user",
           header_params: [
             {"authorization", "token"},
@@ -49,7 +49,7 @@ defmodule Xcribe.RequestsExamples do
         },
         %Request{
           action: "index",
-          controller: "Elixir.Xcribe.PostsController",
+          controller: Elixir.Xcribe.PostsController,
           description: "get all user posts",
           header_params: [{"authorization", "token"}],
           params: %{"users_id" => "1"},
@@ -69,7 +69,7 @@ defmodule Xcribe.RequestsExamples do
         },
         %Request{
           action: "index",
-          controller: "Elixir.Xcribe.MonitoringController",
+          controller: Elixir.Xcribe.MonitoringController,
           description: "get monitoring info",
           header_params: [{"authorization", "token"}],
           params: %{},
@@ -97,7 +97,7 @@ defmodule Xcribe.RequestsExamples do
                [
                  %Request{
                    action: "index",
-                   controller: "Elixir.Xcribe.PostsController",
+                   controller: Elixir.Xcribe.PostsController,
                    description: "get all user posts",
                    header_params: [{"authorization", "token"}],
                    params: %{"users_id" => "1"},
@@ -123,7 +123,7 @@ defmodule Xcribe.RequestsExamples do
                [
                  %Request{
                    action: "create",
-                   controller: "Elixir.Xcribe.UsersController",
+                   controller: Elixir.Xcribe.UsersController,
                    description: "create an user",
                    header_params: [
                      {"authorization", "token"},
@@ -149,7 +149,7 @@ defmodule Xcribe.RequestsExamples do
                [
                  %Request{
                    action: "index",
-                   controller: "Elixir.Xcribe.UsersController",
+                   controller: Elixir.Xcribe.UsersController,
                    description: "get all users",
                    header_params: [{"authorization", "token"}],
                    params: %{},
@@ -178,7 +178,7 @@ defmodule Xcribe.RequestsExamples do
                [
                  %Request{
                    action: "index",
-                   controller: "Elixir.Xcribe.MonitoringController",
+                   controller: Elixir.Xcribe.MonitoringController,
                    description: "get monitoring info",
                    header_params: [{"authorization", "token"}],
                    params: %{},

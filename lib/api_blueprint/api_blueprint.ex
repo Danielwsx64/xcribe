@@ -1,5 +1,6 @@
 defmodule Xcribe.ApiBlueprint do
   alias Xcribe.ApiBlueprint.Formatter
+  alias Xcribe.Information
 
   def generate_doc(requests) do
     requests
@@ -23,17 +24,34 @@ defmodule Xcribe.ApiBlueprint do
 
   defp resource_to_string(resources) do
     resources
-    |> Enum.reduce("", fn {resource, reqs}, acc ->
-      acc <> resource <> actions_to_string(reqs)
-    end)
+    |> Enum.reduce("", &resource_reducer/2)
   end
+
+  defp resource_reducer({resource, reqs}, doc) do
+    description = reqs |> resource_request_example() |> Information.resource_description()
+
+    resource_string =
+      if(is_nil(description), do: resource, else: "#{resource <> description}\n\n")
+
+    doc <> resource_string <> actions_to_string(reqs)
+  end
+
+  defp resource_request_example([{_, [request | _]} | _]), do: request
 
   defp actions_to_string(actions) do
     actions
-    |> Enum.reduce("", fn {action, reqs}, acc ->
-      acc <> action <> action_requests_to_string(reqs)
-    end)
+    |> Enum.reduce("", &action_reducer/2)
   end
+
+  defp action_reducer({action, reqs}, doc) do
+    description = reqs |> action_request_example() |> Information.action_description()
+
+    action_string = if(is_nil(description), do: action, else: "#{action <> description}\n\n")
+
+    doc <> action_string <> action_requests_to_string(reqs)
+  end
+
+  defp action_request_example([request | _]), do: request
 
   defp action_requests_to_string(requests) do
     requests
