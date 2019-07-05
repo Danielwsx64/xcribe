@@ -91,9 +91,9 @@ defmodule Xcribe.RequestsExamples do
       @grouped_sample_requests [
         {"## Group API\n",
          [
-           {"## Users Posts [/users/{users_id}/posts/]\n",
+           {"## Users Posts [/users/{usersId}/posts/]\n",
             [
-              {"### Users Posts show [GET /users/{users_id}/posts/{id}/]\n",
+              {"### Users Posts show [GET /users/{usersId}/posts/{id}/]\n",
                [
                  %Request{
                    action: "show",
@@ -202,11 +202,11 @@ defmodule Xcribe.RequestsExamples do
 
       @sample_requests_as_string """
       ## Group API
-      ## Users Posts [/users/{users_id}/posts/]
+      ## Users Posts [/users/{usersId}/posts/]
       + Parameters
 
-          + users_id: `1` (required, string) - The users_id
-      ### Users Posts show [GET /users/{users_id}/posts/{id}/]
+          + usersId: `1` (required, string) - The users_id
+      ### Users Posts show [GET /users/{usersId}/posts/{id}/]
       + Parameters
 
           + id: `2` (required, string) - The id

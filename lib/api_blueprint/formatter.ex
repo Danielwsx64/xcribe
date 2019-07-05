@@ -85,7 +85,8 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     params_list =
       params
       |> Enum.reduce("", fn {key, value}, acc ->
-        acc <> "+ #{key}: `#{value}` (required, string) - The #{key}\n"
+        param = Macro.camelize("+ " <> key)
+        acc <> "#{param}: `#{value}` (required, string) - The #{key}\n"
       end)
       |> ident_lines(1)
 
@@ -134,6 +135,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     path
     |> add_forward_slash()
     |> remove_ending_argument(!last_argument)
+    |> camelize_params()
     |> into_brackets(verb)
   end
 
@@ -150,6 +152,16 @@ defmodule Xcribe.ApiBlueprint.Formatter do
       nil -> path
       [capture | _] -> String.replace(path, capture, "")
     end
+  end
+
+  defp camelize_params(path) do
+    ~r/({\w*})/
+    |> Regex.run(path)
+    |> case do
+      nil -> []
+      p -> Enum.uniq(p)
+    end
+    |> Enum.reduce(path, fn param, text -> String.replace(text, param, Macro.camelize(param)) end)
   end
 
   defp clean_description(description) do

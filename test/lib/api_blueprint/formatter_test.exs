@@ -42,6 +42,12 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
       assert Formatter.resource(struct) == "## Users Posts [/users/{id}/posts/]\n"
     end
+
+    test "camelize params" do
+      struct = %Request{resource: "users", path: "/users/{user_id}/posts/{post_id}"}
+
+      assert Formatter.resource(struct) == "## Users [/users/{userId}/posts/]\n"
+    end
   end
 
   describe "resource_parameters/1" do
@@ -54,7 +60,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       assert Formatter.resource_parameters(struct) == """
              + Parameters
 
-                 + users_id: `1` (required, string) - The users_id
+                 + usersId: `1` (required, string) - The users_id
              """
     end
 
@@ -100,6 +106,18 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
       assert Formatter.resource_action(struct) == "### Users Posts new index [GET /users/]\n"
     end
+
+    test "camelize params" do
+      struct = %Request{
+        resource: "users_posts",
+        path: "/users/{user_id}/user",
+        action: "new_index",
+        verb: "get"
+      }
+
+      assert Formatter.resource_action(struct) ==
+               "### Users Posts new index [GET /users/{userId}/user/]\n"
+    end
   end
 
   describe "action_parameters/1" do
@@ -113,6 +131,19 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
              + Parameters
 
                  + id: `5` (required, string) - The id
+             """
+    end
+
+    test "camelize param" do
+      struct = %Request{
+        path_params: %{"users_id" => "1", "user_id" => 5},
+        path: "/users/{users_id}/posts/{user_id}"
+      }
+
+      assert Formatter.action_parameters(struct) == """
+             + Parameters
+
+                 + userId: `5` (required, string) - The user_id
              """
     end
 
