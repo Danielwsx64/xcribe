@@ -20,15 +20,24 @@ defmodule Xcribe.ApiBlueprint.Formatter do
         _ -> nil
       end
 
+    params
+    |> Map.delete(ending_arg)
+    |> format_parameters()
+  end
+
+  def action_parameters(%{path_params: params}), do: format_parameters(params)
+
+  defp format_parameters(params) when params == %{}, do: ""
+
+  defp format_parameters(params) do
     params_list =
       params
-      |> Map.delete(ending_arg)
       |> Enum.reduce("", fn {key, value}, acc ->
         acc <> "+ #{key}: `#{value}` (required, string) - The #{key}\n"
       end)
       |> ident_lines(1)
 
-    if(params_list == "", do: "", else: "+ Parameters\n\n" <> params_list)
+    "+ Parameters\n\n" <> params_list
   end
 
   def resource_action(%{resource: resource, path: path, action: action, verb: verb}) do

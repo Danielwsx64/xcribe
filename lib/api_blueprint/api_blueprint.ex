@@ -46,11 +46,13 @@ defmodule Xcribe.ApiBlueprint do
   end
 
   defp action_reducer({action, reqs}, doc) do
-    description = reqs |> action_request_example() |> Information.action_description()
+    request_example = action_request_example(reqs)
+    description = request_example |> Information.action_description()
+    parameters = Formatter.action_parameters(request_example)
 
     action_string = if(is_nil(description), do: action, else: "#{action <> description}\n\n")
 
-    doc <> action_string <> action_requests_to_string(reqs)
+    doc <> action_string <> parameters <> action_requests_to_string(reqs)
   end
 
   defp action_request_example([request | _]), do: request

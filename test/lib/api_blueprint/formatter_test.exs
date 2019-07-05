@@ -102,6 +102,27 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
   end
 
+  describe "action_parameters/1" do
+    test "format action URI parameters" do
+      struct = %Request{
+        path_params: %{"users_id" => "1", "id" => 5}
+      }
+
+      assert Formatter.action_parameters(struct) == """
+             + Parameters
+
+                 + id: `5` (required, string) - The id
+                 + users_id: `1` (required, string) - The users_id
+             """
+    end
+
+    test "with no parameters" do
+      struct = %Request{path_params: %{}}
+
+      assert Formatter.action_parameters(struct) == ""
+    end
+  end
+
   describe "request_description/1" do
     test "return formatted request description" do
       struct = %Request{description: "create user with token"}

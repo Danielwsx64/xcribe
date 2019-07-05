@@ -48,18 +48,18 @@ defmodule Xcribe.RequestsExamples do
           verb: "post"
         },
         %Request{
-          action: "index",
+          action: "show",
           controller: Elixir.Xcribe.PostsController,
           description: "get all user posts",
           header_params: [{"authorization", "token"}],
           params: %{"users_id" => "1"},
-          path: "/users/{users_id}/posts",
-          path_params: %{"users_id" => "1"},
+          path: "/users/{users_id}/posts/{id}",
+          path_params: %{"users_id" => "1", "id" => "2"},
           query_params: %{},
           request_body: %{},
           resource: "users_posts",
           resource_group: :api,
-          resp_body: "[{\"id\":1,\"title\":\"user 1\"},{\"id\":2,\"title\":\"user 2\"}]",
+          resp_body: "{\"id\":1,\"title\":\"user 1\"}",
           resp_headers: [
             {"content-type", "application/json; charset=utf-8"},
             {"cache-control", "max-age=0, private, must-revalidate"}
@@ -93,21 +93,21 @@ defmodule Xcribe.RequestsExamples do
          [
            {"## Users Posts [/users/{users_id}/posts/]\n",
             [
-              {"### Users Posts index [GET /users/{users_id}/posts/]\n",
+              {"### Users Posts show [GET /users/{users_id}/posts/{id}/]\n",
                [
                  %Request{
-                   action: "index",
+                   action: "show",
                    controller: Elixir.Xcribe.PostsController,
                    description: "get all user posts",
                    header_params: [{"authorization", "token"}],
                    params: %{"users_id" => "1"},
-                   path: "/users/{users_id}/posts",
-                   path_params: %{"users_id" => "1"},
+                   path: "/users/{users_id}/posts/{id}",
+                   path_params: %{"users_id" => "1", "id" => "2"},
                    query_params: %{},
                    request_body: %{},
                    resource: "users_posts",
                    resource_group: :api,
-                   resp_body: "[{\"id\":1,\"title\":\"user 1\"},{\"id\":2,\"title\":\"user 2\"}]",
+                   resp_body: "{\"id\":1,\"title\":\"user 1\"}",
                    resp_headers: [
                      {"content-type", "application/json; charset=utf-8"},
                      {"cache-control", "max-age=0, private, must-revalidate"}
@@ -206,7 +206,11 @@ defmodule Xcribe.RequestsExamples do
       + Parameters
 
           + users_id: `1` (required, string) - The users_id
-      ### Users Posts index [GET /users/{users_id}/posts/]
+      ### Users Posts show [GET /users/{users_id}/posts/{id}/]
+      + Parameters
+
+          + id: `2` (required, string) - The id
+          + users_id: `1` (required, string) - The users_id
       + Request get all user posts (text/plain)
           + Headers
 
@@ -218,16 +222,10 @@ defmodule Xcribe.RequestsExamples do
                   cache-control: max-age=0, private, must-revalidate
           + Body
 
-                  [
-                    {
-                      "id": 1,
-                      "title": "user 1"
-                    },
-                    {
-                      "id": 2,
-                      "title": "user 2"
-                    }
-                  ]
+                  {
+                    "id": 1,
+                    "title": "user 1"
+                  }
       ## Users [/users/]
       ### Users create [POST /users/]
       + Request create an user (multipart/mixed; boundary=plug_conn_test)
