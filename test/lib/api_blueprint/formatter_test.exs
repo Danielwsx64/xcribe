@@ -105,15 +105,24 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   describe "action_parameters/1" do
     test "format action URI parameters" do
       struct = %Request{
-        path_params: %{"users_id" => "1", "id" => 5}
+        path_params: %{"users_id" => "1", "id" => 5},
+        path: "/users/{users_id}/posts/{id}"
       }
 
       assert Formatter.action_parameters(struct) == """
              + Parameters
 
                  + id: `5` (required, string) - The id
-                 + users_id: `1` (required, string) - The users_id
              """
+    end
+
+    test "just resource params" do
+      struct = %Request{
+        path_params: %{"users_id" => "1"},
+        path: "/users/{users_id}/posts"
+      }
+
+      assert Formatter.action_parameters(struct) == ""
     end
 
     test "with no parameters" do

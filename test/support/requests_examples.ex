@@ -210,7 +210,6 @@ defmodule Xcribe.RequestsExamples do
       + Parameters
 
           + id: `2` (required, string) - The id
-          + users_id: `1` (required, string) - The users_id
       + Request get all user posts (text/plain)
           + Headers
 

@@ -14,30 +14,19 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   def resource_parameters(%{path_params: params}) when params == %{}, do: ""
 
   def resource_parameters(%{path_params: params, path: path}) do
-    ending_arg =
-      case Regex.run(~r/{(\w*)}$/, path) do
-        [_, arg] -> arg
-        _ -> nil
-      end
-
     params
-    |> Map.delete(ending_arg)
+    |> resource_path_parameters(path)
     |> format_parameters()
   end
 
-  def action_parameters(%{path_params: params}), do: format_parameters(params)
+  def action_parameters(%{path_params: params}) when params == %{}, do: ""
 
-  defp format_parameters(params) when params == %{}, do: ""
+  def action_parameters(%{path_params: params, path: path}) do
+    resourse_params = params |> resource_path_parameters(path) |> Map.keys()
 
-  defp format_parameters(params) do
-    params_list =
-      params
-      |> Enum.reduce("", fn {key, value}, acc ->
-        acc <> "+ #{key}: `#{value}` (required, string) - The #{key}\n"
-      end)
-      |> ident_lines(1)
-
-    "+ Parameters\n\n" <> params_list
+    params
+    |> Map.drop(resourse_params)
+    |> format_parameters()
   end
 
   def resource_action(%{resource: resource, path: path, action: action, verb: verb}) do
@@ -78,6 +67,30 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   def response_description(%{status_code: code, resp_headers: headers}),
     do: "+ Response #{code} (#{find_content_type(headers)})\n"
+
+  defp resource_path_parameters(params, path) do
+    ending_arg =
+      case Regex.run(~r/{(\w*)}$/, path) do
+        [_, arg] -> arg
+        _ -> nil
+      end
+
+    params
+    |> Map.delete(ending_arg)
+  end
+
+  defp format_parameters(params) when params == %{}, do: ""
+
+  defp format_parameters(params) do
+    params_list =
+      params
+      |> Enum.reduce("", fn {key, value}, acc ->
+        acc <> "+ #{key}: `#{value}` (required, string) - The #{key}\n"
+      end)
+      |> ident_lines(1)
+
+    "+ Parameters\n\n" <> params_list
+  end
 
   defp remove_underline(text), do: String.replace(text, "_", " ")
 
