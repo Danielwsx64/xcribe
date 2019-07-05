@@ -31,4 +31,9 @@ defmodule Xcribe.UsersController do
     conn
     |> send_resp(:no_content, "")
   end
+
+  def cancel(conn, _params) do
+    conn
+    |> send_resp(:no_content, "")
+  end
 end

@@ -11,7 +11,11 @@ defmodule Xcribe.WebRouter do
     pipe_through(:api)
 
     resources("/users", UsersController) do
-      resources("/posts", PostsController)
+      post("/cancel", UsersController, :cancel, as: :cancel)
+
+      resources("/posts", PostsController) do
+        resources("/comments", PostCommentsController)
+      end
     end
   end
 end

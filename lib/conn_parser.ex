@@ -3,6 +3,7 @@ defmodule Xcribe.ConnParser do
 
   def execute(conn, description \\ "sample request") do
     route = identify_route(conn)
+    path = format_path(route.path, Map.keys(conn.path_params))
 
     %Request{
       action: Atom.to_string(route.opts),
@@ -10,11 +11,11 @@ defmodule Xcribe.ConnParser do
       controller: conn |> controller_module() |> Atom.to_string(),
       description: description,
       params: conn.params,
-      path: format_path(route.path, Map.keys(conn.path_params)),
+      path: path,
       path_params: conn.path_params,
       query_params: conn.query_params,
       request_body: conn.body_params,
-      resource: resource_name(route),
+      resource: resource_name(path, route),
       resource_group: resource_group(route),
       resp_body: conn.resp_body,
       resp_headers: conn.resp_headers,
@@ -55,10 +56,20 @@ defmodule Xcribe.ConnParser do
 
   defp resource_group(%{pipe_through: [head | _rest]}), do: head
 
+  defp resource_name(path, %{opts: opts}) do
+    action = "#{opts}"
+
+    path
+    |> String.split("/")
+    |> Enum.filter(fn item -> item != action && Regex.match?(~r/^\w+$/, item) end)
+    |> Enum.join("_")
+  end
+
   defp resource_name(%{helper: nil, plug: controller}),
     do: resource_name_by_controller(controller)
 
-  defp resource_name(%{helper: name}), do: name
+  defp resource_name(%{helper: name, opts: action}),
+    do: name |> String.replace("_#{action}", "")
 
   defp resource_name_by_controller(controller) do
     ~r/\.(\w+)Controller$/

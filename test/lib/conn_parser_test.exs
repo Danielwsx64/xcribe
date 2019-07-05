@@ -62,6 +62,33 @@ defmodule Xcribe.ConnParserTest do
              }
     end
 
+    test "custom action with custom helper name", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("authorization", "token")
+        |> post(users_cancel_path(conn, :cancel, 1))
+
+      assert ConnParser.execute(conn) == %Xcribe.Request{
+               action: "cancel",
+               controller: "Elixir.Xcribe.UsersController",
+               description: "sample request",
+               header_params: [{"authorization", "token"}],
+               params: %{"users_id" => "1"},
+               path: "/users/{users_id}/cancel",
+               path_params: %{"users_id" => "1"},
+               query_params: %{},
+               request_body: %{},
+               resource: "users",
+               resource_group: :api,
+               resp_body: "",
+               resp_headers: [
+                 {"cache-control", "max-age=0, private, must-revalidate"}
+               ],
+               status_code: 204,
+               verb: "post"
+             }
+    end
+
     test "extract request data from a show request", %{conn: conn} do
       conn =
         conn
@@ -317,7 +344,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{"id" => "2", "users_id" => "1"},
                query_params: %{},
                request_body: %{"title" => "test"},
-               resource: "posts",
+               resource: "users_posts",
                resource_group: :api,
                resp_body: "{\"title\":\"test\",\"users_id\":\"1\"}",
                resp_headers: [
