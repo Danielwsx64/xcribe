@@ -1,6 +1,5 @@
 defmodule Xcribe.ApiBlueprint do
   alias Xcribe.ApiBlueprint.Formatter
-  alias Xcribe.Information
 
   def generate_doc(requests) do
     requests
@@ -29,7 +28,7 @@ defmodule Xcribe.ApiBlueprint do
 
   defp resource_reducer({resource, reqs}, doc) do
     request_example = resource_request_example(reqs)
-    description = Information.resource_description(request_example)
+    description = resource_description(request_example)
     parameters = Formatter.resource_parameters(request_example)
 
     resource_string =
@@ -47,7 +46,7 @@ defmodule Xcribe.ApiBlueprint do
 
   defp action_reducer({action, reqs}, doc) do
     request_example = action_request_example(reqs)
-    description = request_example |> Information.action_description()
+    description = request_example |> action_description()
     parameters = Formatter.action_parameters(request_example)
 
     action_string = if(is_nil(description), do: action, else: "#{action <> description}\n\n")
@@ -85,4 +84,13 @@ defmodule Xcribe.ApiBlueprint do
       {resource_name, reqs |> Enum.group_by(&Formatter.resource_action(&1)) |> Enum.sort()}
     end)
   end
+
+  defp resource_description(%{controller: controller}),
+    do: apply(xcribe_information_source(), :resource_description, [controller])
+
+  defp action_description(%{controller: controller, action: action}),
+    do: apply(xcribe_information_source(), :action_description, [controller, action])
+
+  defp xcribe_information_source,
+    do: Application.fetch_env!(:xcribe, :information_source)
 end

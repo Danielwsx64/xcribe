@@ -26,7 +26,7 @@ defmodule Xcribe.ApiBlueprintTest do
       assert ApiBlueprint.generate_doc([]) == ""
     end
 
-    test "when controller has protocol" do
+    test "when controller has information defined" do
       requests = [
         %Request{
           action: "index",
