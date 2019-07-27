@@ -61,6 +61,25 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
              + Parameters
 
                  + usersId: `1` (required, string) - The users_id
+
+             """
+    end
+
+    test "format resource URI parameters with custom description" do
+      struct = %Request{
+        path_params: %{"users_id" => "1", "id" => 5},
+        path: "/users/{users_id}/posts/{id}"
+      }
+
+      descripitions = %{
+        "users_id" => "The user identificator"
+      }
+
+      assert Formatter.resource_parameters(struct, descripitions) == """
+             + Parameters
+
+                 + usersId: `1` (required, string) - The user identificator
+
              """
     end
 
@@ -131,6 +150,23 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
              + Parameters
 
                  + id: `5` (required, string) - The id
+
+             """
+    end
+
+    test "format action URI parameters with custom descriptions" do
+      struct = %Request{
+        path_params: %{"users_id" => "1", "id" => 5},
+        path: "/users/{users_id}/posts/{id}"
+      }
+
+      descriptions = %{"id" => "the identificator"}
+
+      assert Formatter.action_parameters(struct, descriptions) == """
+             + Parameters
+
+                 + id: `5` (required, string) - the identificator
+
              """
     end
 
@@ -144,6 +180,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
              + Parameters
 
                  + userId: `5` (required, string) - The user_id
+
              """
     end
 

@@ -11,22 +11,24 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     "## #{resource_name} #{resource_path}\n"
   end
 
-  def resource_parameters(%{path_params: params}) when params == %{}, do: ""
+  def resource_parameters(struct, descriptions \\ %{})
+  def resource_parameters(%{path_params: params}, _desc) when params == %{}, do: ""
 
-  def resource_parameters(%{path_params: params, path: path}) do
+  def resource_parameters(%{path_params: params, path: path}, desc) do
     params
     |> resource_path_parameters(path)
-    |> format_parameters()
+    |> format_parameters(desc)
   end
 
-  def action_parameters(%{path_params: params}) when params == %{}, do: ""
+  def action_parameters(struct, descriptions \\ %{})
+  def action_parameters(%{path_params: params}, _desc) when params == %{}, do: ""
 
-  def action_parameters(%{path_params: params, path: path}) do
+  def action_parameters(%{path_params: params, path: path}, desc) do
     resourse_params = params |> resource_path_parameters(path) |> Map.keys()
 
     params
     |> Map.drop(resourse_params)
-    |> format_parameters()
+    |> format_parameters(desc)
   end
 
   def resource_action(%{resource: resource, path: path, action: action, verb: verb}) do
@@ -79,18 +81,19 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     |> Map.delete(ending_arg)
   end
 
-  defp format_parameters(params) when params == %{}, do: ""
+  defp format_parameters(params, descriptions \\ %{})
+  defp format_parameters(params, _desc) when params == %{}, do: ""
 
-  defp format_parameters(params) do
+  defp format_parameters(params, desc) do
     params_list =
       params
       |> Enum.reduce("", fn {key, value}, acc ->
         param = Macro.camelize("+ " <> key)
-        acc <> "#{param}: `#{value}` (required, string) - The #{key}\n"
+        acc <> "#{param}: `#{value}` (required, string) - #{fetch_key(desc, key, "The #{key}")}\n"
       end)
       |> ident_lines(1)
 
-    "+ Parameters\n\n" <> params_list
+    "+ Parameters\n\n" <> params_list <> "\n"
   end
 
   defp remove_underline(text), do: String.replace(text, "_", " ")
@@ -192,4 +195,11 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   defp format_body(body),
     do: body |> JSON.encode!(pretty: true) |> ident_lines(3)
+
+  defp fetch_key(map, key, default) do
+    case Map.fetch(map, key) do
+      {:ok, value} -> value
+      _ -> default
+    end
+  end
 end

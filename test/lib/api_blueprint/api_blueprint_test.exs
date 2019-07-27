@@ -29,13 +29,13 @@ defmodule Xcribe.ApiBlueprintTest do
     test "when controller has information defined" do
       requests = [
         %Request{
-          action: "index",
+          action: "show",
           controller: Elixir.Xcribe.ProtocolsController,
-          description: "index of protocols",
+          description: "show the protocol",
           header_params: [{"authorization", "token"}],
           params: %{},
-          path: "/protocols",
-          path_params: %{},
+          path: "server/{server_id}/protocols/{id}",
+          path_params: %{"id" => 90, "server_id" => 88},
           query_params: %{},
           request_body: %{},
           resource: "protocols",
@@ -51,13 +51,21 @@ defmodule Xcribe.ApiBlueprintTest do
 
       assert ApiBlueprint.generate_doc(requests) == """
              ## Group API
-             ## Protocols [/protocols/]
+             ## Protocols [server/{serverId}/protocols/]
              Application protocols is a awesome feature of our app
 
-             ### Protocols index [GET /protocols/]
-             You can get all protocols with index action
+             + Parameters
 
-             + Request index of protocols (text/plain)
+                 + serverId: `88` (required, string) - The id number of the server
+
+             ### Protocols show [GET server/{serverId}/protocols/{id}/]
+             You can show a protocol with show action
+
+             + Parameters
+
+                 + id: `90` (required, string) - The id
+
+             + Request show the protocol (text/plain)
                  + Headers
 
                          authorization: token

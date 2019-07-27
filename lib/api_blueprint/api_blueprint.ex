@@ -29,7 +29,9 @@ defmodule Xcribe.ApiBlueprint do
   defp resource_reducer({resource, reqs}, doc) do
     request_example = resource_request_example(reqs)
     description = resource_description(request_example)
-    parameters = Formatter.resource_parameters(request_example)
+
+    parameters =
+      Formatter.resource_parameters(request_example, resource_parameters(request_example))
 
     resource_string =
       if(is_nil(description), do: resource, else: "#{resource <> description}\n\n")
@@ -87,6 +89,9 @@ defmodule Xcribe.ApiBlueprint do
 
   defp resource_description(%{controller: controller}),
     do: apply(xcribe_information_source(), :resource_description, [controller])
+
+  defp resource_parameters(%{controller: controller}),
+    do: apply(xcribe_information_source(), :resource_parameters, [controller])
 
   defp action_description(%{controller: controller, action: action}),
     do: apply(xcribe_information_source(), :action_description, [controller, action])

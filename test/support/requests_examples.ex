@@ -206,10 +206,12 @@ defmodule Xcribe.RequestsExamples do
       + Parameters
 
           + usersId: `1` (required, string) - The users_id
+
       ### Users Posts show [GET /users/{usersId}/posts/{id}/]
       + Parameters
 
           + id: `2` (required, string) - The id
+
       + Request get all user posts (text/plain)
           + Headers
 
