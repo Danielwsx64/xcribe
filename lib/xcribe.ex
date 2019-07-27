@@ -1,11 +1,18 @@
 defmodule Xcribe do
+  @moduledoc """
+  This is the documentation for te XCribe Project
+
+  XCribe was built to generate API documentation for your app tests.
+  """
   use Application
 
+  @doc false
   def start(_type, _opts) do
     opts = [strategy: :one_for_one, name: Xcribe.Supervisor]
     Supervisor.start_link(children(), opts)
   end
 
+  @doc false
   def start(_options \\ []) do
     {:ok, _} = Application.start(:xcribe)
 
@@ -15,8 +22,6 @@ defmodule Xcribe do
   defp children do
     import Supervisor.Spec
 
-    [
-      worker(Xcribe.Recorder, [])
-    ]
+    [worker(Xcribe.Recorder, [])]
   end
 end
