@@ -39,12 +39,11 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     "### #{resource_name} #{resource_action} #{resource_path}\n"
   end
 
-  def full_request(struct) do
+  def full_request(struct, desc \\ %{}) do
     [
       request_description(struct),
       request_headers(struct),
-      request_body(struct),
-      "\n",
+      request_attributes(struct, desc),
       response_description(struct),
       response_headers(struct),
       response_body(struct)
@@ -64,6 +63,10 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   def request_body(%{request_body: body}) when body == %{}, do: ""
   def request_body(%{request_body: body}), do: body_section(body)
 
+  def request_attributes(structs, descriptions \\ %{})
+  def request_attributes(%{request_body: body}, _desc) when body == %{}, do: ""
+  def request_attributes(%{request_body: body}, desc), do: attributes_section(body, desc)
+
   def response_body(%{resp_body: body}) when body == %{}, do: ""
   def response_body(%{resp_body: body}), do: body_section(body)
 
@@ -81,16 +84,12 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     |> Map.delete(ending_arg)
   end
 
-  defp format_parameters(params, descriptions \\ %{})
   defp format_parameters(params, _desc) when params == %{}, do: ""
 
   defp format_parameters(params, desc) do
     params_list =
       params
-      |> Enum.reduce("", fn {key, value}, acc ->
-        param = Macro.camelize("+ " <> key)
-        acc <> "#{param}: `#{value}` (required, string) - #{fetch_key(desc, key, "The #{key}")}\n"
-      end)
+      |> define_schema(desc)
       |> ident_lines(1)
 
     "+ Parameters\n\n" <> params_list <> "\n"
@@ -112,7 +111,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     title = "+ Headers\n\n" |> apply_tab(1)
     headers = format_headers(headers)
 
-    if headers == "", do: "", else: title <> headers
+    if headers == "", do: "", else: title <> headers <> "\n"
   end
 
   def body_section(body) do
@@ -121,6 +120,36 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
     title <> body <> "\n"
   end
+
+  def attributes_section(attrs, desc) do
+    title = "+ Attributes\n\n" |> apply_tab(1)
+
+    body =
+      attrs
+      |> define_schema(desc, camelize: false, required: false, prefix: "+ ")
+      |> ident_lines(2)
+
+    title <> body <> "\n"
+  end
+
+  defp define_schema(params, desc, opts \\ []) do
+    opts = Keyword.merge([camelize: true, required: true, prefix: ""], opts)
+    camelize = Keyword.fetch!(opts, :camelize)
+    required = Keyword.fetch!(opts, :required)
+    prefix = Keyword.fetch!(opts, :prefix)
+
+    Enum.reduce(params, "", fn {key, value}, acc ->
+      param = if camelize, do: Macro.camelize("+ " <> key), else: key
+      type = if required, do: "required, #{type_of(value)}", else: "#{type_of(value)}"
+      description = fetch_key(desc, key, "The #{key}")
+
+      acc <> "#{prefix}#{param}: `#{value}` (#{type}) - #{description}\n"
+    end)
+  end
+
+  defp type_of(item) when is_number(item), do: "number"
+  defp type_of(item) when is_binary(item), do: "string"
+  defp type_of(item) when is_boolean(item), do: "boolean"
 
   defp capitalize(string) do
     string

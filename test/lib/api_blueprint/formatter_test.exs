@@ -149,7 +149,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       assert Formatter.action_parameters(struct) == """
              + Parameters
 
-                 + id: `5` (required, string) - The id
+                 + id: `5` (required, number) - The id
 
              """
     end
@@ -165,7 +165,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       assert Formatter.action_parameters(struct, descriptions) == """
              + Parameters
 
-                 + id: `5` (required, string) - the identificator
+                 + id: `5` (required, number) - the identificator
 
              """
     end
@@ -179,7 +179,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       assert Formatter.action_parameters(struct) == """
              + Parameters
 
-                 + userId: `5` (required, string) - The user_id
+                 + userId: `5` (required, number) - The user_id
 
              """
     end
@@ -242,6 +242,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                  + Headers
 
                          authorization: token
+
              """
     end
 
@@ -289,6 +290,46 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
   end
 
+  describe "request_attributes" do
+    test "return formatted request attributes" do
+      struct = %Request{
+        request_body: %{"age" => 5, "name" => "teste"}
+      }
+
+      assert Formatter.request_attributes(struct) == """
+                 + Attributes
+
+                     + age: `5` (number) - The age
+                     + name: `teste` (string) - The name
+
+             """
+    end
+
+    test "return formatted request attributes with custom descriptions" do
+      struct = %Request{
+        request_body: %{"age" => 5, "name" => "teste"}
+      }
+
+      descriptions = %{"age" => "the user age", "name" => "is the full name of the user"}
+
+      assert Formatter.request_attributes(struct, descriptions) == """
+                 + Attributes
+
+                     + age: `5` (number) - the user age
+                     + name: `teste` (string) - is the full name of the user
+
+             """
+    end
+
+    test "return empty string when no body" do
+      struct = %Request{
+        request_body: %{}
+      }
+
+      assert Formatter.request_attributes(struct) == ""
+    end
+  end
+
   describe "response_description/1" do
     test "return formatted response description" do
       struct = %Request{
@@ -323,6 +364,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                  + Headers
 
                          authorization: token
+
              """
     end
 
@@ -393,17 +435,61 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                  + Headers
 
                          authorization: token
+
+                 + Attributes
+
+                     + age: `5` (number) - The age
+                     + name: `teste` (string) - The name
+
+             + Response 201 (application/json; charset=utf-8)
+                 + Headers
+
+                         cache-control: max-age=0, private, must-revalidate
+
                  + Body
 
                          {
                            "age": 5,
                            "name": "teste"
                          }
+             """
+    end
+
+    test "return full request with descriptions" do
+      struct = %Request{
+        description: "create an user",
+        header_params: [
+          {"authorization", "token"},
+          {"content-type", "multipart/mixed; boundary=plug_conn_test"}
+        ],
+        params: %{"age" => 5, "name" => "teste"},
+        request_body: %{"age" => 5, "name" => "teste"},
+        resp_body: "{\"age\":5,\"name\":\"teste\"}",
+        resp_headers: [
+          {"content-type", "application/json; charset=utf-8"},
+          {"cache-control", "max-age=0, private, must-revalidate"}
+        ],
+        status_code: 201
+      }
+
+      descriptions = %{"age" => "the user age", "name" => "is the full name of the user"}
+
+      assert Formatter.full_request(struct, descriptions) == """
+             + Request create an user (multipart/mixed; boundary=plug_conn_test)
+                 + Headers
+
+                         authorization: token
+
+                 + Attributes
+
+                     + age: `5` (number) - the user age
+                     + name: `teste` (string) - is the full name of the user
 
              + Response 201 (application/json; charset=utf-8)
                  + Headers
 
                          cache-control: max-age=0, private, must-revalidate
+
                  + Body
 
                          {

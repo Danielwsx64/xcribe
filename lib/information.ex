@@ -11,16 +11,20 @@ defmodule Xcribe.Information do
     resource_desc = fetch_information(information, :description)
     actions = fetch_information(information, :actions, [])
     parameters = information |> fetch_information(:parameters, []) |> stringfy_keys()
+    attributes = information |> fetch_information(:attributes, []) |> stringfy_keys()
 
     quote bind_quoted: [
             actions: actions,
             controller: controller,
             resource_desc: resource_desc,
-            parameters: parameters
+            parameters: parameters,
+            attributes: attributes
           ] do
       def resource_description(unquote(controller)), do: unquote(resource_desc)
 
       def resource_parameters(unquote(controller)), do: Map.new(unquote(parameters))
+
+      def resource_attributes(unquote(controller)), do: Map.new(unquote(attributes))
 
       actions
       |> Enum.each(fn {action, action_info} ->
@@ -31,8 +35,12 @@ defmodule Xcribe.Information do
         def action_description(unquote(controller), unquote(action_name)),
           do: unquote(action_desc)
 
-        def action_parameters(unquote(controller), unquote(action_name)),
-          do: Map.new(unquote(action_params))
+        def action_parameters(unquote(controller), unquote(action_name)) do
+          Map.merge(
+            resource_parameters(unquote(controller)),
+            Map.new(unquote(action_params))
+          )
+        end
       end)
     end
   end
@@ -41,8 +49,9 @@ defmodule Xcribe.Information do
     quote do
       def resource_description(_), do: nil
       def resource_parameters(_), do: %{}
+      def resource_attributes(_), do: %{}
       def action_description(_, _), do: nil
-      def action_parameters(_, _), do: %{}
+      def action_parameters(controller, _), do: resource_parameters(controller)
     end
   end
 

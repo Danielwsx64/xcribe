@@ -5,6 +5,11 @@ defmodule Xcribe.Support.Information do
     description("Application protocols is a awesome feature of our app")
     parameters(server_id: "The id number of the server")
 
+    attributes(
+      name: "The protocol full name",
+      priority: "the priority of the protocol. It could be 0 or 1"
+    )
+
     actions(
       show: [
         description: "You can show a protocol with show action",

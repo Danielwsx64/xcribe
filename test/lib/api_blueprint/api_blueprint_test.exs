@@ -46,8 +46,29 @@ defmodule Xcribe.ApiBlueprintTest do
           ],
           status_code: 200,
           verb: "get"
+        },
+        %Request{
+          action: "create",
+          controller: Elixir.Xcribe.ProtocolsController,
+          description: "create the protocol",
+          header_params: [{"authorization", "token"}],
+          params: %{"name" => "zelda", "server_id" => 88, "priority" => 0},
+          path: "server/{server_id}/protocols",
+          path_params: %{"server_id" => 88},
+          query_params: %{},
+          request_body: %{"name" => "zelda", "priority" => 0},
+          resource: "protocols",
+          resource_group: :api,
+          resp_body: "{\"id\":2,\"name\":\"user 2\"}",
+          resp_headers: [
+            {"content-type", "application/json"}
+          ],
+          status_code: 201,
+          verb: "post"
         }
       ]
+
+      # assert ApiBlueprint.generate_doc(requests) == ""
 
       assert ApiBlueprint.generate_doc(requests) == """
              ## Group API
@@ -56,14 +77,32 @@ defmodule Xcribe.ApiBlueprintTest do
 
              + Parameters
 
-                 + serverId: `88` (required, string) - The id number of the server
+                 + serverId: `88` (required, number) - The id number of the server
 
+             ### Protocols create [POST server/{serverId}/protocols/]
+             + Request create the protocol (text/plain)
+                 + Headers
+
+                         authorization: token
+
+                 + Attributes
+
+                     + name: `zelda` (string) - The protocol full name
+                     + priority: `0` (number) - the priority of the protocol. It could be 0 or 1
+
+             + Response 201 (application/json)
+                 + Body
+
+                         {
+                           "id": 2,
+                           "name": "user 2"
+                         }
              ### Protocols show [GET server/{serverId}/protocols/{id}/]
              You can show a protocol with show action
 
              + Parameters
 
-                 + id: `90` (required, string) - The id
+                 + id: `90` (required, number) - The id
 
              + Request show the protocol (text/plain)
                  + Headers

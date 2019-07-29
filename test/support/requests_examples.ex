@@ -221,6 +221,7 @@ defmodule Xcribe.RequestsExamples do
           + Headers
 
                   cache-control: max-age=0, private, must-revalidate
+
           + Body
 
                   {
@@ -233,17 +234,17 @@ defmodule Xcribe.RequestsExamples do
           + Headers
 
                   authorization: token
-          + Body
 
-                  {
-                    "age": 5,
-                    "name": "teste"
-                  }
+          + Attributes
+
+              + age: `5` (number) - The age
+              + name: `teste` (string) - The name
 
       + Response 201 (application/json; charset=utf-8)
           + Headers
 
                   cache-control: max-age=0, private, must-revalidate
+
           + Body
 
                   {
@@ -260,6 +261,7 @@ defmodule Xcribe.RequestsExamples do
           + Headers
 
                   cache-control: max-age=0, private, must-revalidate
+
           + Body
 
                   [

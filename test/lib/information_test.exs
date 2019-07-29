@@ -4,8 +4,15 @@ defmodule Xcribe.ModuleExample do
   xcribe_info Xcribe.FakeController do
     description("some cool description")
     parameters(id: "This is the user id", tag: "a usefull tag")
+    attributes(name: "the protocol name", priority: "the priority of the protocol")
 
-    actions(index: [description: "other cool description", parameters: [value: "some value"]])
+    actions(
+      index: [
+        description: "other cool description",
+        parameters: [value: "some value", id: "This is the action id"]
+      ]
+    )
+
     actions(create: [parameters: [key: "key value"]])
     actions(update: [description: "update description"])
   end
@@ -38,6 +45,19 @@ defmodule Xcribe.InformationTest do
     end
   end
 
+  describe "resource_attributes/1" do
+    test "return description" do
+      assert ModuleExample.resource_attributes(Xcribe.FakeController) == %{
+               "name" => "the protocol name",
+               "priority" => "the priority of the protocol"
+             }
+    end
+
+    test "unknow controller" do
+      assert ModuleExample.resource_attributes(Xcribe.UnknowController) == %{}
+    end
+  end
+
   describe "action_description/2" do
     test "return description" do
       assert ModuleExample.action_description(Xcribe.FakeController, "index") ==
@@ -58,18 +78,26 @@ defmodule Xcribe.InformationTest do
   end
 
   describe "action_parameters/2" do
-    test "return description" do
+    test "return action parameters merged with controller parameters" do
       assert ModuleExample.action_parameters(Xcribe.FakeController, "index") == %{
-               "value" => "some value"
+               "value" => "some value",
+               "id" => "This is the action id",
+               "tag" => "a usefull tag"
              }
     end
 
-    test "action with no defined params" do
-      assert ModuleExample.action_parameters(Xcribe.FakeController, "update") == %{}
+    test "action with no defined params return just the controller parameters" do
+      assert ModuleExample.action_parameters(Xcribe.FakeController, "update") == %{
+               "id" => "This is the user id",
+               "tag" => "a usefull tag"
+             }
     end
 
-    test "unknow action" do
-      assert ModuleExample.action_parameters(Xcribe.FakeController, "invalid") == %{}
+    test "unknow action return controller parameters" do
+      assert ModuleExample.action_parameters(Xcribe.FakeController, "invalid") == %{
+               "id" => "This is the user id",
+               "tag" => "a usefull tag"
+             }
     end
 
     test "unknow controller" do

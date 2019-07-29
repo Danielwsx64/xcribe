@@ -61,7 +61,9 @@ defmodule Xcribe.ApiBlueprint do
   defp action_requests_to_string(requests) do
     requests
     |> Enum.reduce("", fn req, acc ->
-      acc <> Formatter.full_request(req)
+      attributes = resource_attributes(req)
+
+      acc <> Formatter.full_request(req, attributes)
     end)
   end
 
@@ -92,6 +94,9 @@ defmodule Xcribe.ApiBlueprint do
 
   defp resource_parameters(%{controller: controller}),
     do: apply(xcribe_information_source(), :resource_parameters, [controller])
+
+  defp resource_attributes(%{controller: controller}),
+    do: apply(xcribe_information_source(), :resource_attributes, [controller])
 
   defp action_description(%{controller: controller, action: action}),
     do: apply(xcribe_information_source(), :action_description, [controller, action])
