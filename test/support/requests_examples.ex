@@ -201,6 +201,12 @@ defmodule Xcribe.RequestsExamples do
       ]
 
       @sample_requests_as_string """
+      FORMAT: 1A
+      HOST: http://my-api.com
+
+      # Basic API
+      The description of the API
+
       ## Group API
       ## Users Posts [/users/{usersId}/posts/]
       + Parameters

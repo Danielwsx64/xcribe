@@ -412,6 +412,25 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
   end
 
+  describe "overview/1" do
+    test "return API overview" do
+      api_info = %{
+        description: "some cool description",
+        host: "http://my-host.com",
+        name: "The Cool API"
+      }
+
+      assert Formatter.overview(api_info) == """
+             FORMAT: 1A
+             HOST: http://my-host.com
+
+             # The Cool API
+             some cool description
+
+             """
+    end
+  end
+
   describe "full_request/1" do
     test "return full request" do
       struct = %Request{

@@ -22,8 +22,9 @@ defmodule Xcribe.ApiBlueprintTest do
       assert ApiBlueprint.generate_doc(@sample_requests) == @sample_requests_as_string
     end
 
-    test "when list is empty" do
-      assert ApiBlueprint.generate_doc([]) == ""
+    test "when list is empty just the metadata" do
+      assert ApiBlueprint.generate_doc([]) ==
+               "FORMAT: 1A\nHOST: http://my-api.com\n\n# Basic API\nThe description of the API\n\n"
     end
 
     test "when controller has information defined" do
@@ -71,6 +72,12 @@ defmodule Xcribe.ApiBlueprintTest do
       # assert ApiBlueprint.generate_doc(requests) == ""
 
       assert ApiBlueprint.generate_doc(requests) == """
+             FORMAT: 1A
+             HOST: http://my-api.com
+
+             # Basic API
+             The description of the API
+
              ## Group API
              ## Protocols [server/{serverId}/protocols/]
              Application protocols is a awesome feature of our app

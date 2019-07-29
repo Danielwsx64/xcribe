@@ -7,6 +7,22 @@ defmodule Xcribe.Information do
     end
   end
 
+  defmacro xcribe_info(do: information) do
+    name = fetch_information(information, :name, default_name())
+    description = fetch_information(information, :description, default_description())
+    host = fetch_information(information, :host, default_host())
+
+    quote bind_quoted: [description: description, host: host, name: name] do
+      def api_info do
+        %{
+          description: unquote(description),
+          host: unquote(host),
+          name: unquote(name)
+        }
+      end
+    end
+  end
+
   defmacro xcribe_info(controller, do: information) do
     resource_desc = fetch_information(information, :description)
     actions = fetch_information(information, :actions, [])
@@ -52,6 +68,14 @@ defmodule Xcribe.Information do
       def resource_attributes(_), do: %{}
       def action_description(_, _), do: nil
       def action_parameters(controller, _), do: resource_parameters(controller)
+
+      def api_info do
+        %{
+          description: default_description(),
+          host: default_host(),
+          name: default_name()
+        }
+      end
     end
   end
 
@@ -73,4 +97,8 @@ defmodule Xcribe.Information do
       _ -> default
     end
   end
+
+  def default_host, do: "http://example.com"
+  def default_name, do: "API"
+  def default_description, do: ""
 end

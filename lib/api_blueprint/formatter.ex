@@ -39,6 +39,17 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     "### #{resource_name} #{resource_action} #{resource_path}\n"
   end
 
+  def overview(api_info) do
+    """
+    FORMAT: 1A
+    HOST: #{fetch_key(api_info, :host, "")}
+
+    # #{fetch_key(api_info, :name, "")}
+    #{fetch_key(api_info, :description, "")}
+
+    """
+  end
+
   def full_request(struct, desc \\ %{}) do
     [
       request_description(struct),

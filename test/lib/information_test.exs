@@ -1,5 +1,15 @@
+defmodule Xcribe.EmptyExample do
+  use Xcribe.Information
+end
+
 defmodule Xcribe.ModuleExample do
   use Xcribe.Information
+
+  xcribe_info do
+    name("Basic API")
+    description("The description of the API")
+    host("http://my-api.com")
+  end
 
   xcribe_info Xcribe.FakeController do
     description("some cool description")
@@ -20,7 +30,25 @@ end
 
 defmodule Xcribe.InformationTest do
   use ExUnit.Case, async: true
-  alias Xcribe.ModuleExample
+  alias Xcribe.{EmptyExample, ModuleExample}
+
+  describe "api_info/0" do
+    test "return configured app info" do
+      assert ModuleExample.api_info() == %{
+               description: "The description of the API",
+               host: "http://my-api.com",
+               name: "Basic API"
+             }
+    end
+
+    test "when is not defined" do
+      assert EmptyExample.api_info() == %{
+               description: "",
+               host: "http://example.com",
+               name: "API"
+             }
+    end
+  end
 
   describe "resource_description/1" do
     test "return description" do
