@@ -5,6 +5,11 @@ defmodule Xcribe.Helpers.DocumentTest do
 
   import Xcribe.Helpers.Document
 
+  setup do
+    Application.put_env(:xcribe, :env_var, "PWD")
+    :ok
+  end
+
   describe "document/1" do
     test "parse conn and save it", %{conn: conn} do
       Recorder.start_link()
@@ -35,6 +40,19 @@ defmodule Xcribe.Helpers.DocumentTest do
       expected_record = [ConnParser.execute(conn, request_description)]
 
       assert Recorder.get_all() == expected_record
+    end
+
+    test "dont document when env var is not defined", %{conn: conn} do
+      Application.put_env(:xcribe, :env_var, "UNDEFINED_XCRIBE_ENV_VAR_!@#")
+
+      Recorder.start_link()
+
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document()
+
+      assert Recorder.get_all() == []
     end
   end
 end
