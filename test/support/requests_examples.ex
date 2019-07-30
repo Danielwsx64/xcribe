@@ -211,7 +211,7 @@ defmodule Xcribe.RequestsExamples do
       ## Users Posts [/users/{usersId}/posts/]
       + Parameters
 
-          + usersId: `1` (required, string) - The users_id
+          + usersId: `1` (required, string) - The users id
 
       ### Users Posts show [GET /users/{usersId}/posts/{id}/]
       + Parameters

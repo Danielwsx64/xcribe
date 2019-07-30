@@ -60,7 +60,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       assert Formatter.resource_parameters(struct) == """
              + Parameters
 
-                 + usersId: `1` (required, string) - The users_id
+                 + usersId: `1` (required, string) - The users id
 
              """
     end
@@ -179,7 +179,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       assert Formatter.action_parameters(struct) == """
              + Parameters
 
-                 + userId: `5` (required, number) - The user_id
+                 + userId: `5` (required, number) - The user id
 
              """
     end
@@ -317,6 +317,22 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
                      + age: `5` (number) - the user age
                      + name: `teste` (string) - is the full name of the user
+
+             """
+    end
+
+    test "remove underline from example and description" do
+      struct = %Request{
+        request_body: %{"age" => 5, "name" => "teste_of_name"}
+      }
+
+      descriptions = %{"age" => "the user age", "name" => "is the full_name of the user"}
+
+      assert Formatter.request_attributes(struct, descriptions) == """
+                 + Attributes
+
+                     + age: `5` (number) - the user age
+                     + name: `teste of name` (string) - is the full name of the user
 
              """
     end

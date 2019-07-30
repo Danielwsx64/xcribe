@@ -106,7 +106,8 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     "+ Parameters\n\n" <> params_list <> "\n"
   end
 
-  defp remove_underline(text), do: String.replace(text, "_", " ")
+  defp remove_underline(text) when is_binary(text), do: String.replace(text, "_", " ")
+  defp remove_underline(other), do: other
 
   defp find_content_type(nil), do: "text/plain"
 
@@ -152,7 +153,8 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     Enum.reduce(params, "", fn {key, value}, acc ->
       param = if camelize, do: Macro.camelize("+ " <> key), else: key
       type = if required, do: "required, #{type_of(value)}", else: "#{type_of(value)}"
-      description = fetch_key(desc, key, "The #{key}")
+      description = desc |> fetch_key(key, "The #{key}") |> remove_underline()
+      value = remove_underline(value)
 
       acc <> "#{prefix}#{param}: `#{value}` (#{type}) - #{description}\n"
     end)
