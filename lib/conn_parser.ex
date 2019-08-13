@@ -6,7 +6,7 @@ defmodule Xcribe.ConnParser do
     path = format_path(route.path, Map.keys(conn.path_params))
 
     %Request{
-      action: Atom.to_string(route.opts),
+      action: Atom.to_string(route.plug_opts),
       header_params: conn.req_headers,
       controller: conn |> controller_module(),
       description: description,
@@ -37,7 +37,7 @@ defmodule Xcribe.ConnParser do
   end
 
   defp has_eql_values?(route, conn) do
-    route.plug == controller_module(conn) and route.opts == action_atom(conn) and
+    route.plug == controller_module(conn) and route.plug_opts == action_atom(conn) and
       route.verb == verb_atom(conn) and match_path?(route, conn)
   end
 
@@ -56,8 +56,8 @@ defmodule Xcribe.ConnParser do
 
   defp resource_group(%{pipe_through: [head | _rest]}), do: head
 
-  defp resource_name(path, %{opts: opts}) do
-    action = "#{opts}"
+  defp resource_name(path, %{plug_opts: plug_opts}) do
+    action = "#{plug_opts}"
 
     path
     |> String.split("/")
@@ -68,7 +68,7 @@ defmodule Xcribe.ConnParser do
   defp resource_name(%{helper: nil, plug: controller}),
     do: resource_name_by_controller(controller)
 
-  defp resource_name(%{helper: name, opts: action}),
+  defp resource_name(%{helper: name, plug_opts: action}),
     do: name |> String.replace("_#{action}", "")
 
   defp resource_name_by_controller(controller) do
