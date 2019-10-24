@@ -1,11 +1,19 @@
 defmodule Xcribe.MixProject do
   use Mix.Project
 
+  @version "0.0.1"
+  @description "A lib to generate API documentation from test specs"
+  @links %{"GitHub" => "https://github.com/danielwsx64/xcribe"}
+
   def project do
     [
       app: :xcribe,
-      version: "0.1.0",
+      version: @version,
+      name: "XCribe",
+      description: @description,
       elixir: "~> 1.8",
+      package: package(),
+      source_url: @links["GitHub"],
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: [tool: ExCoveralls],
@@ -22,7 +30,6 @@ defmodule Xcribe.MixProject do
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       mod: application_mod(Mix.env()),
@@ -33,7 +40,6 @@ defmodule Xcribe.MixProject do
   defp application_mod(:test), do: {Xcribe.Support.Application, []}
   defp application_mod(_), do: {Xcribe, []}
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       # Dev environment
@@ -45,6 +51,13 @@ defmodule Xcribe.MixProject do
       {:phoenix, "~> 1.4.0", only: [:test]},
       {:excoveralls, "~> 0.10", only: :test},
       {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false}
+    ]
+  end
+
+  defp package do
+    [
+      licenses: ["Apache-2.0"],
+      links: @links
     ]
   end
 end
