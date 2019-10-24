@@ -37,7 +37,8 @@ defmodule Xcribe.MixProject do
   defp deps do
     [
       # Dev environment
-      {:ex_doc, "~> 0.18.0", only: :dev, runtime: false},
+      {:earmark, "~> 1.2", only: :dev},
+      {:ex_doc, "~> 0.19", only: :dev},
 
       # Test environment
       {:jason, "~> 1.1", only: [:dev, :test]},
