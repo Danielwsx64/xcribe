@@ -1,4 +1,6 @@
 defmodule Xcribe.Helpers.Formatter do
+  alias Xcribe.JSON
+
   @arguments_regex ~r/({\w*})/
   @ending_arg_regex ~r/{(\w*)}$/
   @non_word_regex ~r/\W/
@@ -83,6 +85,21 @@ defmodule Xcribe.Helpers.Formatter do
       [capture | _] -> String.replace(path, capture, "")
     end
   end
+
+  def find_content_type(nil), do: "text/plain"
+  def find_content_type(headers), do: Enum.reduce(headers, "text/plain", &find_content_header/2)
+
+  def format_body(body, "application/json" <> _) when is_binary(body),
+    do: body |> JSON.decode!() |> format_body("application/json")
+
+  def format_body(body, "application/json" <> _) when is_map(body) or is_list(body),
+    do: body |> JSON.encode!(pretty: true)
+
+  def format_body(body, "text/plain" <> _) when is_binary(body),
+    do: body
+
+  defp find_content_header({"content-type", type}, _acc), do: type
+  defp find_content_header(_, acc), do: acc
 
   defp unify_matchs(nil), do: []
   defp unify_matchs(matchs), do: Enum.uniq(matchs)

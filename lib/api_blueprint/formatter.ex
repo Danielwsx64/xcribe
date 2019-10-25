@@ -1,5 +1,4 @@
 defmodule Xcribe.ApiBlueprint.Formatter do
-  alias Xcribe.JSON
   alias Xcribe.Request
 
   import Xcribe.Helpers.Formatter
@@ -58,9 +57,13 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   def response_headers(%Request{resp_headers: headers}), do: headers_section(headers)
 
-  def request_body(%Request{request_body: body}), do: body_section(body)
+  def request_body(%Request{request_body: body, header_params: headers}),
+    do: body_section(body, headers)
 
-  def response_body(%Request{resp_body: body}), do: body_section(body)
+  def response_body(%Request{status_code: 204}), do: ""
+
+  def response_body(%Request{resp_body: body, resp_headers: headers}),
+    do: body_section(body, headers)
 
   def request_attributes(%Request{request_body: body}, desc \\ %{}),
     do: attributes_section(body, desc)
@@ -108,11 +111,11 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     )
   end
 
-  defp body_section(body) when body == %{}, do: ""
+  defp body_section(body, _headers) when body == "" or body == %{}, do: ""
 
-  defp body_section(body) do
+  defp body_section(body, headers) do
     apply_template(@body_template,
-      body: format_body(body)
+      body: body |> format_body(find_content_type(headers)) |> ident_lines(3)
     )
   end
 
@@ -149,12 +152,6 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   defp remove_path_ending_arg(params, path), do: Map.delete(params, path_ending_arg(path))
 
-  defp find_content_type(nil), do: "text/plain"
-  defp find_content_type(headers), do: Enum.reduce(headers, "text/plain", &find_content_header/2)
-
-  defp find_content_header({"content-type", type}, _acc), do: type
-  defp find_content_header(_, acc), do: acc
-
   defp format_headers(headers), do: Enum.reduce(headers, "", &add_header/2)
 
   defp add_header({"content-type", _}, acc), do: acc
@@ -176,10 +173,4 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     |> add_forward_slash()
     |> (fn p -> "[#{String.upcase(verb)} #{p}]" end).()
   end
-
-  defp format_body(body) when is_binary(body),
-    do: body |> JSON.decode!() |> format_body()
-
-  defp format_body(body),
-    do: body |> JSON.encode!(pretty: true) |> ident_lines(3)
 end

@@ -266,9 +266,12 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   end
 
   describe "request_body/1" do
-    test "return formatted request body" do
+    test "return formatted json request body" do
       struct = %Request{
-        request_body: %{"age" => 5, "name" => "teste"}
+        request_body: %{"age" => 5, "name" => "teste"},
+        header_params: [
+          {"content-type", "application/json; charset=utf8"}
+        ]
       }
 
       assert Formatter.request_body(struct) == """
@@ -404,9 +407,12 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   end
 
   describe "response_body/1" do
-    test "return formatted request body" do
+    test "return formatted json request body" do
       struct = %Request{
-        resp_body: "{\"age\":5,\"name\":\"teste\"}"
+        resp_body: "{\"age\":5,\"name\":\"teste\"}",
+        resp_headers: [
+          {"content-type", "application/json; charset=utf8"}
+        ]
       }
 
       assert Formatter.response_body(struct) == """
@@ -421,10 +427,40 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
     test "return empty string when no body" do
       struct = %Request{
-        resp_body: %{}
+        resp_body: "",
+        resp_headers: [
+          {"content-type", "application/json; charset=utf8"}
+        ]
       }
 
       assert Formatter.response_body(struct) == ""
+    end
+
+    test "return empty string when status 204" do
+      struct = %Request{
+        resp_body: "{\"age\":5,\"name\":\"teste\"}",
+        status_code: 204,
+        resp_headers: [
+          {"content-type", "application/json; charset=utf8"}
+        ]
+      }
+
+      assert Formatter.response_body(struct) == ""
+    end
+
+    test "when content type is text/plain" do
+      struct = %Request{
+        resp_body: "no json response",
+        resp_headers: [
+          {"content-type", "text/plain"}
+        ]
+      }
+
+      assert Formatter.response_body(struct) == """
+                 + Body
+
+                         no json response
+             """
     end
   end
 

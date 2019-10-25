@@ -65,19 +65,6 @@ defmodule Xcribe.ConnParser do
     |> Enum.join("_")
   end
 
-  defp resource_name(%{helper: nil, plug: controller}),
-    do: resource_name_by_controller(controller)
-
-  defp resource_name(%{helper: name, plug_opts: action}),
-    do: name |> String.replace("_#{action}", "")
-
-  defp resource_name_by_controller(controller) do
-    ~r/\.(\w+)Controller$/
-    |> Regex.run(to_string(controller))
-    |> List.last()
-    |> String.downcase()
-  end
-
   defp verb_atom(%{method: verb}), do: verb |> String.downcase() |> String.to_atom()
 
   defp format_path(path, params), do: Enum.reduce(params, path, &transform_param/2)

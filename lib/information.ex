@@ -69,12 +69,14 @@ defmodule Xcribe.Information do
       def action_description(_, _), do: nil
       def action_parameters(controller, _), do: resource_parameters(controller)
 
-      def api_info do
-        %{
-          description: default_description(),
-          host: default_host(),
-          name: default_name()
-        }
+      if(!Module.defines?(__MODULE__, {:api_info, 0})) do
+        def api_info do
+          %{
+            description: default_description(),
+            host: default_host(),
+            name: default_name()
+          }
+        end
       end
     end
   end
