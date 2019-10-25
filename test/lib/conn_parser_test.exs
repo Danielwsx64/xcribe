@@ -62,7 +62,7 @@ defmodule Xcribe.ConnParserTest do
              }
     end
 
-    test "custom action with custom helper name", %{conn: conn} do
+    test "route out of standard REST", %{conn: conn} do
       conn =
         conn
         |> put_req_header("authorization", "token")
@@ -78,7 +78,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{"users_id" => "1"},
                query_params: %{},
                request_body: %{},
-               resource: "users",
+               resource: "users_cancel",
                resource_group: :api,
                resp_body: "",
                resp_headers: [

@@ -16,7 +16,7 @@ defmodule Xcribe.ConnParser do
       path_params: conn.path_params,
       query_params: conn.query_params,
       request_body: conn.body_params,
-      resource: resource_name(path, route, namespaces),
+      resource: resource_name(path, namespaces),
       resource_group: resource_group(route),
       resp_body: conn.resp_body,
       resp_headers: conn.resp_headers,
@@ -57,13 +57,11 @@ defmodule Xcribe.ConnParser do
 
   defp resource_group(%{pipe_through: [head | _rest]}), do: head
 
-  defp resource_name(path, %{plug_opts: plug_opts}, namespaces) do
-    action = "#{plug_opts}"
-
+  defp resource_name(path, namespaces) do
     namespaces
     |> Enum.reduce(path, &remove_namespace/2)
     |> String.split("/")
-    |> Enum.filter(fn item -> item != action && Regex.match?(~r/^\w+$/, item) end)
+    |> Enum.filter(&Regex.match?(~r/^\w+$/, &1))
     |> Enum.join("_")
   end
 
