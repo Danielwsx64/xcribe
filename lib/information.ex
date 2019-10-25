@@ -11,8 +11,9 @@ defmodule Xcribe.Information do
     name = fetch_information(information, :name, default_name())
     description = fetch_information(information, :description, default_description())
     host = fetch_information(information, :host, default_host())
+    namespaces = fetch_information(information, :namespaces, [])
 
-    quote bind_quoted: [description: description, host: host, name: name] do
+    quote bind_quoted: [description: description, host: host, name: name, namespaces: namespaces] do
       def api_info do
         %{
           description: unquote(description),
@@ -20,6 +21,8 @@ defmodule Xcribe.Information do
           name: unquote(name)
         }
       end
+
+      def namespaces, do: unquote(namespaces)
     end
   end
 
@@ -77,6 +80,10 @@ defmodule Xcribe.Information do
             name: default_name()
           }
         end
+      end
+
+      if(!Module.defines?(__MODULE__, {:namespaces, 0})) do
+        def namespaces, do: []
       end
     end
   end

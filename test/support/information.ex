@@ -5,6 +5,7 @@ defmodule Xcribe.Support.Information do
     name("Basic API")
     description("The description of the API")
     host("http://my-api.com")
+    namespaces(["/namespace_ignored"])
   end
 
   xcribe_info Elixir.Xcribe.ProtocolsController do

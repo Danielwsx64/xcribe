@@ -9,6 +9,7 @@ defmodule Xcribe.ModuleExample do
     name("Basic API")
     description("The description of the API")
     host("http://my-api.com")
+    namespaces(["/api", "/v1"])
   end
 
   xcribe_info Xcribe.FakeController do
@@ -47,6 +48,16 @@ defmodule Xcribe.InformationTest do
                host: "http://example.com",
                name: "API"
              }
+    end
+  end
+
+  describe "namespaces/0" do
+    test "return configured namespaces" do
+      assert ModuleExample.namespaces() == ["/api", "/v1"]
+    end
+
+    test "when is not defined" do
+      assert EmptyExample.namespaces() == []
     end
   end
 

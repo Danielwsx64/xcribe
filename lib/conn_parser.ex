@@ -1,9 +1,10 @@
 defmodule Xcribe.ConnParser do
-  alias Xcribe.Request
+  alias Xcribe.{Config, Request}
 
   def execute(conn, description \\ "sample request") do
     route = identify_route(conn)
     path = format_path(route.path, Map.keys(conn.path_params))
+    namespaces = fetch_namespaces()
 
     %Request{
       action: Atom.to_string(route.plug_opts),
@@ -15,7 +16,7 @@ defmodule Xcribe.ConnParser do
       path_params: conn.path_params,
       query_params: conn.query_params,
       request_body: conn.body_params,
-      resource: resource_name(path, route),
+      resource: resource_name(path, route, namespaces),
       resource_group: resource_group(route),
       resp_body: conn.resp_body,
       resp_headers: conn.resp_headers,
@@ -56,18 +57,23 @@ defmodule Xcribe.ConnParser do
 
   defp resource_group(%{pipe_through: [head | _rest]}), do: head
 
-  defp resource_name(path, %{plug_opts: plug_opts}) do
+  defp resource_name(path, %{plug_opts: plug_opts}, namespaces) do
     action = "#{plug_opts}"
 
-    path
+    namespaces
+    |> Enum.reduce(path, &remove_namespace/2)
     |> String.split("/")
     |> Enum.filter(fn item -> item != action && Regex.match?(~r/^\w+$/, item) end)
     |> Enum.join("_")
   end
+
+  defp remove_namespace(namespace, path), do: String.replace(path, ~r/^#{namespace}/, "")
 
   defp verb_atom(%{method: verb}), do: verb |> String.downcase() |> String.to_atom()
 
   defp format_path(path, params), do: Enum.reduce(params, path, &transform_param/2)
 
   defp transform_param(param, path), do: String.replace(path, ":#{param}", "{#{param}}")
+
+  defp fetch_namespaces, do: apply(Config.xcribe_information_source(), :namespaces, [])
 end

@@ -7,6 +7,12 @@ defmodule Xcribe.WebRouter do
     plug(:accepts, ["json"])
   end
 
+  scope "/namespace_ignored", Xcribe do
+    pipe_through(:api)
+
+    resources("/notes", NotesController, only: [:index])
+  end
+
   scope "/", Xcribe do
     pipe_through(:api)
 

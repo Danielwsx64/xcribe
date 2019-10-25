@@ -356,6 +356,12 @@ defmodule Xcribe.ConnParserTest do
              }
     end
 
+    test "ignore configured namespaces", %{conn: conn} do
+      conn = get(conn, notes_path(conn, :index))
+
+      assert %Request{resource: "notes"} = ConnParser.execute(conn)
+    end
+
     test "test group subject" do
       _incomplete_conn = %{
         adapter:

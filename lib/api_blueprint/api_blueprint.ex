@@ -1,5 +1,6 @@
 defmodule Xcribe.ApiBlueprint do
   alias Xcribe.ApiBlueprint.Formatter
+  alias Xcribe.Config
 
   def generate_doc(requests) do
     requests
@@ -92,20 +93,17 @@ defmodule Xcribe.ApiBlueprint do
   defp api_overview, do: Formatter.overview(xcribe_info())
 
   defp resource_description(%{controller: controller}),
-    do: apply(xcribe_information_source(), :resource_description, [controller])
+    do: apply(Config.xcribe_information_source(), :resource_description, [controller])
 
   defp resource_parameters(%{controller: controller}),
-    do: apply(xcribe_information_source(), :resource_parameters, [controller])
+    do: apply(Config.xcribe_information_source(), :resource_parameters, [controller])
 
   defp resource_attributes(%{controller: controller}),
-    do: apply(xcribe_information_source(), :resource_attributes, [controller])
+    do: apply(Config.xcribe_information_source(), :resource_attributes, [controller])
 
   defp action_description(%{controller: controller, action: action}),
-    do: apply(xcribe_information_source(), :action_description, [controller, action])
+    do: apply(Config.xcribe_information_source(), :action_description, [controller, action])
 
   defp xcribe_info,
-    do: apply(xcribe_information_source(), :api_info, [])
-
-  defp xcribe_information_source,
-    do: Application.fetch_env!(:xcribe, :information_source)
+    do: apply(Config.xcribe_information_source(), :api_info, [])
 end
