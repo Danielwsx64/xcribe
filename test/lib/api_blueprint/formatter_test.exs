@@ -101,11 +101,11 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
   end
 
-  describe "resource_action/1" do
+  describe "action_section/1" do
     test "return formatted resource action" do
       struct = %Request{resource: "users", path: "/users", action: "index", verb: "get"}
 
-      assert Formatter.resource_action(struct) == "### Users index [GET /users/]\n"
+      assert Formatter.action_section(struct) == "### Users index [GET /users/]\n"
     end
 
     test "when there is an arg in the path's end" do
@@ -116,14 +116,14 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         verb: "put"
       }
 
-      assert Formatter.resource_action(struct) ==
+      assert Formatter.action_section(struct) ==
                "### Users Posts update [PUT /users/{id}/posts/{post_id}/]\n"
     end
 
     test "when there is underline" do
       struct = %Request{resource: "users_posts", path: "/users", action: "new_index", verb: "get"}
 
-      assert Formatter.resource_action(struct) == "### Users Posts new index [GET /users/]\n"
+      assert Formatter.action_section(struct) == "### Users Posts new index [GET /users/]\n"
     end
 
     test "camelize params" do
@@ -134,7 +134,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         verb: "get"
       }
 
-      assert Formatter.resource_action(struct) ==
+      assert Formatter.action_section(struct) ==
                "### Users Posts new index [GET /users/{userId}/user/]\n"
     end
   end

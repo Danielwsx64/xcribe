@@ -86,7 +86,7 @@ defmodule Xcribe.ApiBlueprint do
   defp group_the_actions(resource_requests) do
     resource_requests
     |> Enum.map(fn {resource_name, reqs} ->
-      {resource_name, reqs |> Enum.group_by(&Formatter.resource_action(&1)) |> Enum.sort()}
+      {resource_name, reqs |> Enum.group_by(&Formatter.action_section(&1)) |> Enum.sort()}
     end)
   end
 

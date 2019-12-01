@@ -20,7 +20,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     )
   end
 
-  def resource_action(%Request{resource: resource, path: path, action: action, verb: verb}) do
+  def action_section(%Request{resource: resource, path: path, action: action, verb: verb}) do
     apply_template(
       @action_template,
       resource_name: prepare_and_captalize(resource),
