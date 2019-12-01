@@ -18,7 +18,7 @@ defmodule Xcribe.ApiBlueprint.Templates do
       @headers_template "    + Headers\n\n--headers--\n"
       @header_item_template "            --header--: --value--\n"
       @request_template "+ Request --identifier-- (--media_type--)\n"
-      @response_template "+ Response --code-- (--content_type--)\n"
+      @response_template "+ Response --code-- (--media_type--)\n"
       @body_template "    + Body\n\n--body--\n"
     end
   end

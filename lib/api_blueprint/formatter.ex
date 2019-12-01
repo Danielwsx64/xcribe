@@ -47,10 +47,10 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     )
   end
 
-  def response_description(%Request{status_code: code, resp_headers: headers}) do
+  def response_section(%Request{status_code: code, resp_headers: headers}) do
     apply_template(@response_template,
-      code: "#{code}",
-      content_type: find_content_type(headers)
+      code: to_string(code),
+      media_type: find_content_type(headers)
     )
   end
 
@@ -88,7 +88,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
       request_section(struct),
       request_headers(struct),
       request_attributes(struct, desc),
-      response_description(struct),
+      response_section(struct),
       response_headers(struct),
       response_body(struct)
     ])

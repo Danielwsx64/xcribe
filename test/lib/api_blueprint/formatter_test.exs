@@ -349,13 +349,13 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
   end
 
-  describe "response_description/1" do
+  describe "response_section/1" do
     test "return formatted response description" do
       struct = %Request{
         status_code: 201
       }
 
-      assert Formatter.response_description(struct) == "+ Response 201 (text/plain)\n"
+      assert Formatter.response_section(struct) == "+ Response 201 (text/plain)\n"
     end
 
     test "when has content type header" do
@@ -366,7 +366,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         ]
       }
 
-      assert Formatter.response_description(struct) == "+ Response 201 (multipart/mixed)\n"
+      assert Formatter.response_section(struct) == "+ Response 201 (multipart/mixed)\n"
     end
   end
 
