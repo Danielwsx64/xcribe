@@ -1,7 +1,7 @@
 defmodule Xcribe.ApiBlueprint.Templates do
   defmacro __using__(_opts \\ []) do
     quote do
-      @overview_template """
+      @metadata_template """
       FORMAT: 1A
       HOST: --host--
 

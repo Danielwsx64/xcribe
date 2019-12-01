@@ -5,6 +5,15 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   use Xcribe.ApiBlueprint.Templates
 
+  def metadata_section(api_info) do
+    apply_template(
+      @metadata_template,
+      host: fetch_key(api_info, :host, ""),
+      name: fetch_key(api_info, :name, ""),
+      description: fetch_key(api_info, :description, "")
+    )
+  end
+
   def resource_group(%Request{} = request) do
     apply_template(
       @group_template,
@@ -26,15 +35,6 @@ defmodule Xcribe.ApiBlueprint.Formatter do
       resource_name: prepare_and_captalize(resource),
       action_name: remove_underline(action),
       resource_path: build_action_path(path, verb)
-    )
-  end
-
-  def overview(api_info) do
-    apply_template(
-      @overview_template,
-      host: fetch_key(api_info, :host, ""),
-      name: fetch_key(api_info, :name, ""),
-      description: fetch_key(api_info, :description, "")
     )
   end
 

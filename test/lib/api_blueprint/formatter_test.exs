@@ -464,7 +464,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
   end
 
-  describe "overview/1" do
+  describe "metadata_section/1" do
     test "return API overview" do
       api_info = %{
         description: "some cool description",
@@ -472,7 +472,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         name: "The Cool API"
       }
 
-      assert Formatter.overview(api_info) == """
+      assert Formatter.metadata_section(api_info) == """
              FORMAT: 1A
              HOST: http://my-host.com
 
