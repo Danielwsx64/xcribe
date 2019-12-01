@@ -39,11 +39,11 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     )
   end
 
-  def request_description(%Request{description: description, header_params: headers}) do
+  def request_section(%Request{description: description, header_params: headers}) do
     apply_template(
       @request_template,
-      description: purge_string(description),
-      content_type: find_content_type(headers)
+      identifier: purge_string(description),
+      media_type: find_content_type(headers)
     )
   end
 
@@ -85,7 +85,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   def full_request(%Request{} = struct, desc \\ %{}) do
     Enum.join([
-      request_description(struct),
+      request_section(struct),
       request_headers(struct),
       request_attributes(struct, desc),
       response_description(struct),
