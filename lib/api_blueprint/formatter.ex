@@ -17,24 +17,25 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   def resource_group(%Request{} = request) do
     apply_template(
       @group_template,
-      group_name: prepare_and_upcase(request.resource_group)
+      identifier: prepare_and_upcase(request.resource_group)
     )
   end
 
   def resource_section(%Request{resource: resource, path: path}) do
     apply_template(
       @resource_template,
-      resource_path: build_uri_template(path),
-      resource_name: prepare_and_captalize(resource)
+      identifier: prepare_and_captalize(resource),
+      uri_template: build_uri_template(path, :resource)
     )
   end
 
   def action_section(%Request{resource: resource, path: path, action: action, verb: verb}) do
     apply_template(
       @action_template,
-      resource_name: prepare_and_captalize(resource),
-      action_name: remove_underline(action),
-      resource_path: build_action_path(path, verb)
+      identifier_resource: prepare_and_captalize(resource),
+      identifier_action: remove_underline(action),
+      request_method: String.upcase(verb),
+      uri_template: build_uri_template(path, :action)
     )
   end
 
@@ -159,18 +160,13 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   defp add_header({header, value}, acc),
     do: apply_template(@header_item_template, header: header, value: value) <> acc
 
-  defp build_uri_template(path) do
+  defp build_uri_template(path, typ) do
     path
     |> camelize_params()
     |> add_forward_slash()
-    |> remove_ending_argument()
-    |> (fn p -> "[#{p}]" end).()
+    |> remove_ending_argument_for(typ)
   end
 
-  defp build_action_path(path, verb) do
-    path
-    |> camelize_params()
-    |> add_forward_slash()
-    |> (fn p -> "[#{String.upcase(verb)} #{p}]" end).()
-  end
+  defp remove_ending_argument_for(uri, :resource), do: remove_ending_argument(uri)
+  defp remove_ending_argument_for(uri, _), do: uri
 end
