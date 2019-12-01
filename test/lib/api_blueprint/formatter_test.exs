@@ -340,6 +340,22 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
              """
     end
 
+    test "attribute object and array" do
+      struct = %Request{
+        request_body: %{"age" => ["item one", "item two"], "name" => %{"key" => "value"}}
+      }
+
+      descriptions = %{"age" => "the user age", "name" => "is the full_name of the user"}
+
+      assert Formatter.request_attributes(struct, descriptions) == """
+                 + Attributes
+
+                     + age: `array` (array) - the user age
+                     + name: `object` (object) - is the full name of the user
+
+             """
+    end
+
     test "return empty string when no body" do
       struct = %Request{
         request_body: %{}
