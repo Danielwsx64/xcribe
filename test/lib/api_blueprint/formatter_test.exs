@@ -489,7 +489,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         description: "create an user",
         header_params: [
           {"authorization", "token"},
-          {"content-type", "multipart/mixed; boundary=plug_conn_test"}
+          {"content-type", "application/json"}
         ],
         params: %{"age" => 5, "name" => "teste"},
         request_body: %{"age" => 5, "name" => "teste"},
@@ -502,7 +502,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       }
 
       assert Formatter.full_request(struct) == """
-             + Request create an user (multipart/mixed; boundary=plug_conn_test)
+             + Request create an user (application/json)
                  + Headers
 
                          authorization: token
@@ -512,6 +512,12 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                      + age: `5` (number) - The age
                      + name: `teste` (string) - The name
 
+                 + Body
+
+                         {
+                           "age": 5,
+                           "name": "teste"
+                         }
              + Response 201 (application/json; charset=utf-8)
                  + Headers
 
@@ -531,7 +537,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         description: "create an user",
         header_params: [
           {"authorization", "token"},
-          {"content-type", "multipart/mixed; boundary=plug_conn_test"}
+          {"content-type", "application/json"}
         ],
         params: %{"age" => 5, "name" => "teste"},
         request_body: %{"age" => 5, "name" => "teste"},
@@ -546,7 +552,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       descriptions = %{"age" => "the user age", "name" => "is the full name of the user"}
 
       assert Formatter.full_request(struct, descriptions) == """
-             + Request create an user (multipart/mixed; boundary=plug_conn_test)
+             + Request create an user (application/json)
                  + Headers
 
                          authorization: token
@@ -556,6 +562,12 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                      + age: `5` (number) - the user age
                      + name: `teste` (string) - is the full name of the user
 
+                 + Body
+
+                         {
+                           "age": 5,
+                           "name": "teste"
+                         }
              + Response 201 (application/json; charset=utf-8)
                  + Headers
 

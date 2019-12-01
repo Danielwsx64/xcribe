@@ -88,6 +88,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
       request_section(struct),
       request_headers(struct),
       request_attributes(struct, desc),
+      request_body(struct),
       response_section(struct),
       response_headers(struct),
       response_body(struct)

@@ -53,7 +53,7 @@ defmodule Xcribe.ApiBlueprintTest do
           action: "create",
           controller: Elixir.Xcribe.ProtocolsController,
           description: "create the protocol",
-          header_params: [{"authorization", "token"}],
+          header_params: [{"authorization", "token"}, {"content-type", "application/json"}],
           params: %{"name" => "zelda", "server_id" => 88, "priority" => 0},
           path: "server/{server_id}/protocols",
           path_params: %{"server_id" => 88},
@@ -88,7 +88,7 @@ defmodule Xcribe.ApiBlueprintTest do
                  + serverId: `88` (required, number) - The id number of the server
 
              ### Protocols create [POST server/{serverId}/protocols/]
-             + Request create the protocol (text/plain)
+             + Request create the protocol (application/json)
                  + Headers
 
                          authorization: token
@@ -98,6 +98,12 @@ defmodule Xcribe.ApiBlueprintTest do
                      + name: `zelda` (string) - The protocol full name
                      + priority: `0` (number) - the priority of the protocol. It could be 0 or 1
 
+                 + Body
+
+                         {
+                           "name": "zelda",
+                           "priority": 0
+                         }
              + Response 201 (application/json)
                  + Body
 
