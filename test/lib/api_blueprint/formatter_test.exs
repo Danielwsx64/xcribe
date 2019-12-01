@@ -18,35 +18,35 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
   end
 
-  describe "resource/1" do
+  describe "resource_section/1" do
     test "return formatted resource" do
       struct = %Request{resource: "users", path: "/users"}
 
-      assert Formatter.resource(struct) == "## Users [/users/]\n"
+      assert Formatter.resource_section(struct) == "## Users [/users/]\n"
     end
 
     test "when path ends with forward slash" do
       struct = %Request{resource: "users", path: "/users/"}
 
-      assert Formatter.resource(struct) == "## Users [/users/]\n"
+      assert Formatter.resource_section(struct) == "## Users [/users/]\n"
     end
 
     test "when there is an arg in the path's end" do
       struct = %Request{resource: "users posts", path: "/users/{id}/posts/{post_id}"}
 
-      assert Formatter.resource(struct) == "## Users Posts [/users/{id}/posts/]\n"
+      assert Formatter.resource_section(struct) == "## Users Posts [/users/{id}/posts/]\n"
     end
 
     test "resource with underline" do
       struct = %Request{resource: "users_posts", path: "/users/{id}/posts/{post_id}"}
 
-      assert Formatter.resource(struct) == "## Users Posts [/users/{id}/posts/]\n"
+      assert Formatter.resource_section(struct) == "## Users Posts [/users/{id}/posts/]\n"
     end
 
     test "camelize params" do
       struct = %Request{resource: "users", path: "/users/{user_id}/posts/{post_id}"}
 
-      assert Formatter.resource(struct) == "## Users [/users/{userId}/posts/]\n"
+      assert Formatter.resource_section(struct) == "## Users [/users/{userId}/posts/]\n"
     end
   end
 

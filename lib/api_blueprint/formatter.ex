@@ -12,10 +12,10 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     )
   end
 
-  def resource(%Request{resource: resource, path: path}) do
+  def resource_section(%Request{resource: resource, path: path}) do
     apply_template(
       @resource_template,
-      resource_path: build_resource_path(path),
+      resource_path: build_uri_template(path),
       resource_name: prepare_and_captalize(resource)
     )
   end
@@ -159,7 +159,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   defp add_header({header, value}, acc),
     do: apply_template(@header_item_template, header: header, value: value) <> acc
 
-  defp build_resource_path(path) do
+  defp build_uri_template(path) do
     path
     |> camelize_params()
     |> add_forward_slash()
