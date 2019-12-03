@@ -1,6 +1,7 @@
 defmodule Xcribe.ApiBlueprintTest do
   use ExUnit.Case, async: true
   use Xcribe.RequestsExamples
+  use Xcribe.ApiBlueprintExamples
 
   alias Xcribe.ApiBlueprint
 
