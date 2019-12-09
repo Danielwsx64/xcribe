@@ -14,11 +14,12 @@ defmodule Xcribe.SwaggerExamples do
         "paths": {
           "/users/{users_id}/posts/{id}": {
             "get": {
-              "description": "get all user posts",
+              "description": "",
               "parameters": [
                 {
                   "name": "users_id",
                   "in": "path",
+                  "description": "",
                   "required": true,
                   "schema": {
                     "type": "string"
@@ -27,6 +28,7 @@ defmodule Xcribe.SwaggerExamples do
                 {
                   "name": "id",
                   "in": "path",
+                  "description": "",
                   "required": true,
                   "schema": {
                     "type": "string"
@@ -35,7 +37,7 @@ defmodule Xcribe.SwaggerExamples do
               ],
               "responses": {
                 "200": {
-                  "description": "Success",
+                  "description": "get all user posts",
                   "headers": {
                     "cache-control": {
                       "schema": {
@@ -69,10 +71,10 @@ defmodule Xcribe.SwaggerExamples do
           },
           "/users": {
             "get": {
-              "description": "get all users",
+              "description": "",
               "responses": {
                 "200": {
-                  "description": "Success",
+                  "description": "get all users",
                   "headers": {
                     "cache-control": {
                       "schema": {
@@ -107,7 +109,7 @@ defmodule Xcribe.SwaggerExamples do
               }
             },
             "post": {
-              "description": "create an user",
+              "description": "",
               "requestBody": {
                 "required": true,
                 "content": {
@@ -128,7 +130,7 @@ defmodule Xcribe.SwaggerExamples do
               },
               "responses": {
                 "201": {
-                  "description": "Success",
+                  "description": "create an user",
                   "headers": {
                     "cache-control": {
                       "schema": {
@@ -162,10 +164,10 @@ defmodule Xcribe.SwaggerExamples do
           },
           "/monitoring/": {
             "get": {
-              "description": "get monitoring info",
+              "description": "",
               "responses": {
                 "200": {
-                  "description": "Success",
+                  "description": "get monitoring info",
                   "headers": {
                     "content-type": {
                       "schema": {
@@ -185,6 +187,122 @@ defmodule Xcribe.SwaggerExamples do
                             }
                           }
                         }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/server/{server_id}/protocols": {
+            "post": {
+              "description": "Application protocols is a awesome feature of our app",
+              "parameters": [
+                {
+                  "name": "server_id",
+                  "in": "path",
+                  "description": "The id number of the server",
+                  "required": true,
+                  "schema": {
+                    "type": "integer"
+                  }
+                }
+              ],
+              "requestBody": {
+                "required": true,
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "priority": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "responses": {
+                "201": {
+                  "description": "create the protocol",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "headers": {
+                    "content-type": {
+                      "schema": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/server/{server_id}/protocols/{id}": {
+            "get": {
+              "description": "Application protocols is a awesome feature of our app",
+              "parameters": [
+                {
+                  "name": "server_id",
+                  "in": "path",
+                  "description": "The id number of the server",
+                  "required": true,
+                  "schema": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "name": "id",
+                  "in": "path",
+                  "description": "",
+                  "required": true,
+                  "schema": {
+                    "type": "integer"
+                  }
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "show the protocol",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "headers": {
+                    "content-type": {
+                      "schema": {
+                        "type": "string"
                       }
                     }
                   }

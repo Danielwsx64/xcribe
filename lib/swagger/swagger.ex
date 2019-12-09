@@ -31,7 +31,7 @@ defmodule Xcribe.Swagger do
   defp format_request(request) do
     operation =
       %{
-        "description" => request.description,
+        "description" => get_request_description(request),
         "responses" => format_responses(request)
       }
       |> put_parameters_if_needed(request)
@@ -42,8 +42,8 @@ defmodule Xcribe.Swagger do
     }
   end
 
-  defp put_parameters_if_needed(swagger, %{path_params: params}) when params not in [nil, %{}] do
-    Map.put(swagger, "parameters", format_paramseters(params))
+  defp put_parameters_if_needed(swagger, %{path_params: params} = request) when params not in [nil, %{}] do
+    Map.put(swagger, "parameters", format_parameters(request))
   end
 
   defp put_parameters_if_needed(swagger, _), do: swagger
@@ -55,14 +55,15 @@ defmodule Xcribe.Swagger do
 
   defp put_request_body_if_needed(swagger, _), do: swagger
 
-  defp format_paramseters(params) do
-    Enum.reduce(params, [], fn {p, v}, acc ->
+  defp format_parameters(%{path_params: params, controller: controller}) do
+    Enum.reduce(params, [], fn {name, value}, acc ->
       [
         %{
-          "name" => p,
+          "name" => name,
           "in" => "path",
+          "description" => get_param_description(name, controller),
           "required" => true,
-          "schema" => %{"type" => type_of(v)}
+          "schema" => %{"type" => type_of(value)}
         }
         | acc
       ]
@@ -107,7 +108,7 @@ defmodule Xcribe.Swagger do
   defp format_responses(request) do
     %{
       request.status_code => %{
-        "description" => "Success", # TODO
+        "description" => request.description,
         "headers" => format_headers(request.resp_headers),
         "content" => format_response_body(request)
       }
@@ -153,10 +154,29 @@ defmodule Xcribe.Swagger do
   # TODO
   defp get_content_type(_), do: "application/json"
 
-  defp resource_description(%{controller: controller}),
+  defp get_request_description(%{controller: controller}) do
+    controller
+    |> resource_description
+    |> (fn
+      nil -> ""
+      any -> any
+      end).()
+  end
+
+  defp get_param_description(name, controller) do
+    controller
+    |> resource_parameters()
+    |> Map.fetch(name)
+    |> (fn
+      {:ok, desc} -> desc
+      :error -> ""
+    end).()
+  end
+
+  defp resource_description(controller),
     do: apply(Config.xcribe_information_source(), :resource_description, [controller])
 
-  defp resource_parameters(%{controller: controller}),
+  defp resource_parameters(controller),
     do: apply(Config.xcribe_information_source(), :resource_parameters, [controller])
 
   defp resource_attributes(%{controller: controller}),
