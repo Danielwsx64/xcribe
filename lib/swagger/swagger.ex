@@ -1,5 +1,6 @@
 defmodule Xcribe.Swagger do
   alias Xcribe.Config
+  alias Xcribe.Helpers.Formatter, as: HelperFormatter
 
   def generate_doc(requests) do
     swagger_json()
@@ -156,8 +157,11 @@ defmodule Xcribe.Swagger do
   defp type_of(value) when is_integer(value), do: "integer"
   defp type_of(_), do: "string"
 
-  # TODO
-  defp get_content_type(_), do: "application/json"
+  defp get_content_type(%{resp_headers: headers}) do
+    headers
+    |> HelperFormatter.find_content_type()
+    |> (fn string -> Regex.run(~r/\w*\/\w*/, string) end).()
+  end
 
   defp get_request_description(%{controller: controller}) do
     controller
