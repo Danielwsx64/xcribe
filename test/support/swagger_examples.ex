@@ -56,10 +56,12 @@ defmodule Xcribe.SwaggerExamples do
                         "type": "object",
                         "properties": {
                           "id": {
-                            "type": "integer"
+                            "type": "integer",
+                            "description": ""
                           },
                           "title": {
-                            "type": "string"
+                            "type": "string",
+                            "description": ""
                           }
                         }
                       }
@@ -95,10 +97,12 @@ defmodule Xcribe.SwaggerExamples do
                           "type": "object",
                           "properties": {
                             "id": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": ""
                             },
                             "name": {
-                              "type": "string"
+                              "type": "string",
+                              "description": ""
                             }
                           }
                         }
@@ -118,10 +122,12 @@ defmodule Xcribe.SwaggerExamples do
                       "type": "object",
                       "properties": {
                         "age": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": ""
                         },
                         "name": {
-                          "type": "string"
+                          "type": "string",
+                          "description": ""
                         }
                       }
                     }
@@ -149,10 +155,12 @@ defmodule Xcribe.SwaggerExamples do
                         "type": "object",
                         "properties": {
                           "age": {
-                            "type": "integer"
+                            "type": "integer",
+                            "description": ""
                           },
                           "name": {
-                            "type": "string"
+                            "type": "string",
+                            "description": ""
                           }
                         }
                       }
@@ -183,7 +191,8 @@ defmodule Xcribe.SwaggerExamples do
                           "type": "object",
                           "properties": {
                             "status": {
-                              "type": "string"
+                              "type": "string",
+                              "description": ""
                             }
                           }
                         }
@@ -216,10 +225,12 @@ defmodule Xcribe.SwaggerExamples do
                       "type": "object",
                       "properties": {
                         "priority": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "the priority of the protocol. It could be 0 or 1"
                         },
                         "name": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "The protocol full name"
                         }
                       }
                     }
@@ -235,10 +246,12 @@ defmodule Xcribe.SwaggerExamples do
                         "type": "object",
                         "properties": {
                           "id": {
-                            "type": "integer"
+                            "type": "integer",
+                            "description": ""
                           },
                           "name": {
-                            "type": "string"
+                            "type": "string",
+                            "description": ""
                           }
                         }
                       }
@@ -289,10 +302,12 @@ defmodule Xcribe.SwaggerExamples do
                           "type": "object",
                           "properties": {
                             "id": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": ""
                             },
                             "name": {
-                              "type": "string"
+                              "type": "string",
+                              "description": ""
                             }
                           }
                         }

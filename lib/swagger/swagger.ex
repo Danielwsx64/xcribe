@@ -21,7 +21,8 @@ defmodule Xcribe.Swagger do
   end
 
   defp add_requests(swagger_map, requests) do
-    paths = Enum.reduce(requests, %{}, fn x, acc ->
+    paths =
+      Enum.reduce(requests, %{}, fn x, acc ->
         Map.put(acc, x.path, Map.merge(acc[x.path] || %{}, format_request(x)))
       end)
 
@@ -42,7 +43,8 @@ defmodule Xcribe.Swagger do
     }
   end
 
-  defp put_parameters_if_needed(swagger, %{path_params: params} = request) when params not in [nil, %{}] do
+  defp put_parameters_if_needed(swagger, %{path_params: params} = request)
+       when params not in [nil, %{}] do
     Map.put(swagger, "parameters", format_parameters(request))
   end
 
@@ -77,33 +79,36 @@ defmodule Xcribe.Swagger do
         get_content_type(request) => %{
           "schema" => %{
             "type" => "object",
-            "properties" => format_body_params(body)
+            "properties" => format_body_params(body, request)
           }
         }
       }
     }
   end
 
-  defp format_body_params(body) when is_map(body) do
+  defp format_body_params(body, request) when is_map(body) do
     body
     |> Map.to_list()
-    |> format_params()
+    |> format_params(request)
   end
 
-  defp format_body_params(body) when is_list(body) do
-    Enum.map(body, &format_body_params/1)
+  defp format_body_params(body, request) when is_list(body) do
+    Enum.map(body, &format_body_params(&1, request))
   end
 
-  defp format_params([{name, value} | tail]) do
+  defp format_params([{name, value} | tail], %{controller: controller} = request) do
     Map.merge(
       %{
-        name => %{"type" => type_of(value)}
+        name => %{
+          "type" => type_of(value),
+          "description" => get_attr_description(name, controller)
+        }
       },
-      format_params(tail)
+      format_params(tail, request)
     )
   end
 
-  defp format_params([]), do: %{}
+  defp format_params([], _), do: %{}
 
   defp format_responses(request) do
     %{
@@ -137,7 +142,7 @@ defmodule Xcribe.Swagger do
   defp format_response_body_schema(body) when is_map(body) do
     %{
       "type" => "object",
-      "properties" => format_body_params(body)
+      "properties" => format_body_params(body, %{controller: nil})
     }
   end
 
@@ -156,11 +161,11 @@ defmodule Xcribe.Swagger do
 
   defp get_request_description(%{controller: controller}) do
     controller
-    |> resource_description
+    |> resource_description()
     |> (fn
-      nil -> ""
-      any -> any
-      end).()
+          nil -> ""
+          any -> any
+        end).()
   end
 
   defp get_param_description(name, controller) do
@@ -168,9 +173,19 @@ defmodule Xcribe.Swagger do
     |> resource_parameters()
     |> Map.fetch(name)
     |> (fn
-      {:ok, desc} -> desc
-      :error -> ""
-    end).()
+          {:ok, desc} -> desc
+          :error -> ""
+        end).()
+  end
+
+  defp get_attr_description(name, controller) do
+    controller
+    |> resource_attributes()
+    |> Map.fetch(name)
+    |> (fn
+          {:ok, desc} -> desc
+          :error -> ""
+        end).()
   end
 
   defp resource_description(controller),
@@ -179,7 +194,7 @@ defmodule Xcribe.Swagger do
   defp resource_parameters(controller),
     do: apply(Config.xcribe_information_source(), :resource_parameters, [controller])
 
-  defp resource_attributes(%{controller: controller}),
+  defp resource_attributes(controller),
     do: apply(Config.xcribe_information_source(), :resource_attributes, [controller])
 
   defp action_description(%{controller: controller, action: action}),
