@@ -284,7 +284,7 @@ defmodule Xcribe.SwaggerExamples do
                 {
                   "name": "id",
                   "in": "path",
-                  "description": "",
+                  "description": "the number id of the protocol",
                   "required": true,
                   "schema": {
                     "type": "integer"

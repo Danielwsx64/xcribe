@@ -57,13 +57,13 @@ defmodule Xcribe.Swagger do
 
   defp put_request_body_if_needed(swagger, _), do: swagger
 
-  defp format_parameters(%{path_params: params, controller: controller}) do
+  defp format_parameters(%{path_params: params, controller: controller, action: action}) do
     Enum.reduce(params, [], fn {name, value}, acc ->
       [
         %{
           "name" => name,
           "in" => "path",
-          "description" => get_param_description(name, controller),
+          "description" => get_param_description(name, controller, action),
           "required" => true,
           "schema" => %{"type" => type_of(value)}
         }
@@ -168,13 +168,22 @@ defmodule Xcribe.Swagger do
         end).()
   end
 
-  defp get_param_description(name, controller) do
+  defp get_param_description(name, controller, action) do
     controller
     |> resource_parameters()
     |> Map.fetch(name)
     |> (fn
-          {:ok, desc} -> desc
-          :error -> ""
+          {:ok, desc} ->
+            desc
+
+          :error ->
+            controller
+            |> action_parameters(action)
+            |> Map.fetch(name)
+            |> (fn
+                  {:ok, descr} -> descr
+                  :error -> ""
+                end).()
         end).()
   end
 
@@ -197,8 +206,8 @@ defmodule Xcribe.Swagger do
   defp resource_attributes(controller),
     do: apply(Config.xcribe_information_source(), :resource_attributes, [controller])
 
-  defp action_description(%{controller: controller, action: action}),
-    do: apply(Config.xcribe_information_source(), :action_description, [controller, action])
+  defp action_parameters(controller, action),
+    do: apply(Config.xcribe_information_source(), :action_parameters, [controller, action])
 
   defp xcribe_info,
     do: apply(Config.xcribe_information_source(), :api_info, [])
