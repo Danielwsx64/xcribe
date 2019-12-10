@@ -46,10 +46,6 @@ defmodule Xcribe.Swagger.Formatter do
     |> format_params(request)
   end
 
-  # defp format_body_params(body, request) when is_list(body) do
-  #   Enum.map(body, &format_body_params(&1, request))
-  # end
-
   defp format_params([{name, value} | tail], %{controller: controller} = request) do
     Map.merge(
       %{

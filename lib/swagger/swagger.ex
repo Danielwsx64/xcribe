@@ -23,11 +23,39 @@ defmodule Xcribe.Swagger do
 
   defp add_requests(swagger_map, requests) do
     paths =
-      Enum.reduce(requests, %{}, fn x, acc ->
-        Map.put(acc, x.path, Map.merge(acc[x.path] || %{}, format_request(x)))
+      requests
+      |> Enum.sort_by(& &1.status_code)
+      |> Enum.reduce(%{}, fn x, acc ->
+        Map.put(acc, x.path, Map.merge(acc[x.path] || %{}, handle_request(x, acc)))
       end)
 
     Map.merge(swagger_map, %{"paths" => paths})
+  end
+
+  defp handle_request(request, swagger_paths) do
+    swagger_paths
+    |> Map.fetch(request.path)
+    |> has_key?(request.verb)
+    |> handle_request(swagger_paths, request)
+  end
+
+  defp has_key?(:error, _), do: false
+  defp has_key?({:ok, map}, key), do: Map.has_key?(map, key)
+
+  defp handle_request(true, swagger_paths, request), do: add_response(swagger_paths, request)
+  defp handle_request(false, _swagger_paths, request), do: format_request(request)
+
+  defp add_response(swagger_map, request) do
+    original_request = swagger_map[request.path][request.verb]
+
+    %{
+      request.verb =>
+        Map.put(
+          original_request,
+          "responses",
+          Map.merge(original_request["responses"], Formatter.format_responses(request))
+        )
+    }
   end
 
   defp format_request(request) do

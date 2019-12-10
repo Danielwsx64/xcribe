@@ -166,6 +166,34 @@ defmodule Xcribe.SwaggerExamples do
                       }
                     }
                   }
+                },
+                "400": {
+                  "description": "invalid parameters",
+                  "headers": {
+                    "cache-control": {
+                      "schema": {
+                        "type": "string"
+                      }
+                    },
+                    "content-type": {
+                      "schema": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string",
+                            "description": ""
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

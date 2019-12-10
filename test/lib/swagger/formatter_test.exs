@@ -84,53 +84,6 @@ defmodule Xcribe.Swagger.FormatterTest do
 
       assert actual == expected
     end
-
-    # test "when body is a list" do
-    #   request = %{
-    #     request_body: [
-    #       %{
-    #         "user_id" => 1,
-    #         "email" => "user@email.com"
-    #       },
-    #       %{
-    #         "user_id" => 2,
-    #         "email" => "user2@email.com"
-    #       }
-    #     ],
-    #     controller: Elixir.Xcribe.UsersController,
-    #     resp_headers: [
-    #       {"content-type", "application/json; charset=utf-8"}
-    #     ]
-    #   }
-
-    #   actual = Formatter.format_body(request)
-
-    #   expected = %{
-    #     "required" => true,
-    #     "content" => %{
-    #       "application/json" => %{
-    #         "schema" => %{
-    #           "type" => "array",
-    #           "items" => %{
-    #             "schema" => "object",
-    #             "properties" => %{
-    #               "user_id" => %{
-    #                 "type" => "integer",
-    #                 "description" => ""
-    #               },
-    #               "email" => %{
-    #                 "type" => "string",
-    #                 "description" => ""
-    #               }
-    #             }
-    #           }
-    #         }
-    #       }
-    #     }
-    #   }
-
-    #   assert actual == expected
-    # end
   end
 
   describe "format_responses/1" do

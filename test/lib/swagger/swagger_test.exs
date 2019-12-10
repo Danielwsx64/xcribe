@@ -9,6 +9,29 @@ defmodule Xcribe.SwaggerTest do
     test "parse requests do string" do
       requests = [
         %Request{
+          action: "create",
+          controller: Elixir.Xcribe.UsersController,
+          description: "invalid parameters",
+          header_params: [
+            {"authorization", "token"},
+            {"content-type", "multipart/mixed; boundary=plug_conn_test"}
+          ],
+          params: %{"age" => "5", "name" => 6},
+          path: "/users",
+          path_params: %{},
+          query_params: %{},
+          request_body: %{"age" => "5", "name" => 6},
+          resource: "users",
+          resource_group: :api,
+          resp_body: "{\"message\":\"invalid parameters\"}",
+          resp_headers: [
+            {"content-type", "application/json; charset=utf-8"},
+            {"cache-control", "max-age=0, private, must-revalidate"}
+          ],
+          status_code: 400,
+          verb: "post"
+        },
+        %Request{
           action: "show",
           controller: Elixir.Xcribe.ProtocolsController,
           description: "show the protocol",
