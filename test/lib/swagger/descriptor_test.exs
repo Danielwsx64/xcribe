@@ -83,4 +83,28 @@ defmodule Xcribe.Swagger.DescriptorTest do
       assert actual == ""
     end
   end
+
+  describe "get_action_description/2" do
+    test "when there is attr description available" do
+      request = %{
+        action: "show",
+        controller: Elixir.Xcribe.ProtocolsController
+      }
+
+      actual = Descriptor.get_action_description(request)
+
+      assert actual == "You can show a protocol with show action"
+    end
+
+    test "when there is not an attr description available" do
+      request = %{
+        action: "index",
+        controller: Elixir.Xcribe.ProtocolsController
+      }
+
+      actual = Descriptor.get_action_description(request)
+
+      assert actual == ""
+    end
+  end
 end

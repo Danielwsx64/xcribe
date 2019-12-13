@@ -34,6 +34,12 @@ defmodule Xcribe.Swagger.Descriptor do
     |> handle_resource_attributes()
   end
 
+  def get_action_description(%{controller: controller, action: action}) do
+    controller
+    |> action_description(action)
+    |> handle_resource_description()
+  end
+
   defp handle_param_description({:ok, desc}, _), do: desc
   defp handle_param_description(:error, {:ok, desc}), do: desc
   defp handle_param_description(:error, :error), do: ""
@@ -52,6 +58,9 @@ defmodule Xcribe.Swagger.Descriptor do
 
   defp resource_attributes(controller),
     do: apply(Config.xcribe_information_source(), :resource_attributes, [controller])
+
+  defp action_description(controller, action),
+    do: apply(Config.xcribe_information_source(), :action_description, [controller, action])
 
   defp action_parameters(controller, action),
     do: apply(Config.xcribe_information_source(), :action_parameters, [controller, action])

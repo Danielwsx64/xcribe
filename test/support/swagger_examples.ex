@@ -14,6 +14,7 @@ defmodule Xcribe.SwaggerExamples do
         "paths": {
           "/users/{users_id}/posts/{id}": {
             "get": {
+              "summary": "",
               "description": "",
               "parameters": [
                 {
@@ -73,6 +74,7 @@ defmodule Xcribe.SwaggerExamples do
           },
           "/users": {
             "get": {
+              "summary": "",
               "description": "",
               "responses": {
                 "200": {
@@ -113,6 +115,7 @@ defmodule Xcribe.SwaggerExamples do
               }
             },
             "post": {
+              "summary": "",
               "description": "",
               "requestBody": {
                 "required": true,
@@ -200,6 +203,7 @@ defmodule Xcribe.SwaggerExamples do
           },
           "/monitoring/": {
             "get": {
+              "summary": "",
               "description": "",
               "responses": {
                 "200": {
@@ -233,6 +237,7 @@ defmodule Xcribe.SwaggerExamples do
           },
           "/server/{server_id}/protocols": {
             "post": {
+              "summary": "",
               "description": "Application protocols is a awesome feature of our app",
               "parameters": [
                 {
@@ -298,6 +303,7 @@ defmodule Xcribe.SwaggerExamples do
           },
           "/server/{server_id}/protocols/{id}": {
             "get": {
+              "summary": "You can show a protocol with show action",
               "description": "Application protocols is a awesome feature of our app",
               "parameters": [
                 {

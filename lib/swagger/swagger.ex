@@ -61,6 +61,7 @@ defmodule Xcribe.Swagger do
   defp format_request(request) do
     operation =
       %{
+        "summary" => Descriptor.get_action_description(request),
         "description" => Descriptor.get_request_description(request),
         "responses" => Formatter.format_responses(request)
       }
