@@ -11,11 +11,15 @@ defmodule Xcribe.SwaggerExamples do
           "version": "0.1.0",
           "description": "The description of the API"
         },
-        "security": [
-          {
-            "api_key": []
+        "components": {
+          "securitySchemes": {
+            "api_key": {
+              "in": "header",
+              "name": "api_key",
+              "type": "apiKey"
+            }
           }
-        ],
+        },
         "paths": {
           "/users/{users_id}/posts/{id}": {
             "get": {
