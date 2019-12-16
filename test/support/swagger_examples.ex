@@ -264,11 +264,6 @@ defmodule Xcribe.SwaggerExamples do
             "post": {
               "summary": "",
               "description": "Application protocols is a awesome feature of our app",
-              "security": [
-                {
-                  "api_key": []
-                }
-              ],
               "parameters": [
                 {
                   "name": "server_id",

@@ -54,7 +54,7 @@ defmodule Xcribe.SwaggerTest do
           action: "create",
           controller: Elixir.Xcribe.ProtocolsController,
           description: "create the protocol",
-          header_params: [{"authorization", "token"}],
+          header_params: [],
           params: %{"name" => "zelda", "server_id" => 88, "priority" => 0},
           path: "/server/{server_id}/protocols",
           path_params: %{"server_id" => 88},

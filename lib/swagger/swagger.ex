@@ -39,6 +39,8 @@ defmodule Xcribe.Swagger do
     |> Enum.any?(&has_authorization_header?/1)
     |> if do
       Map.put(swagger_map, "security", [%{"api_key" => []}])
+    else
+      swagger_map
     end
   end
 
@@ -109,6 +111,8 @@ defmodule Xcribe.Swagger do
     |> Enum.any?(fn {header, _} -> String.downcase(header) == "authorization" end)
     |> if do
       Map.put(swagger, "security", [%{"api_key" => []}])
+    else
+      swagger
     end
   end
 
