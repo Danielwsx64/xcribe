@@ -1,4 +1,7 @@
 defmodule Xcribe.Swagger.Descriptor do
+  @moduledoc """
+  Gets descriptions from Information source
+  """
   alias Xcribe.Config
   alias Xcribe.Helpers.Formatter, as: HelperFormatter
 

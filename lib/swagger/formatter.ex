@@ -1,4 +1,7 @@
 defmodule Xcribe.Swagger.Formatter do
+  @moduledoc """
+  Creates Swagger maps according to OpenAPI Specification
+  """
   alias Xcribe.Swagger.Descriptor
 
   def format_parameters(%{path_params: params, controller: controller, action: action}) do

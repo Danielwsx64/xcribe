@@ -1,12 +1,14 @@
 defmodule Xcribe.Swagger do
+  @moduledoc """
+  Treats list of Requests and generates OpenAPI 3.0 JSON
+  """
   alias Xcribe.Config
   alias Xcribe.Swagger.{Descriptor, Formatter}
 
   def generate_doc(requests) do
     swagger_json()
     |> add_requests(requests)
-    |> Jason.encode()
-    |> (fn {:ok, resp} -> resp end).()
+    |> Xcribe.JSON.encode!()
   end
 
   defp swagger_json() do
@@ -16,8 +18,7 @@ defmodule Xcribe.Swagger do
         "title" => xcribe_info() |> Map.get(:name, ""),
         "version" => xcribe_info() |> Map.get(:version, "0.1.0"),
         "description" => xcribe_info() |> Map.get(:description, "")
-      },
-      "paths" => %{}
+      }
     }
   end
 
@@ -29,7 +30,7 @@ defmodule Xcribe.Swagger do
         Map.put(acc, x.path, Map.merge(acc[x.path] || %{}, handle_request(x, acc)))
       end)
 
-    Map.merge(swagger_map, %{"paths" => paths})
+    Map.put(swagger_map, "paths", paths)
   end
 
   defp handle_request(request, swagger_paths) do
