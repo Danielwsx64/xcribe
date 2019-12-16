@@ -7,7 +7,7 @@ defmodule Xcribe.ConnParser do
     namespaces = fetch_namespaces()
 
     %Request{
-      action: Atom.to_string(route.plug_opts),
+      action: route |> router_options() |> Atom.to_string(),
       header_params: conn.req_headers,
       controller: conn |> controller_module(),
       description: description,
@@ -38,9 +38,12 @@ defmodule Xcribe.ConnParser do
   end
 
   defp has_eql_values?(route, conn) do
-    route.plug == controller_module(conn) and route.plug_opts == action_atom(conn) and
+    route.plug == controller_module(conn) and router_options(route) == action_atom(conn) and
       route.verb == verb_atom(conn) and match_path?(route, conn)
   end
+
+  defp router_options(%{plug_opts: opts}), do: opts
+  defp router_options(%{opts: opts}), do: opts
 
   defp match_path?(%{path: route_path}, %{request_path: conn_path}),
     do: Regex.match?(regex_to(route_path), conn_path)
