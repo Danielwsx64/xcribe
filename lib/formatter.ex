@@ -10,7 +10,7 @@ defmodule Xcribe.Formatter do
   def handle_cast({:suite_finished, _run_us, _load_us}, nil) do
     if Config.active?() do
       Recorder.get_all()
-      |> generate_docs(Config.api_format())
+      |> generate_docs(Config.doc_format())
       |> Writter.write()
     end
 
