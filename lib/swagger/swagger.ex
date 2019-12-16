@@ -36,15 +36,16 @@ defmodule Xcribe.Swagger do
 
   defp add_security(swagger_map, requests) do
     requests
-    |> Enum.map(fn r ->
-      r
-      |> Map.fetch!(:header_params)
-      |> Enum.any?(fn {header, _} -> String.downcase(header) == "authorization" end)
-    end)
-    |> Enum.any?(& &1)
+    |> Enum.any?(&has_authorization_header?/1)
     |> if do
       Map.put(swagger_map, "security", [%{"api_key" => []}])
     end
+  end
+
+  defp has_authorization_header?(request) do
+    request
+    |> Map.fetch!(:header_params)
+    |> Enum.any?(fn {header, _} -> String.downcase(header) == "authorization" end)
   end
 
   defp handle_request(request, swagger_paths) do
