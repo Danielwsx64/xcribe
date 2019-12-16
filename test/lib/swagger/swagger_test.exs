@@ -39,7 +39,7 @@ defmodule Xcribe.SwaggerTest do
           params: %{},
           path: "/server/{server_id}/protocols/{id}",
           path_params: %{"id" => 90, "server_id" => 88},
-          query_params: %{},
+          query_params: %{"updated_at" => DateTime.utc_now() |> DateTime.to_iso8601()},
           request_body: %{},
           resource: "protocols",
           resource_group: :api,

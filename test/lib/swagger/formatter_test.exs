@@ -7,6 +7,7 @@ defmodule Xcribe.Swagger.FormatterTest do
     test "with some parameters" do
       request = %{
         path_params: %{"id" => 1, "post_title" => "title"},
+        query_params: %{"name" => "test"},
         controller: Elixir.Xcribe.PostsController,
         action: "show"
       }
@@ -19,6 +20,13 @@ defmodule Xcribe.Swagger.FormatterTest do
           "in" => "path",
           "description" => "",
           "required" => true,
+          "schema" => %{"type" => "string"}
+        },
+        %{
+          "name" => "name",
+          "in" => "query",
+          "description" => "",
+          "required" => false,
           "schema" => %{"type" => "string"}
         },
         %{
@@ -36,6 +44,7 @@ defmodule Xcribe.Swagger.FormatterTest do
     test "without any parameters" do
       request = %{
         path_params: %{},
+        query_params: %{},
         controller: Elixir.Xcribe.PostsController,
         action: "show"
       }

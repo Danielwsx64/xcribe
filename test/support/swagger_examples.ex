@@ -341,6 +341,15 @@ defmodule Xcribe.SwaggerExamples do
               ],
               "parameters": [
                 {
+                  "name": "updated_at",
+                  "in": "query",
+                  "description": "",
+                  "required": false,
+                  "schema": {
+                    "type": "string"
+                  }
+                },
+                {
                   "name": "server_id",
                   "in": "path",
                   "description": "The id number of the server",

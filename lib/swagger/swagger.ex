@@ -96,8 +96,8 @@ defmodule Xcribe.Swagger do
     }
   end
 
-  defp put_parameters_if_needed(swagger, %{path_params: params} = request)
-       when params not in [nil, %{}] do
+  defp put_parameters_if_needed(swagger, %{path_params: params, query_params: query} = request)
+       when params not in [nil, %{}] or query not in [nil, %{}] do
     Map.put(swagger, "parameters", Formatter.format_parameters(request))
   end
 

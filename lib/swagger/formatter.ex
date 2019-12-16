@@ -4,14 +4,21 @@ defmodule Xcribe.Swagger.Formatter do
   """
   alias Xcribe.Swagger.Descriptor
 
-  def format_parameters(%{path_params: params, controller: controller, action: action}) do
-    Enum.reduce(params, [], fn {name, value}, acc ->
+  def format_parameters(%{
+        path_params: params,
+        query_params: query,
+        controller: controller,
+        action: action
+      }) do
+    params
+    |> Map.merge(query)
+    |> Enum.reduce([], fn {name, value}, acc ->
       [
         %{
           "name" => name,
-          "in" => "path",
+          "in" => if(Map.has_key?(params, name), do: "path", else: "query"),
           "description" => Descriptor.get_param_description(name, controller, action),
-          "required" => true,
+          "required" => if(Map.has_key?(params, name), do: true, else: false),
           "schema" => %{"type" => type_of(value)}
         }
         | acc
