@@ -19,6 +19,7 @@ defmodule Xcribe.Config do
     case doc_format() do
       :api_blueprint -> "api_doc.apib"
       :swagger -> "openapi.json"
+      _ -> ""
     end
   end
 

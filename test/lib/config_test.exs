@@ -10,10 +10,18 @@ defmodule Xcribe.ConfigTest do
       assert Config.output_file() == "example.md"
     end
 
-    test "return default file name" do
+    test "return default file name for ApiBlueprint" do
+      Application.put_env(:xcribe, :doc_format, :api_blueprint)
       Application.delete_env(:xcribe, :output_file)
 
       assert Config.output_file() == "api_doc.apib"
+    end
+
+    test "return default file name for Swagger" do
+      Application.put_env(:xcribe, :doc_format, :swagger)
+      Application.delete_env(:xcribe, :output_file)
+
+      assert Config.output_file() == "openapi.json"
     end
   end
 
