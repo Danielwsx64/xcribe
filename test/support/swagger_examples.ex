@@ -11,6 +11,11 @@ defmodule Xcribe.SwaggerExamples do
           "version": "0.1.0",
           "description": "The description of the API"
         },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "paths": {
           "/users/{users_id}/posts/{id}": {
             "get": {
@@ -34,6 +39,11 @@ defmodule Xcribe.SwaggerExamples do
                   "schema": {
                     "type": "string"
                   }
+                }
+              ],
+              "security": [
+                {
+                  "api_key": []
                 }
               ],
               "responses": {
@@ -76,6 +86,11 @@ defmodule Xcribe.SwaggerExamples do
             "get": {
               "summary": "",
               "description": "",
+              "security": [
+                {
+                  "api_key": []
+                }
+              ],
               "responses": {
                 "200": {
                   "description": "get all users",
@@ -117,6 +132,11 @@ defmodule Xcribe.SwaggerExamples do
             "post": {
               "summary": "",
               "description": "",
+              "security": [
+                {
+                  "api_key": []
+                }
+              ],
               "requestBody": {
                 "required": true,
                 "content": {
@@ -205,6 +225,11 @@ defmodule Xcribe.SwaggerExamples do
             "get": {
               "summary": "",
               "description": "",
+              "security": [
+                {
+                  "api_key": []
+                }
+              ],
               "responses": {
                 "200": {
                   "description": "get monitoring info",
@@ -239,6 +264,11 @@ defmodule Xcribe.SwaggerExamples do
             "post": {
               "summary": "",
               "description": "Application protocols is a awesome feature of our app",
+              "security": [
+                {
+                  "api_key": []
+                }
+              ],
               "parameters": [
                 {
                   "name": "server_id",
@@ -305,6 +335,11 @@ defmodule Xcribe.SwaggerExamples do
             "get": {
               "summary": "You can show a protocol with show action",
               "description": "Application protocols is a awesome feature of our app",
+              "security": [
+                {
+                  "api_key": []
+                }
+              ],
               "parameters": [
                 {
                   "name": "server_id",

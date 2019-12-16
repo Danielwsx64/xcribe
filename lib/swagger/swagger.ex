@@ -8,6 +8,7 @@ defmodule Xcribe.Swagger do
   def generate_doc(requests) do
     swagger_json()
     |> add_requests(requests)
+    |> add_security(requests)
     |> Xcribe.JSON.encode!()
   end
 
@@ -31,6 +32,19 @@ defmodule Xcribe.Swagger do
       end)
 
     Map.put(swagger_map, "paths", paths)
+  end
+
+  defp add_security(swagger_map, requests) do
+    requests
+    |> Enum.map(fn r ->
+      r
+      |> Map.fetch!(:header_params)
+      |> Enum.any?(fn {header, _} -> String.downcase(header) == "authorization" end)
+    end)
+    |> Enum.any?(& &1)
+    |> if do
+      Map.put(swagger_map, "security", [%{"api_key" => []}])
+    end
   end
 
   defp handle_request(request, swagger_paths) do
@@ -68,6 +82,7 @@ defmodule Xcribe.Swagger do
       }
       |> put_parameters_if_needed(request)
       |> put_request_body_if_needed(request)
+      |> put_security_if_needed(request)
 
     %{
       request.verb => operation
@@ -87,6 +102,14 @@ defmodule Xcribe.Swagger do
   end
 
   defp put_request_body_if_needed(swagger, _), do: swagger
+
+  defp put_security_if_needed(swagger, %{header_params: headers}) do
+    headers
+    |> Enum.any?(fn {header, _} -> String.downcase(header) == "authorization" end)
+    |> if do
+      Map.put(swagger, "security", [%{"api_key" => []}])
+    end
+  end
 
   defp xcribe_info,
     do: apply(Config.xcribe_information_source(), :api_info, [])
