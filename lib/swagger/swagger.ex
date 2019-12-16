@@ -16,9 +16,9 @@ defmodule Xcribe.Swagger do
     %{
       "openapi" => "3.0.0",
       "info" => %{
-        "title" => xcribe_info() |> Map.get(:name, ""),
-        "version" => xcribe_info() |> Map.get(:version, "0.1.0"),
-        "description" => xcribe_info() |> Map.get(:description, "")
+        "title" => Map.get(xcribe_info(), :name, ""),
+        "version" => Map.get(xcribe_info(), :version, "0.1.0"),
+        "description" => Map.get(xcribe_info(), :description, "")
       }
     }
   end
