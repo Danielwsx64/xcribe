@@ -30,4 +30,24 @@ defmodule Xcribe.ConfigTest do
       assert Config.active?() == false
     end
   end
+
+  describe "doc_format/0" do
+    test "when ApiBlueprint format is specified" do
+      Application.put_env(:xcribe, :doc_format, :api_blueprint)
+
+      assert Config.doc_format() == :api_blueprint
+    end
+
+    test "when Swagger format is specified" do
+      Application.put_env(:xcribe, :doc_format, :swagger)
+
+      assert Config.doc_format() == :swagger
+    end
+
+    test "when an invalid format is specified" do
+      Application.put_env(:xcribe, :doc_format, :invalid)
+
+      assert Config.doc_format() == :error
+    end
+  end
 end
