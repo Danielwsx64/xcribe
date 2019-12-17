@@ -15,7 +15,7 @@ defmodule Xcribe.SwaggerExamples do
           "securitySchemes": {
             "api_key": {
               "in": "header",
-              "name": "api_key",
+              "name": "Authorization",
               "type": "apiKey"
             }
           }

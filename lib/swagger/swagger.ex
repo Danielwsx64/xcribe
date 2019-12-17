@@ -40,7 +40,7 @@ defmodule Xcribe.Swagger do
     |> if do
       Map.put(swagger_map, "components", %{
         "securitySchemes" => %{
-          "api_key" => %{"name" => "api_key", "type" => "apiKey", "in" => "header"}
+          "api_key" => %{"name" => "Authorization", "type" => "apiKey", "in" => "header"}
         }
       })
     else

@@ -170,7 +170,7 @@ defmodule Xcribe.SwaggerTest do
       """
 
       assert Jason.decode!(Swagger.generate_doc(requests)) ==
-        Jason.decode!(expected)
+               Jason.decode!(expected)
     end
   end
 end
