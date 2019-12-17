@@ -1,6 +1,6 @@
 defmodule Xcribe do
   @moduledoc """
-  This is the documentation for te XCribe Project
+  This is the documentation for the XCribe Project
 
   XCribe was built to generate API documentation for your app tests.
   """
