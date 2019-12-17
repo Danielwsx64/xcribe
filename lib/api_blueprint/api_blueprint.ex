@@ -17,7 +17,7 @@ defmodule Xcribe.ApiBlueprint do
 
   def grouped_requests_to_string(requests) do
     requests
-    |> Enum.reduce(api_overview(), fn {group, reqs}, acc ->
+    |> Enum.reduce(api_metadata(), fn {group, reqs}, acc ->
       acc <> group <> resource_to_string(reqs)
     end)
   end
@@ -74,7 +74,7 @@ defmodule Xcribe.ApiBlueprint do
   defp group_by_resource_name(requests) do
     requests
     |> Enum.map(fn {resource_group, reqs} ->
-      {resource_group, reqs |> Enum.group_by(&Formatter.resource(&1)) |> Enum.sort()}
+      {resource_group, reqs |> Enum.group_by(&Formatter.resource_section(&1)) |> Enum.sort()}
     end)
   end
 
@@ -86,11 +86,11 @@ defmodule Xcribe.ApiBlueprint do
   defp group_the_actions(resource_requests) do
     resource_requests
     |> Enum.map(fn {resource_name, reqs} ->
-      {resource_name, reqs |> Enum.group_by(&Formatter.resource_action(&1)) |> Enum.sort()}
+      {resource_name, reqs |> Enum.group_by(&Formatter.action_section(&1)) |> Enum.sort()}
     end)
   end
 
-  defp api_overview, do: Formatter.overview(xcribe_info())
+  defp api_metadata, do: Formatter.metadata_section(xcribe_info())
 
   defp resource_description(%{controller: controller}),
     do: apply(Config.xcribe_information_source(), :resource_description, [controller])

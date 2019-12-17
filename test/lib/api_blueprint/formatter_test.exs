@@ -18,35 +18,35 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
   end
 
-  describe "resource/1" do
+  describe "resource_section/1" do
     test "return formatted resource" do
       struct = %Request{resource: "users", path: "/users"}
 
-      assert Formatter.resource(struct) == "## Users [/users/]\n"
+      assert Formatter.resource_section(struct) == "## Users [/users/]\n"
     end
 
     test "when path ends with forward slash" do
       struct = %Request{resource: "users", path: "/users/"}
 
-      assert Formatter.resource(struct) == "## Users [/users/]\n"
+      assert Formatter.resource_section(struct) == "## Users [/users/]\n"
     end
 
     test "when there is an arg in the path's end" do
       struct = %Request{resource: "users posts", path: "/users/{id}/posts/{post_id}"}
 
-      assert Formatter.resource(struct) == "## Users Posts [/users/{id}/posts/]\n"
+      assert Formatter.resource_section(struct) == "## Users Posts [/users/{id}/posts/]\n"
     end
 
     test "resource with underline" do
       struct = %Request{resource: "users_posts", path: "/users/{id}/posts/{post_id}"}
 
-      assert Formatter.resource(struct) == "## Users Posts [/users/{id}/posts/]\n"
+      assert Formatter.resource_section(struct) == "## Users Posts [/users/{id}/posts/]\n"
     end
 
     test "camelize params" do
       struct = %Request{resource: "users", path: "/users/{user_id}/posts/{post_id}"}
 
-      assert Formatter.resource(struct) == "## Users [/users/{userId}/posts/]\n"
+      assert Formatter.resource_section(struct) == "## Users [/users/{userId}/posts/]\n"
     end
   end
 
@@ -101,11 +101,11 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
   end
 
-  describe "resource_action/1" do
+  describe "action_section/1" do
     test "return formatted resource action" do
       struct = %Request{resource: "users", path: "/users", action: "index", verb: "get"}
 
-      assert Formatter.resource_action(struct) == "### Users index [GET /users/]\n"
+      assert Formatter.action_section(struct) == "### Users index [GET /users/]\n"
     end
 
     test "when there is an arg in the path's end" do
@@ -116,14 +116,14 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         verb: "put"
       }
 
-      assert Formatter.resource_action(struct) ==
+      assert Formatter.action_section(struct) ==
                "### Users Posts update [PUT /users/{id}/posts/{post_id}/]\n"
     end
 
     test "when there is underline" do
       struct = %Request{resource: "users_posts", path: "/users", action: "new_index", verb: "get"}
 
-      assert Formatter.resource_action(struct) == "### Users Posts new index [GET /users/]\n"
+      assert Formatter.action_section(struct) == "### Users Posts new index [GET /users/]\n"
     end
 
     test "camelize params" do
@@ -134,7 +134,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         verb: "get"
       }
 
-      assert Formatter.resource_action(struct) ==
+      assert Formatter.action_section(struct) ==
                "### Users Posts new index [GET /users/{userId}/user/]\n"
     end
   end
@@ -200,18 +200,18 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
   end
 
-  describe "request_description/1" do
+  describe "request_section/1" do
     test "return formatted request description" do
       struct = %Request{description: "create user with token"}
 
-      assert Formatter.request_description(struct) ==
+      assert Formatter.request_section(struct) ==
                "+ Request create user with token (text/plain)\n"
     end
 
     test "clean description" do
       struct = %Request{description: "POST /api/boletos [ create  ] add a boleto"}
 
-      assert Formatter.request_description(struct) ==
+      assert Formatter.request_section(struct) ==
                "+ Request POST api boletos create add a boleto (text/plain)\n"
     end
 
@@ -224,7 +224,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         ]
       }
 
-      assert Formatter.request_description(struct) ==
+      assert Formatter.request_section(struct) ==
                "+ Request create user with token (application/json; charset=utf-8)\n"
     end
   end
@@ -340,6 +340,22 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
              """
     end
 
+    test "attribute object and array" do
+      struct = %Request{
+        request_body: %{"age" => ["item one", "item two"], "name" => %{"key" => "value"}}
+      }
+
+      descriptions = %{"age" => "the user age", "name" => "is the full_name of the user"}
+
+      assert Formatter.request_attributes(struct, descriptions) == """
+                 + Attributes
+
+                     + age: `array` (array) - the user age
+                     + name: `object` (object) - is the full name of the user
+
+             """
+    end
+
     test "return empty string when no body" do
       struct = %Request{
         request_body: %{}
@@ -349,13 +365,13 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
   end
 
-  describe "response_description/1" do
+  describe "response_section/1" do
     test "return formatted response description" do
       struct = %Request{
         status_code: 201
       }
 
-      assert Formatter.response_description(struct) == "+ Response 201 (text/plain)\n"
+      assert Formatter.response_section(struct) == "+ Response 201 (text/plain)\n"
     end
 
     test "when has content type header" do
@@ -366,7 +382,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         ]
       }
 
-      assert Formatter.response_description(struct) == "+ Response 201 (multipart/mixed)\n"
+      assert Formatter.response_section(struct) == "+ Response 201 (multipart/mixed)\n"
     end
   end
 
@@ -464,7 +480,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     end
   end
 
-  describe "overview/1" do
+  describe "metadata_section/1" do
     test "return API overview" do
       api_info = %{
         description: "some cool description",
@@ -472,7 +488,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         name: "The Cool API"
       }
 
-      assert Formatter.overview(api_info) == """
+      assert Formatter.metadata_section(api_info) == """
              FORMAT: 1A
              HOST: http://my-host.com
 
@@ -489,7 +505,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         description: "create an user",
         header_params: [
           {"authorization", "token"},
-          {"content-type", "multipart/mixed; boundary=plug_conn_test"}
+          {"content-type", "application/json"}
         ],
         params: %{"age" => 5, "name" => "teste"},
         request_body: %{"age" => 5, "name" => "teste"},
@@ -502,7 +518,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       }
 
       assert Formatter.full_request(struct) == """
-             + Request create an user (multipart/mixed; boundary=plug_conn_test)
+             + Request create an user (application/json)
                  + Headers
 
                          authorization: token
@@ -512,6 +528,12 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                      + age: `5` (number) - The age
                      + name: `teste` (string) - The name
 
+                 + Body
+
+                         {
+                           "age": 5,
+                           "name": "teste"
+                         }
              + Response 201 (application/json; charset=utf-8)
                  + Headers
 
@@ -531,7 +553,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         description: "create an user",
         header_params: [
           {"authorization", "token"},
-          {"content-type", "multipart/mixed; boundary=plug_conn_test"}
+          {"content-type", "application/json"}
         ],
         params: %{"age" => 5, "name" => "teste"},
         request_body: %{"age" => 5, "name" => "teste"},
@@ -546,7 +568,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       descriptions = %{"age" => "the user age", "name" => "is the full name of the user"}
 
       assert Formatter.full_request(struct, descriptions) == """
-             + Request create an user (multipart/mixed; boundary=plug_conn_test)
+             + Request create an user (application/json)
                  + Headers
 
                          authorization: token
@@ -556,6 +578,12 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                      + age: `5` (number) - the user age
                      + name: `teste` (string) - is the full name of the user
 
+                 + Body
+
+                         {
+                           "age": 5,
+                           "name": "teste"
+                         }
              + Response 201 (application/json; charset=utf-8)
                  + Headers
 

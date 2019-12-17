@@ -49,6 +49,8 @@ defmodule Xcribe.Helpers.Formatter do
   def type_of(item) when is_number(item), do: "number"
   def type_of(item) when is_binary(item), do: "string"
   def type_of(item) when is_boolean(item), do: "boolean"
+  def type_of(item) when is_map(item), do: "object"
+  def type_of(item) when is_list(item), do: "array"
 
   def purge_string(string),
     do: string |> String.replace(@non_word_regex, " ") |> String.replace(@mult_spaces_regex, " ")

@@ -5,51 +5,52 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   use Xcribe.ApiBlueprint.Templates
 
-  def resource_group(%Request{} = request) do
+  def metadata_section(api_info) do
     apply_template(
-      @group_template,
-      group_name: prepare_and_upcase(request.resource_group)
-    )
-  end
-
-  def resource(%Request{resource: resource, path: path}) do
-    apply_template(
-      @resource_template,
-      resource_path: build_resource_path(path),
-      resource_name: prepare_and_captalize(resource)
-    )
-  end
-
-  def resource_action(%Request{resource: resource, path: path, action: action, verb: verb}) do
-    apply_template(
-      @action_template,
-      resource_name: prepare_and_captalize(resource),
-      action_name: remove_underline(action),
-      resource_path: build_action_path(path, verb)
-    )
-  end
-
-  def overview(api_info) do
-    apply_template(
-      @overview_template,
+      @metadata_template,
       host: fetch_key(api_info, :host, ""),
       name: fetch_key(api_info, :name, ""),
       description: fetch_key(api_info, :description, "")
     )
   end
 
-  def request_description(%Request{description: description, header_params: headers}) do
+  def resource_group(%Request{} = request) do
     apply_template(
-      @request_template,
-      description: purge_string(description),
-      content_type: find_content_type(headers)
+      @group_template,
+      identifier: prepare_and_upcase(request.resource_group)
     )
   end
 
-  def response_description(%Request{status_code: code, resp_headers: headers}) do
+  def resource_section(%Request{resource: resource, path: path}) do
+    apply_template(
+      @resource_template,
+      identifier: prepare_and_captalize(resource),
+      uri_template: build_uri_template(path, :resource)
+    )
+  end
+
+  def action_section(%Request{resource: resource, path: path, action: action, verb: verb}) do
+    apply_template(
+      @action_template,
+      identifier_resource: prepare_and_captalize(resource),
+      identifier_action: remove_underline(action),
+      request_method: String.upcase(verb),
+      uri_template: build_uri_template(path, :action)
+    )
+  end
+
+  def request_section(%Request{description: description, header_params: headers}) do
+    apply_template(
+      @request_template,
+      identifier: purge_string(description),
+      media_type: find_content_type(headers)
+    )
+  end
+
+  def response_section(%Request{status_code: code, resp_headers: headers}) do
     apply_template(@response_template,
-      code: "#{code}",
-      content_type: find_content_type(headers)
+      code: to_string(code),
+      media_type: find_content_type(headers)
     )
   end
 
@@ -84,10 +85,11 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   def full_request(%Request{} = struct, desc \\ %{}) do
     Enum.join([
-      request_description(struct),
+      request_section(struct),
       request_headers(struct),
       request_attributes(struct, desc),
-      response_description(struct),
+      request_body(struct),
+      response_section(struct),
       response_headers(struct),
       response_body(struct)
     ])
@@ -142,10 +144,13 @@ defmodule Xcribe.ApiBlueprint.Formatter do
           param: camelize(" #{key}"),
           prefix: tab <> "+",
           type: type <> "#{type_of(value)}",
-          value: "#{remove_underline(value)}"
+          value: "#{item_value(value)}"
         )
     end)
   end
+
+  defp item_value(item) when is_list(item) or is_map(item), do: type_of(item)
+  defp item_value(item), do: remove_underline(item)
 
   defp get_description(param, desc),
     do: desc |> fetch_key(param, "The #{param}") |> remove_underline()
@@ -159,18 +164,13 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   defp add_header({header, value}, acc),
     do: apply_template(@header_item_template, header: header, value: value) <> acc
 
-  defp build_resource_path(path) do
+  defp build_uri_template(path, typ) do
     path
     |> camelize_params()
     |> add_forward_slash()
-    |> remove_ending_argument()
-    |> (fn p -> "[#{p}]" end).()
+    |> remove_ending_argument_for(typ)
   end
 
-  defp build_action_path(path, verb) do
-    path
-    |> camelize_params()
-    |> add_forward_slash()
-    |> (fn p -> "[#{String.upcase(verb)} #{p}]" end).()
-  end
+  defp remove_ending_argument_for(uri, :resource), do: remove_ending_argument(uri)
+  defp remove_ending_argument_for(uri, _), do: uri
 end
