@@ -1,5 +1,5 @@
 defmodule Xcribe.Helpers.DocumentTest do
-  use Xcribe.ConnCase, async: true
+  use Xcribe.ConnCase, async: false
 
   alias Xcribe.{ConnParser, Recorder}
 

@@ -42,7 +42,7 @@ defmodule Xcribe.ApiBlueprintExamples do
                    description: "create an user",
                    header_params: [
                      {"authorization", "token"},
-                     {"content-type", "multipart/mixed; boundary=plug_conn_test"}
+                     {"content-type", "application/json; boundary=plug_conn_test"}
                    ],
                    params: %{"age" => 5, "name" => "teste"},
                    path: "/users",
@@ -151,7 +151,7 @@ defmodule Xcribe.ApiBlueprintExamples do
                   }
       ## Users [/users/]
       ### Users create [POST /users/]
-      + Request create an user (multipart/mixed; boundary=plug_conn_test)
+      + Request create an user (application/json; boundary=plug_conn_test)
           + Headers
 
                   authorization: token
@@ -161,6 +161,12 @@ defmodule Xcribe.ApiBlueprintExamples do
               + age: `5` (number) - The age
               + name: `teste` (string) - The name
 
+          + Body
+
+                  {
+                    "age": 5,
+                    "name": "teste"
+                  }
       + Response 201 (application/json; charset=utf-8)
           + Headers
 
