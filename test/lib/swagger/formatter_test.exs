@@ -19,6 +19,13 @@ defmodule Xcribe.Swagger.FormatterTest do
 
       expected = [
         %{
+          "name" => "x-client-id",
+          "in" => "header",
+          "description" => "",
+          "required" => false,
+          "schema" => %{"type" => "string"}
+        },
+        %{
           "name" => "post_title",
           "in" => "path",
           "description" => "",
@@ -38,13 +45,6 @@ defmodule Xcribe.Swagger.FormatterTest do
           "description" => "",
           "required" => true,
           "schema" => %{"type" => "integer"}
-        },
-        %{
-          "name" => "x-client-id",
-          "in" => "header",
-          "description" => "",
-          "required" => false,
-          "schema" => %{"type" => "string"}
         }
       ]
 

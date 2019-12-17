@@ -27,6 +27,15 @@ defmodule Xcribe.SwaggerExamples do
               "description": "",
               "parameters": [
                 {
+                  "name": "authorization",
+                  "in": "header",
+                  "description": "",
+                  "required": false,
+                  "schema": {
+                    "type": "string"
+                  }
+                },
+                {
                   "name": "users_id",
                   "in": "path",
                   "description": "",
@@ -40,15 +49,6 @@ defmodule Xcribe.SwaggerExamples do
                   "in": "path",
                   "description": "",
                   "required": true,
-                  "schema": {
-                    "type": "string"
-                  }
-                },
-                {
-                  "name": "authorization",
-                  "in": "header",
-                  "description": "",
-                  "required": false,
                   "schema": {
                     "type": "string"
                   }
@@ -428,6 +428,15 @@ defmodule Xcribe.SwaggerExamples do
               ],
               "parameters": [
                 {
+                  "name": "authorization",
+                  "in": "header",
+                  "description": "",
+                  "required": false,
+                  "schema": {
+                    "type": "string"
+                  }
+                },
+                {
                   "name": "updated_at",
                   "in": "query",
                   "description": "",
@@ -452,15 +461,6 @@ defmodule Xcribe.SwaggerExamples do
                   "required": true,
                   "schema": {
                     "type": "integer"
-                  }
-                },
-                {
-                  "name": "authorization",
-                  "in": "header",
-                  "description": "",
-                  "required": false,
-                  "schema": {
-                    "type": "string"
                   }
                 }
               ],

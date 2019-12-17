@@ -11,29 +11,21 @@ defmodule Xcribe.Swagger.Formatter do
         controller: controller,
         action: action
       }) do
-    headers_parameters =
-      Enum.reduce(headers, [], fn {name, value}, acc ->
-        [
-          %{
-            "name" => name,
-            "in" => "header",
-            "description" => Descriptor.get_param_description(name, controller, action),
-            "required" => false,
-            "schema" => %{"type" => type_of(value)}
-          }
-          | acc
-        ]
-      end)
-
     params
     |> Map.merge(query)
-    |> Enum.reduce(headers_parameters, fn {name, value}, acc ->
+    |> Map.to_list()
+    |> Kernel.++(headers)
+    |> Enum.reduce([], fn {name, value}, acc ->
       [
         %{
           "name" => name,
-          "in" => if(Map.has_key?(params, name), do: "path", else: "query"),
+          "in" =>
+            if(Map.has_key?(params, name),
+              do: "path",
+              else: if(Map.has_key?(query, name), do: "query", else: "header")
+            ),
           "description" => Descriptor.get_param_description(name, controller, action),
-          "required" => if(Map.has_key?(params, name), do: true, else: false),
+          "required" => Map.has_key?(params, name),
           "schema" => %{"type" => type_of(value)}
         }
         | acc
