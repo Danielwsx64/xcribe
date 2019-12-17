@@ -43,6 +43,15 @@ defmodule Xcribe.SwaggerExamples do
                   "schema": {
                     "type": "string"
                   }
+                },
+                {
+                  "name": "authorization",
+                  "in": "header",
+                  "description": "",
+                  "required": false,
+                  "schema": {
+                    "type": "string"
+                  }
                 }
               ],
               "security": [
@@ -95,6 +104,17 @@ defmodule Xcribe.SwaggerExamples do
                   "api_key": []
                 }
               ],
+              "parameters": [
+                {
+                  "name": "authorization",
+                  "in": "header",
+                  "description": "",
+                  "required": false,
+                  "schema": {
+                    "type": "string"
+                  }
+                }
+              ],
               "responses": {
                 "200": {
                   "description": "get all users",
@@ -139,6 +159,26 @@ defmodule Xcribe.SwaggerExamples do
               "security": [
                 {
                   "api_key": []
+                }
+              ],
+              "parameters": [
+                {
+                  "name": "content-type",
+                  "in": "header",
+                  "description": "",
+                  "required": false,
+                  "schema": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "name": "authorization",
+                  "in": "header",
+                  "description": "",
+                  "required": false,
+                  "schema": {
+                    "type": "string"
+                  }
                 }
               ],
               "requestBody": {
@@ -234,6 +274,17 @@ defmodule Xcribe.SwaggerExamples do
                   "api_key": []
                 }
               ],
+              "parameters": [
+                {
+                  "name": "authorization",
+                  "in": "header",
+                  "description": "",
+                  "required": false,
+                  "schema": {
+                    "type": "string"
+                  }
+                }
+              ],
               "responses": {
                 "200": {
                   "description": "get monitoring info",
@@ -265,6 +316,42 @@ defmodule Xcribe.SwaggerExamples do
             }
           },
           "/server/{server_id}/protocols": {
+            "get": {
+              "summary": "",
+              "description": "Application protocols is a awesome feature of our app",
+              "responses": {
+                "200": {
+                  "description": "index the protocols",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer",
+                              "description": ""
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": ""
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "headers": {
+                    "content-type": {
+                      "schema": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "post": {
               "summary": "",
               "description": "Application protocols is a awesome feature of our app",
@@ -365,6 +452,15 @@ defmodule Xcribe.SwaggerExamples do
                   "required": true,
                   "schema": {
                     "type": "integer"
+                  }
+                },
+                {
+                  "name": "authorization",
+                  "in": "header",
+                  "description": "",
+                  "required": false,
+                  "schema": {
+                    "type": "string"
                   }
                 }
               ],

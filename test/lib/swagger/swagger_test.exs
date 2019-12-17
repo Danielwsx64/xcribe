@@ -68,12 +68,109 @@ defmodule Xcribe.SwaggerTest do
           ],
           status_code: 201,
           verb: "post"
+        },
+        %Request{
+          action: "index",
+          controller: Elixir.Xcribe.ProtocolsController,
+          description: "index the protocols",
+          header_params: [],
+          params: %{},
+          path: "/server/{server_id}/protocols",
+          path_params: %{},
+          query_params: %{},
+          request_body: %{},
+          resource: "protocols",
+          resource_group: :api,
+          resp_body: "[{\"id\":2,\"name\":\"user 2\"}]",
+          resp_headers: [
+            {"content-type", "application/json"}
+          ],
+          status_code: 200,
+          verb: "get"
         }
         | @sample_requests
       ]
 
       assert Jason.decode!(Swagger.generate_doc(requests)) ==
                Jason.decode!(@sample_swagger_output)
+    end
+
+    test "when there is no security schema" do
+      requests = [
+        %Request{
+          action: "index",
+          controller: Elixir.Xcribe.ProtocolsController,
+          description: "index the protocols",
+          header_params: [],
+          params: %{},
+          path: "/server/{server_id}/protocols",
+          path_params: %{},
+          query_params: %{},
+          request_body: %{},
+          resource: "protocols",
+          resource_group: :api,
+          resp_body: "[{\"id\":2,\"name\":\"user 2\"}]",
+          resp_headers: [
+            {"content-type", "application/json"}
+          ],
+          status_code: 200,
+          verb: "get"
+        }
+      ]
+
+      expected = """
+      {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Basic API",
+          "version": "0.1.0",
+          "description": "The description of the API"
+        },
+        "paths": {
+          "/server/{server_id}/protocols": {
+            "get": {
+              "summary": "",
+              "description": "Application protocols is a awesome feature of our app",
+              "responses": {
+                "200": {
+                  "description": "index the protocols",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer",
+                              "description": ""
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": ""
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "headers": {
+                    "content-type": {
+                      "schema": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+      assert Jason.decode!(Swagger.generate_doc(requests)) ==
+        Jason.decode!(expected)
     end
   end
 end

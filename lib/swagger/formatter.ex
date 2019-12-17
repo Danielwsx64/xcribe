@@ -7,12 +7,27 @@ defmodule Xcribe.Swagger.Formatter do
   def format_parameters(%{
         path_params: params,
         query_params: query,
+        header_params: headers,
         controller: controller,
         action: action
       }) do
+    headers_parameters =
+      Enum.reduce(headers, [], fn {name, value}, acc ->
+        [
+          %{
+            "name" => name,
+            "in" => "header",
+            "description" => Descriptor.get_param_description(name, controller, action),
+            "required" => false,
+            "schema" => %{"type" => type_of(value)}
+          }
+          | acc
+        ]
+      end)
+
     params
     |> Map.merge(query)
-    |> Enum.reduce([], fn {name, value}, acc ->
+    |> Enum.reduce(headers_parameters, fn {name, value}, acc ->
       [
         %{
           "name" => name,

@@ -8,6 +8,9 @@ defmodule Xcribe.Swagger.FormatterTest do
       request = %{
         path_params: %{"id" => 1, "post_title" => "title"},
         query_params: %{"name" => "test"},
+        header_params: [
+          {"x-client-id", "123456678"}
+        ],
         controller: Elixir.Xcribe.PostsController,
         action: "show"
       }
@@ -35,6 +38,13 @@ defmodule Xcribe.Swagger.FormatterTest do
           "description" => "",
           "required" => true,
           "schema" => %{"type" => "integer"}
+        },
+        %{
+          "name" => "x-client-id",
+          "in" => "header",
+          "description" => "",
+          "required" => false,
+          "schema" => %{"type" => "string"}
         }
       ]
 
@@ -45,6 +55,7 @@ defmodule Xcribe.Swagger.FormatterTest do
       request = %{
         path_params: %{},
         query_params: %{},
+        header_params: [],
         controller: Elixir.Xcribe.PostsController,
         action: "show"
       }
