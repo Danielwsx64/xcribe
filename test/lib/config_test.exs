@@ -3,6 +3,10 @@ defmodule Xcribe.ConfigTest do
 
   alias Xcribe.Config
 
+  setup_all do
+    System.put_env("EXISTING_ENV_VAR", "1")
+  end
+
   describe "output_file/0" do
     test "return the output file setuped at config" do
       Application.put_env(:xcribe, :output_file, "example.md")
@@ -27,7 +31,7 @@ defmodule Xcribe.ConfigTest do
 
   describe "active?/0" do
     test "return true when xcribe env var is defined" do
-      Application.put_env(:xcribe, :env_var, "SHELL")
+      Application.put_env(:xcribe, :env_var, "EXISTING_ENV_VAR")
 
       assert Config.active?() == true
     end
