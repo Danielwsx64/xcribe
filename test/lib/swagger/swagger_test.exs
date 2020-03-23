@@ -36,7 +36,11 @@ defmodule Xcribe.SwaggerTest do
           controller: Elixir.Xcribe.ProtocolsController,
           description: "show the protocol",
           header_params: [{"authorization", "token"}],
-          params: %{},
+          params: %{
+            "id" => 90,
+            "server_id" => 88,
+            "updated_at" => DateTime.utc_now() |> DateTime.to_iso8601()
+          },
           path: "/server/{server_id}/protocols/{id}",
           path_params: %{"id" => 90, "server_id" => 88},
           query_params: %{"updated_at" => DateTime.utc_now() |> DateTime.to_iso8601()},
