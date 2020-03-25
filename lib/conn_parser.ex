@@ -1,7 +1,33 @@
 defmodule Xcribe.ConnParser do
+  @moduledoc ~S"""
+  Used to convert a `Plug.Conn` to a `Xcribe.Request`.
+
+  Each connection sent to documenting in your tests is given to `ConnParser`.
+  Is expected that connection has been passed through the app `Endpoint` as a
+  finished request. The parser will extract all needed info from `Conn` and uses
+  app `Router` for additional information about the request.
+
+  The atribute `description` must be given at `document` macro call with the
+  option `:as`:
+
+      test "test name", %{conn: conn} do
+        ...
+
+        Xcribe.Helpers.Document.document(conn, as: "description here")
+
+        ...
+      end
+
+  If no description is given the current test description will be used.
+  """
+
   alias Xcribe.{Config, Request}
 
-  def execute(conn, description \\ "sample request") do
+  @doc """
+  Parse the given `Plug.Conn` and transform it to a `Xcribe.Request`. A
+  description can be provided.
+  """
+  def execute(conn, description \\ "") do
     conn
     |> identify_route()
     |> parse_conn(conn, description)
@@ -11,7 +37,6 @@ defmodule Xcribe.ConnParser do
 
   defp parse_conn(route, conn, description) do
     path = format_path(route.route, Map.keys(conn.path_params))
-    namespaces = fetch_namespaces()
 
     %Request{
       action: route |> router_options() |> Atom.to_string(),
@@ -23,7 +48,7 @@ defmodule Xcribe.ConnParser do
       path_params: conn.path_params,
       query_params: conn.query_params,
       request_body: conn.body_params,
-      resource: resource_name(path, namespaces),
+      resource: resource_name(path, fetch_namespaces()),
       resource_group: resource_group(route),
       resp_body: conn.resp_body,
       resp_headers: conn.resp_headers,
