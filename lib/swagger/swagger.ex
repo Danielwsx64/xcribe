@@ -2,127 +2,128 @@ defmodule Xcribe.Swagger do
   @moduledoc """
   Treats list of Requests and generates OpenAPI 3.0 JSON
   """
-  alias Xcribe.Config
+
+  alias Xcribe.{Config, JSON}
   alias Xcribe.Swagger.{Descriptor, Formatter}
 
+  @empty_data [nil, %{}, []]
+  @security_scheme %{
+    "securitySchemes" => %{
+      "api_key" => %{"name" => "Authorization", "type" => "apiKey", "in" => "header"}
+    }
+  }
+
   def generate_doc(requests) do
-    swagger_json()
-    |> add_requests(requests)
-    |> add_security(requests)
-    |> Xcribe.JSON.encode!()
+    requests
+    |> build_openapi_object()
+    |> include_security_scheme(requests)
+    |> json_encode!()
   end
 
-  defp swagger_json() do
+  defp build_openapi_object(requests) do
     %{
       "openapi" => "3.0.0",
       "info" => %{
         "title" => Map.get(xcribe_info(), :name, ""),
         "version" => Map.get(xcribe_info(), :version, "0.1.0"),
         "description" => Map.get(xcribe_info(), :description, "")
-      }
+      },
+      "paths" => requests |> Enum.sort_by(& &1.status_code) |> paths_from_requests()
     }
   end
 
-  defp add_requests(swagger_map, requests) do
-    paths =
-      requests
-      |> Enum.sort_by(& &1.status_code)
-      |> Enum.reduce(%{}, fn x, acc ->
-        Map.put(acc, x.path, Map.merge(acc[x.path] || %{}, handle_request(x, acc)))
-      end)
+  defp paths_from_requests(requests),
+    do: Enum.reduce(requests, %{}, &build_path_from_request/2)
 
-    Map.put(swagger_map, "paths", paths)
+  defp build_path_from_request(%{path: path} = request, paths) do
+    Map.update(
+      paths,
+      path,
+      build_path_item_object(request),
+      &build_path_verb_from_request(&1, request)
+    )
   end
 
-  defp add_security(swagger_map, requests) do
+  defp build_path_verb_from_request(path, %{verb: verb} = request) do
+    Map.update(
+      path,
+      verb,
+      build_operation_object(request),
+      &build_responses_from_request(&1, request)
+    )
+  end
+
+  defp build_responses_from_request(operation_object, request) do
+    Map.update(operation_object, "responses", %{}, fn responses ->
+      Map.merge(responses, Formatter.format_responses(request))
+    end)
+  end
+
+  defp build_path_item_object(%{verb: verb} = request),
+    do: %{verb => build_operation_object(request)}
+
+  defp build_operation_object(request) do
+    request
+    |> base_operation_object
+    |> parameters_if_needed(request)
+    |> request_body_if_needed(request)
+    |> security_if_needed(request)
+  end
+
+  defp base_operation_object(request) do
+    %{
+      "summary" => Descriptor.get_action_description(request),
+      "description" => Descriptor.get_request_description(request),
+      "responses" => Formatter.format_responses(request)
+    }
+  end
+
+  defp include_security_scheme(openapi_object, requests) do
     requests
     |> Enum.any?(&has_authorization_header?/1)
-    |> if do
-      Map.put(swagger_map, "components", %{
-        "securitySchemes" => %{
-          "api_key" => %{"name" => "Authorization", "type" => "apiKey", "in" => "header"}
-        }
-      })
-    else
-      swagger_map
-    end
+    |> put_security_scheme(openapi_object)
   end
+
+  defp put_security_scheme(false, openapi_object), do: openapi_object
+
+  defp put_security_scheme(true, openapi_object),
+    do: Map.put(openapi_object, "components", @security_scheme)
 
   defp has_authorization_header?(request) do
     request
     |> Map.fetch!(:header_params)
-    |> Enum.any?(fn {header, _} -> String.downcase(header) == "authorization" end)
+    |> Enum.any?(fn {h, _} -> String.match?(h, ~r/^authorization$/i) end)
   end
 
-  defp handle_request(request, swagger_paths) do
-    swagger_paths
-    |> Map.fetch(request.path)
-    |> has_key?(request.verb)
-    |> handle_request(swagger_paths, request)
+  defp parameters_if_needed(openapi_object, request) do
+    request
+    |> Map.take([:path_params, :query_params, :header_params])
+    |> Enum.any?(&(elem(&1, 1) not in @empty_data))
+    |> include_parameters(openapi_object, request)
   end
 
-  defp has_key?(:error, _), do: false
-  defp has_key?({:ok, map}, key), do: Map.has_key?(map, key)
+  defp include_parameters(false, openapi_object, _request), do: openapi_object
 
-  defp handle_request(true, swagger_paths, request), do: add_response(swagger_paths, request)
-  defp handle_request(false, _swagger_paths, request), do: format_request(request)
-
-  defp add_response(swagger_map, request) do
-    original_request = swagger_map[request.path][request.verb]
-
-    %{
-      request.verb =>
-        Map.put(
-          original_request,
-          "responses",
-          Map.merge(original_request["responses"], Formatter.format_responses(request))
-        )
-    }
+  defp include_parameters(true, openapi_object, request) do
+    Map.put(openapi_object, "parameters", Formatter.request_parameters(request))
   end
 
-  defp format_request(request) do
-    operation =
-      %{
-        "summary" => Descriptor.get_action_description(request),
-        "description" => Descriptor.get_request_description(request),
-        "responses" => Formatter.format_responses(request)
-      }
-      |> put_parameters_if_needed(request)
-      |> put_request_body_if_needed(request)
-      |> put_security_if_needed(request)
+  defp request_body_if_needed(openapi_object, %{request_body: body}) when body in @empty_data,
+    do: openapi_object
 
-    %{
-      request.verb => operation
-    }
+  defp request_body_if_needed(openapi_object, request) do
+    Map.put(openapi_object, "requestBody", Formatter.request_body(request))
   end
 
-  defp put_parameters_if_needed(
-         swagger,
-         %{path_params: params, query_params: query, header_params: headers} = request
-       )
-       when params not in [nil, %{}] or query not in [nil, %{}] or headers not in [nil, []] do
-    Map.put(swagger, "parameters", Formatter.format_parameters(request))
-  end
-
-  defp put_parameters_if_needed(swagger, _), do: swagger
-
-  defp put_request_body_if_needed(swagger, %{request_body: body} = request)
-       when body not in [nil, %{}] do
-    Map.put(swagger, "requestBody", Formatter.format_body(request))
-  end
-
-  defp put_request_body_if_needed(swagger, _), do: swagger
-
-  defp put_security_if_needed(swagger, %{header_params: headers}) do
-    headers
-    |> Enum.any?(fn {header, _} -> String.downcase(header) == "authorization" end)
-    |> if do
-      Map.put(swagger, "security", [%{"api_key" => []}])
+  defp security_if_needed(openapi_object, request) do
+    if has_authorization_header?(request) do
+      Map.put(openapi_object, "security", [%{"api_key" => []}])
     else
-      swagger
+      openapi_object
     end
   end
 
-  defp xcribe_info,
-    do: apply(Config.xcribe_information_source(), :api_info, [])
+  defp json_encode!(map), do: JSON.encode!(map)
+
+  defp xcribe_info, do: apply(Config.xcribe_information_source(), :api_info, [])
 end

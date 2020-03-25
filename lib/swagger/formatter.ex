@@ -2,45 +2,30 @@ defmodule Xcribe.Swagger.Formatter do
   @moduledoc """
   Creates Swagger maps according to OpenAPI Specification
   """
-  alias Xcribe.Swagger.Descriptor
+  alias Xcribe.{JSON, Request}
 
-  def format_parameters(%{
-        path_params: params,
-        query_params: query,
-        header_params: headers,
-        controller: controller,
-        action: action
-      }) do
-    params
-    |> Map.merge(query)
-    |> Map.to_list()
-    |> Kernel.++(headers)
-    |> Enum.reduce([], fn {name, value}, acc ->
-      [
-        %{
-          "name" => name,
-          "in" =>
-            if(Map.has_key?(params, name),
-              do: "path",
-              else: if(Map.has_key?(query, name), do: "query", else: "header")
-            ),
-          "description" => Descriptor.get_param_description(name, controller, action),
-          "required" => Map.has_key?(params, name),
-          "schema" => %{"type" => type_of(value)}
-        }
-        | acc
-      ]
-    end)
+  import Xcribe.Swagger.Descriptor,
+    only: [
+      get_param_description: 3,
+      get_content_type: 1,
+      get_attr_description: 2
+    ]
+
+  def request_parameters(%Request{} = request) do
+    []
+    |> include_params(request.path_params, request, "path")
+    |> include_params(request.query_params, request, "query")
+    |> include_params(request.header_params, request, "header")
   end
 
-  def format_body(%{request_body: body} = request) do
+  def request_body(%{request_body: body} = request) do
     %{
       "required" => true,
       "content" => %{
-        Descriptor.get_content_type(request) => %{
+        get_content_type(request) => %{
           "schema" => %{
             "type" => "object",
-            "properties" => format_body_params(body, request)
+            "properties" => params_schema_object(body, request)
           }
         }
       }
@@ -57,71 +42,62 @@ defmodule Xcribe.Swagger.Formatter do
     }
   end
 
-  defp format_body_params(body, request) when is_map(body) do
-    body
-    |> Map.to_list()
-    |> format_params(request)
+  defp include_params(list, params, request, inn) do
+    Enum.reduce(params, list, fn {name, value}, acc ->
+      [build_parameter_object(name, value, request, inn) | acc]
+    end)
   end
 
-  defp format_params([{name, value} | tail], %{controller: controller} = request) do
-    Map.merge(
-      %{
-        name => %{
-          "type" => type_of(value),
-          "description" => Descriptor.get_attr_description(name, controller)
-        }
-      },
-      format_params(tail, request)
-    )
+  defp build_parameter_object(name, value, %{action: action, controller: controller}, inn) do
+    %{
+      "name" => name,
+      "in" => inn,
+      "description" => get_param_description(name, controller, action),
+      "required" => inn == "path",
+      "schema" => %{"type" => type_of(value)}
+    }
   end
 
-  defp format_params([], _), do: %{}
-
-  defp format_headers([{name, value} | tail]) do
-    Map.merge(
-      %{
-        name => %{"schema" => %{"type" => type_of(value)}}
-      },
-      format_headers(tail)
-    )
+  defp params_schema_object(params, %{controller: controller}) do
+    Enum.reduce(params, %{}, fn {key, value}, map ->
+      Map.put(map, key, build_simple_schema(key, value, controller))
+    end)
   end
 
-  defp format_headers([]), do: %{}
+  defp build_simple_schema(name, value, controller) do
+    %{"type" => type_of(value), "description" => get_attr_description(name, controller)}
+  end
+
+  defp format_headers(headers) do
+    Enum.reduce(headers, %{}, fn {k, v}, acc ->
+      Map.put(acc, k, %{"schema" => %{"type" => type_of(v)}})
+    end)
+  end
 
   defp format_response_body(%{resp_body: body} = request) do
-    %{
-      Descriptor.get_content_type(request) => %{
-        "schema" =>
-          body
-          |> Jason.decode()
-          |> handle_json_decode()
-          |> format_response_body_schema()
-      }
-    }
+    %{get_content_type(request) => %{"schema" => format_body_schema(body)}}
   end
 
-  defp handle_json_decode({:ok, any}), do: any
+  defp format_body_schema(body) do
+    body
+    |> JSON.decode()
+    |> handle_json_decode()
+    |> body_schema()
+  end
+
+  defp handle_json_decode({:ok, map}), do: map
   defp handle_json_decode({:error, %{data: data}}), do: data
 
-  defp format_response_body_schema(body) when is_bitstring(body) do
-    %{
-      "type" => "string",
-      "example" => body
-    }
+  defp body_schema(body) when is_bitstring(body) do
+    %{"type" => "string", "example" => body}
   end
 
-  defp format_response_body_schema(body) when is_map(body) do
-    %{
-      "type" => "object",
-      "properties" => format_body_params(body, %{controller: nil})
-    }
+  defp body_schema(body) when is_map(body) do
+    %{"type" => "object", "properties" => params_schema_object(body, %{controller: nil})}
   end
 
-  defp format_response_body_schema(body) when is_list(body) do
-    %{
-      "type" => "array",
-      "items" => body |> List.first() |> format_response_body_schema()
-    }
+  defp body_schema([body | _t]) do
+    %{"type" => "array", "items" => body_schema(body)}
   end
 
   defp type_of(value) when is_integer(value), do: "integer"
