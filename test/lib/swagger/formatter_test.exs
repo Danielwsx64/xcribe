@@ -2,25 +2,29 @@ defmodule Xcribe.Swagger.FormatterTest do
   use ExUnit.Case, async: true
 
   alias Xcribe.Swagger.Formatter
+  alias Xcribe.Request
 
-  describe "format_parameters/1" do
+  describe "request_parameters/1" do
     test "with some parameters" do
-      request = %{
+      request = %Request{
         path_params: %{"id" => 1, "post_title" => "title"},
         query_params: %{"name" => "test"},
-        header_params: [
-          {"x-client-id", "123456678"}
-        ],
+        header_params: [{"x-client-id", "123456678"}],
         controller: Elixir.Xcribe.PostsController,
         action: "show"
       }
-
-      actual = Formatter.format_parameters(request)
 
       expected = [
         %{
           "name" => "x-client-id",
           "in" => "header",
+          "description" => "",
+          "required" => false,
+          "schema" => %{"type" => "string"}
+        },
+        %{
+          "name" => "name",
+          "in" => "query",
           "description" => "",
           "required" => false,
           "schema" => %{"type" => "string"}
@@ -33,13 +37,6 @@ defmodule Xcribe.Swagger.FormatterTest do
           "schema" => %{"type" => "string"}
         },
         %{
-          "name" => "name",
-          "in" => "query",
-          "description" => "",
-          "required" => false,
-          "schema" => %{"type" => "string"}
-        },
-        %{
           "name" => "id",
           "in" => "path",
           "description" => "",
@@ -48,25 +45,21 @@ defmodule Xcribe.Swagger.FormatterTest do
         }
       ]
 
-      assert actual == expected
+      assert Formatter.request_parameters(request) == expected
     end
 
     test "without any parameters" do
-      request = %{
+      request = %Request{
         path_params: %{},
         query_params: %{},
-        header_params: [],
-        controller: Elixir.Xcribe.PostsController,
-        action: "show"
+        header_params: []
       }
 
-      actual = Formatter.format_parameters(request)
-
-      assert actual == []
+      assert Formatter.request_parameters(request) == []
     end
   end
 
-  describe "format_body/1" do
+  describe "request_body/1" do
     test "when body is a map" do
       request = %{
         request_body: %{
@@ -78,8 +71,6 @@ defmodule Xcribe.Swagger.FormatterTest do
           {"content-type", "application/json; charset=utf-8"}
         ]
       }
-
-      actual = Formatter.format_body(request)
 
       expected = %{
         "required" => true,
@@ -102,7 +93,7 @@ defmodule Xcribe.Swagger.FormatterTest do
         }
       }
 
-      assert actual == expected
+      assert Formatter.request_body(request) == expected
     end
   end
 
@@ -117,8 +108,6 @@ defmodule Xcribe.Swagger.FormatterTest do
         ],
         resp_body: "[{\"id\":1,\"name\":\"user 1\"},{\"id\":2,\"name\":\"user 2\"}]"
       }
-
-      actual = Formatter.format_responses(request)
 
       expected = %{
         200 => %{
@@ -158,7 +147,7 @@ defmodule Xcribe.Swagger.FormatterTest do
         }
       }
 
-      assert actual == expected
+      assert Formatter.format_responses(request) == expected
     end
 
     test "when response body is a map" do
@@ -171,8 +160,6 @@ defmodule Xcribe.Swagger.FormatterTest do
         ],
         resp_body: "{\"id\":1,\"name\":\"user 1\"}"
       }
-
-      actual = Formatter.format_responses(request)
 
       expected = %{
         200 => %{
@@ -209,7 +196,7 @@ defmodule Xcribe.Swagger.FormatterTest do
         }
       }
 
-      assert actual == expected
+      assert Formatter.format_responses(request) == expected
     end
 
     test "when response body is empty" do
@@ -221,8 +208,6 @@ defmodule Xcribe.Swagger.FormatterTest do
         ],
         resp_body: ""
       }
-
-      actual = Formatter.format_responses(request)
 
       expected = %{
         204 => %{
@@ -245,7 +230,7 @@ defmodule Xcribe.Swagger.FormatterTest do
         }
       }
 
-      assert actual == expected
+      assert Formatter.format_responses(request) == expected
     end
 
     test "when response body is a XML response" do
@@ -258,8 +243,6 @@ defmodule Xcribe.Swagger.FormatterTest do
         ],
         resp_body: "<user><id>1</id><name>user 1</name></user>"
       }
-
-      actual = Formatter.format_responses(request)
 
       expected = %{
         200 => %{
@@ -287,7 +270,7 @@ defmodule Xcribe.Swagger.FormatterTest do
         }
       }
 
-      assert actual == expected
+      assert Formatter.format_responses(request) == expected
     end
   end
 end

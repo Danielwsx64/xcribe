@@ -101,11 +101,11 @@ defmodule Xcribe.Swagger do
   defp include_parameters(false, openapi_object, _request), do: openapi_object
 
   defp include_parameters(true, openapi_object, request),
-    do: Map.put(openapi_object, "parameters", Formatter.format_parameters(request))
+    do: Map.put(openapi_object, "parameters", Formatter.request_parameters(request))
 
   defp request_body_if_needed(openapi_object, request) do
     if request.request_body not in @empty_data do
-      Map.put(openapi_object, "requestBody", Formatter.format_body(request))
+      Map.put(openapi_object, "requestBody", Formatter.request_body(request))
     else
       openapi_object
     end
