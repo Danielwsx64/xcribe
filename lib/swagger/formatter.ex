@@ -5,7 +5,11 @@ defmodule Xcribe.Swagger.Formatter do
   alias Xcribe.{JSON, Request}
 
   import Xcribe.Swagger.Descriptor,
-    only: [get_param_description: 3, get_content_type: 1, get_attr_description: 2]
+    only: [
+      get_param_description: 3,
+      get_content_type: 1,
+      get_attr_description: 2
+    ]
 
   def request_parameters(%Request{} = request) do
     []
@@ -77,12 +81,12 @@ defmodule Xcribe.Swagger.Formatter do
   defp format_body_schema(body) do
     body
     |> JSON.decode()
-    |> case do
-      {:ok, map} -> map
-      {:error, %{data: data}} -> data
-    end
+    |> handle_json_decode()
     |> body_schema()
   end
+
+  defp handle_json_decode({:ok, map}), do: map
+  defp handle_json_decode({:error, %{data: data}}), do: data
 
   defp body_schema(body) when is_bitstring(body) do
     %{"type" => "string", "example" => body}

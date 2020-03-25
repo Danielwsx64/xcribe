@@ -3,7 +3,7 @@ defmodule Xcribe.Swagger do
   Treats list of Requests and generates OpenAPI 3.0 JSON
   """
 
-  alias Xcribe.Config
+  alias Xcribe.{Config, JSON}
   alias Xcribe.Swagger.{Descriptor, Formatter}
 
   @empty_data [nil, %{}, []]
@@ -15,10 +15,9 @@ defmodule Xcribe.Swagger do
 
   def generate_doc(requests) do
     requests
-    |> Enum.sort_by(& &1.status_code)
     |> build_openapi_object()
     |> include_security_scheme(requests)
-    |> Xcribe.JSON.encode!()
+    |> json_encode!()
   end
 
   defp build_openapi_object(requests) do
@@ -29,7 +28,7 @@ defmodule Xcribe.Swagger do
         "version" => Map.get(xcribe_info(), :version, "0.1.0"),
         "description" => Map.get(xcribe_info(), :description, "")
       },
-      "paths" => paths_from_requests(requests)
+      "paths" => requests |> Enum.sort_by(& &1.status_code) |> paths_from_requests()
     }
   end
 
@@ -64,14 +63,19 @@ defmodule Xcribe.Swagger do
     do: %{verb => build_operation_object(request)}
 
   defp build_operation_object(request) do
+    request
+    |> base_operation_object
+    |> parameters_if_needed(request)
+    |> request_body_if_needed(request)
+    |> security_if_needed(request)
+  end
+
+  defp base_operation_object(request) do
     %{
       "summary" => Descriptor.get_action_description(request),
       "description" => Descriptor.get_request_description(request),
       "responses" => Formatter.format_responses(request)
     }
-    |> parameters_if_needed(request)
-    |> request_body_if_needed(request)
-    |> security_if_needed(request)
   end
 
   defp include_security_scheme(openapi_object, requests) do
@@ -100,15 +104,15 @@ defmodule Xcribe.Swagger do
 
   defp include_parameters(false, openapi_object, _request), do: openapi_object
 
-  defp include_parameters(true, openapi_object, request),
-    do: Map.put(openapi_object, "parameters", Formatter.request_parameters(request))
+  defp include_parameters(true, openapi_object, request) do
+    Map.put(openapi_object, "parameters", Formatter.request_parameters(request))
+  end
+
+  defp request_body_if_needed(openapi_object, %{request_body: body}) when body in @empty_data,
+    do: openapi_object
 
   defp request_body_if_needed(openapi_object, request) do
-    if request.request_body not in @empty_data do
-      Map.put(openapi_object, "requestBody", Formatter.request_body(request))
-    else
-      openapi_object
-    end
+    Map.put(openapi_object, "requestBody", Formatter.request_body(request))
   end
 
   defp security_if_needed(openapi_object, request) do
@@ -118,6 +122,8 @@ defmodule Xcribe.Swagger do
       openapi_object
     end
   end
+
+  defp json_encode!(map), do: JSON.encode!(map)
 
   defp xcribe_info, do: apply(Config.xcribe_information_source(), :api_info, [])
 end
