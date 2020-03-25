@@ -33,27 +33,27 @@ defmodule Xcribe.Swagger do
   end
 
   defp paths_from_requests(requests),
-    do: Enum.reduce(requests, %{}, &include_request_into_paths/2)
+    do: Enum.reduce(requests, %{}, &build_path_from_request/2)
 
-  defp include_request_into_paths(%{path: path} = request, paths) do
+  defp build_path_from_request(%{path: path} = request, paths) do
     Map.update(
       paths,
       path,
       build_path_item_object(request),
-      &include_request_into_given_path(&1, request)
+      &build_path_verb_from_request(&1, request)
     )
   end
 
-  defp include_request_into_given_path(path, %{verb: verb} = request) do
+  defp build_path_verb_from_request(path, %{verb: verb} = request) do
     Map.update(
       path,
       verb,
       build_operation_object(request),
-      &include_request_into_given_verb(&1, request)
+      &build_responses_from_request(&1, request)
     )
   end
 
-  defp include_request_into_given_verb(operation_object, request) do
+  defp build_responses_from_request(operation_object, request) do
     Map.update(operation_object, "responses", %{}, fn responses ->
       Map.merge(responses, Formatter.format_responses(request))
     end)
