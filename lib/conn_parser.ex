@@ -36,7 +36,7 @@ defmodule Xcribe.ConnParser do
   defp parse_conn({:error, _} = error, _conn, _description), do: error
 
   defp parse_conn(route, conn, description) do
-    path = format_path(route.route, Map.keys(conn.path_params))
+    path = format_path(route.route, conn.path_params)
 
     %Request{
       action: route |> router_options() |> Atom.to_string(),
@@ -68,7 +68,9 @@ defmodule Xcribe.ConnParser do
 
   defp decode_uri(path_info), do: Enum.map(path_info, &URI.decode/1)
 
-  defp extract_route_info({%{} = route_info, _, _, _}), do: route_info
+  defp extract_route_info({%{} = route_info, _callback_one, _callback_two, _plug_info}),
+    do: route_info
+
   defp extract_route_info(_), do: {:error, "route not found"}
 
   defp router_options(%{plug_opts: opts}), do: opts
@@ -88,7 +90,8 @@ defmodule Xcribe.ConnParser do
 
   defp remove_namespace(namespace, path), do: String.replace(path, ~r/^#{namespace}/, "")
 
-  defp format_path(path, params), do: Enum.reduce(params, path, &transform_param/2)
+  defp format_path(path, params),
+    do: params |> Map.keys() |> Enum.reduce(path, &transform_param/2)
 
   defp transform_param(param, path), do: String.replace(path, ":#{param}", "{#{param}}")
 
