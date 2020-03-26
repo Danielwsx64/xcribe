@@ -59,7 +59,7 @@ defmodule Xcribe.ConnParser do
 
   defp identify_route(%{method: method, host: host, path_info: path} = conn) do
     conn
-    |> router_module
+    |> router_module()
     |> apply(:__match_route__, [method, decode_uri(path), host])
     |> extract_route_info()
   end
