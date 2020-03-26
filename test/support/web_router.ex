@@ -7,10 +7,21 @@ defmodule Xcribe.WebRouter do
     plug(:accepts, ["json"])
   end
 
+  pipeline :authenticated do
+    plug(:api)
+    plug(Xcribe.Plugs.Authentication)
+  end
+
   scope "/namespace_ignored", Xcribe do
     pipe_through(:api)
 
     resources("/notes", NotesController, only: [:index])
+  end
+
+  scope "/authenticated", Xcribe, as: :authenticated do
+    pipe_through(:authenticated)
+
+    resources("/users", UsersController)
   end
 
   scope "/", Xcribe do

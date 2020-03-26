@@ -1,7 +1,7 @@
 defmodule Xcribe.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.1.1"
   @description "A lib to generate API documentation from test specs"
   @links %{"GitHub" => "https://github.com/danielwsx64/xcribe"}
 
@@ -10,6 +10,7 @@ defmodule Xcribe.MixProject do
       app: :xcribe,
       version: @version,
       name: "XCribe",
+      docs: docs(),
       description: @description,
       elixir: "~> 1.8",
       package: package(),
@@ -58,6 +59,36 @@ defmodule Xcribe.MixProject do
     [
       licenses: ["Apache-2.0"],
       links: @links
+    ]
+  end
+
+  defp docs do
+    [
+      source_ref: "v#{@version}",
+      main: "readme",
+      extras: [
+        "README.md": [title: "README"]
+      ],
+      groups_for_modules: doc_groups_for_modules()
+    ]
+  end
+
+  defp doc_groups_for_modules do
+    [
+      BluePrint: [
+        Xcribe.ApiBlueprint,
+        Xcribe.ApiBlueprint.Formatter,
+        Xcribe.ApiBlueprint.Templates
+      ],
+      Swagger: [
+        Xcribe.Swagger,
+        Xcribe.Swagger.Descriptor,
+        Xcribe.Swagger.Formatter
+      ],
+      Helpers: [
+        Xcribe.Helpers.Document,
+        Xcribe.Helpers.Formatter
+      ]
     ]
   end
 end
