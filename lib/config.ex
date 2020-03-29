@@ -15,7 +15,7 @@ defmodule Xcribe.Config do
 
   defp env_var_name, do: Application.get_env(:xcribe, :env_var, "XCRIBE_ENV")
 
-  defp default_output_file() do
+  defp default_output_file do
     case doc_format() do
       :api_blueprint -> "api_doc.apib"
       :swagger -> "openapi.json"

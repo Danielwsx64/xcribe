@@ -1,8 +1,7 @@
 defmodule RecorderTest do
   use ExUnit.Case, async: true
 
-  alias Xcribe.Request
-  alias Xcribe.Recorder
+  alias Xcribe.{Recorder, Request}
 
   describe "save and get requests records" do
     test "use genserver to save and recover requests" do

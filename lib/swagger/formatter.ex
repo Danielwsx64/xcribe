@@ -67,7 +67,8 @@ defmodule Xcribe.Swagger.Formatter do
   Return a Response Object from given request
   """
   def response_object_from_request(%Request{resp_headers: headers, resp_body: body}) do
-    media_type_object(headers, body)
+    headers
+    |> media_type_object(body)
     |> response_object_add_headers(headers)
   end
 

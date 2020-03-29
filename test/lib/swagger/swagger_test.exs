@@ -3,8 +3,8 @@ defmodule Xcribe.SwaggerTest do
   use Xcribe.RequestsExamples
   use Xcribe.SwaggerExamples
 
-  alias Xcribe.Swagger
   alias Xcribe.Support.RequestsGenerator
+  alias Xcribe.Swagger
 
   describe "generate_doc/1" do
     test "parse requests do string" do

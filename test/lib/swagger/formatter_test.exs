@@ -1,9 +1,9 @@
 defmodule Xcribe.Swagger.FormatterTest do
   use ExUnit.Case, async: true
 
+  alias Xcribe.Request
   alias Xcribe.Support.Information, as: ExampleInformation
   alias Xcribe.Swagger.Formatter
-  alias Xcribe.Request
 
   describe "raw_openapi_object/0" do
     test "return an empty OpenAPI object" do
