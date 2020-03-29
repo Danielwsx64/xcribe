@@ -5,6 +5,8 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   use Xcribe.ApiBlueprint.Templates
 
+  @content_type_opts [default: "text/plain"]
+
   def metadata_section(api_info) do
     apply_template(
       @metadata_template,
@@ -43,14 +45,14 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     apply_template(
       @request_template,
       identifier: purge_string(description),
-      media_type: find_content_type(headers)
+      media_type: content_type(headers, @content_type_opts)
     )
   end
 
   def response_section(%Request{status_code: code, resp_headers: headers}) do
     apply_template(@response_template,
       code: to_string(code),
-      media_type: find_content_type(headers)
+      media_type: content_type(headers, @content_type_opts)
     )
   end
 
@@ -117,7 +119,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   defp body_section(body, headers) do
     apply_template(@body_template,
-      body: body |> format_body(find_content_type(headers)) |> ident_lines(3)
+      body: body |> format_body(content_type(headers, @content_type_opts)) |> ident_lines(3)
     )
   end
 

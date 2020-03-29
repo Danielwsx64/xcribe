@@ -1,4 +1,8 @@
 defmodule Xcribe.Helpers.Formatter do
+  @moduledoc ~S"""
+  This module implements a set of useful functions for formatter modules.
+  """
+
   alias Xcribe.JSON
 
   @arguments_regex ~r/({\w*})/
@@ -7,6 +11,34 @@ defmodule Xcribe.Helpers.Formatter do
   @mult_spaces_regex ~r/\s+/
   @slash_regex ~r/\/$/
   @path_ending_arg_regex ~r/({\w*}\/$)/
+  @content_type_regex ~r/^(\w*\/\w*),?.*/
+
+  @doc """
+  return the content type by a list of header params
+
+  ### Options:
+    * `default`: a value to be returned when not found content-type header.
+  """
+  def content_type(headers, opts \\ []) when is_list(headers) do
+    Enum.reduce_while(headers, Keyword.get(opts, :default), &find_content_type/2)
+  end
+
+  @doc """
+  return the authorization header from a list of headers
+  """
+  def authorization(headers) when is_list(headers) do
+    Enum.reduce_while(headers, nil, &find_authorization/2)
+  end
+
+  @doc """
+  Format the path params.
+
+      format_path_parameter("user_id")
+      iex> "userId"
+  """
+  def format_path_parameter(name) do
+    " #{name}" |> Macro.camelize() |> String.replace_prefix(" ", "")
+  end
 
   def prepare_and_upcase(string), do: string |> remove_underline() |> String.upcase()
 
@@ -88,9 +120,6 @@ defmodule Xcribe.Helpers.Formatter do
     end
   end
 
-  def find_content_type(nil), do: "text/plain"
-  def find_content_type(headers), do: Enum.reduce(headers, "text/plain", &find_content_header/2)
-
   def format_body(body, "application/json" <> _) when is_binary(body),
     do: body |> JSON.decode!() |> format_body("application/json")
 
@@ -100,8 +129,19 @@ defmodule Xcribe.Helpers.Formatter do
   def format_body(body, "text/plain" <> _) when is_binary(body),
     do: body
 
-  defp find_content_header({"content-type", type}, _acc), do: type
-  defp find_content_header(_, acc), do: acc
+  defp find_content_type({"content-type", value}, _default) do
+    @content_type_regex
+    |> Regex.run(value, capture: :all_but_first)
+    |> handle_content_type_regex()
+  end
+
+  defp find_content_type(_header, default), do: {:cont, default}
+
+  defp find_authorization({"authorization", value}, _acc), do: {:halt, value}
+  defp find_authorization(_header, _acc), do: {:cont, nil}
+
+  defp handle_content_type_regex(nil), do: {:halt, nil}
+  defp handle_content_type_regex([content_type]), do: {:halt, content_type}
 
   defp unify_matchs(nil), do: []
   defp unify_matchs(matchs), do: Enum.uniq(matchs)

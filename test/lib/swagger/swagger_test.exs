@@ -4,99 +4,27 @@ defmodule Xcribe.SwaggerTest do
   use Xcribe.SwaggerExamples
 
   alias Xcribe.Swagger
+  alias Xcribe.Support.RequestsGenerator
 
   describe "generate_doc/1" do
     test "parse requests do string" do
       requests = [
-        %Request{
-          action: "create",
-          controller: Elixir.Xcribe.UsersController,
-          description: "invalid parameters",
-          header_params: [
-            {"authorization", "token"},
-            {"content-type", "multipart/mixed; boundary=plug_conn_test"}
-          ],
-          params: %{"age" => "5", "name" => 6},
-          path: "/users",
-          path_params: %{},
-          query_params: %{},
-          request_body: %{"age" => "5", "name" => 6},
-          resource: "users",
-          resource_group: :api,
-          resp_body: "{\"message\":\"invalid parameters\"}",
-          resp_headers: [
-            {"content-type", "application/json; charset=utf-8"},
-            {"cache-control", "max-age=0, private, must-revalidate"}
-          ],
-          status_code: 400,
-          verb: "post"
-        },
-        %Request{
-          action: "show",
-          controller: Elixir.Xcribe.ProtocolsController,
-          description: "show the protocol",
-          header_params: [{"authorization", "token"}],
-          params: %{
-            "id" => 90,
-            "server_id" => 88,
-            "updated_at" => DateTime.utc_now() |> DateTime.to_iso8601()
-          },
-          path: "/server/{server_id}/protocols/{id}",
-          path_params: %{"id" => 90, "server_id" => 88},
-          query_params: %{"updated_at" => DateTime.utc_now() |> DateTime.to_iso8601()},
-          request_body: %{},
-          resource: "protocols",
-          resource_group: :api,
-          resp_body: "[{\"id\":1,\"name\":\"user 1\"},{\"id\":2,\"name\":\"user 2\"}]",
-          resp_headers: [
-            {"content-type", "application/json"}
-          ],
-          status_code: 200,
-          verb: "get"
-        },
-        %Request{
-          action: "create",
-          controller: Elixir.Xcribe.ProtocolsController,
-          description: "create the protocol",
-          header_params: [],
-          params: %{"name" => "zelda", "server_id" => 88, "priority" => 0},
-          path: "/server/{server_id}/protocols",
-          path_params: %{"server_id" => 88},
-          query_params: %{},
-          request_body: %{"name" => "zelda", "priority" => 0},
-          resource: "protocols",
-          resource_group: :api,
-          resp_body: "{\"id\":2,\"name\":\"user 2\"}",
-          resp_headers: [
-            {"content-type", "application/json"}
-          ],
-          status_code: 201,
-          verb: "post"
-        },
-        %Request{
-          action: "index",
-          controller: Elixir.Xcribe.ProtocolsController,
-          description: "index the protocols",
-          header_params: [],
-          params: %{},
-          path: "/server/{server_id}/protocols",
-          path_params: %{},
-          query_params: %{},
-          request_body: %{},
-          resource: "protocols",
-          resource_group: :api,
-          resp_body: "[{\"id\":2,\"name\":\"user 2\"}]",
-          resp_headers: [
-            {"content-type", "application/json"}
-          ],
-          status_code: 200,
-          verb: "get"
-        }
-        | @sample_requests
+        RequestsGenerator.users_index([:basic_auth]),
+        RequestsGenerator.users_show([:basic_auth]),
+        RequestsGenerator.users_create([:bearer_auth]),
+        RequestsGenerator.users_update([:bearer_auth]),
+        RequestsGenerator.users_delete([:bearer_auth]),
+        RequestsGenerator.users_custom_action([:api_key_auth]),
+        RequestsGenerator.users_posts_index([:api_key_auth]),
+        RequestsGenerator.users_posts_create([:api_key_auth]),
+        RequestsGenerator.users_posts_update([:api_key_auth])
       ]
 
-      assert Jason.decode!(Swagger.generate_doc(requests)) ==
-               Jason.decode!(@sample_swagger_output)
+      expected = Jason.decode!(@sample_swagger_output)
+
+      response = Swagger.generate_doc(requests)
+
+      assert Jason.decode!(response) == expected
     end
 
     test "when there is no security schema" do
@@ -104,10 +32,10 @@ defmodule Xcribe.SwaggerTest do
         %Request{
           action: "index",
           controller: Elixir.Xcribe.ProtocolsController,
-          description: "index the protocols",
+          description: "",
           header_params: [],
           params: %{},
-          path: "/server/{server_id}/protocols",
+          path: "/servers",
           path_params: %{},
           query_params: %{},
           request_body: %{},
@@ -122,46 +50,36 @@ defmodule Xcribe.SwaggerTest do
         }
       ]
 
-      expected = """
-      {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Basic API",
-          "version": "0.1.0",
-          "description": "The description of the API"
+      expected = %{
+        "openapi" => "3.0.3",
+        "info" => %{
+          "description" => "The description of the API",
+          "title" => "Basic API",
+          "version" => "1"
         },
-        "paths": {
-          "/server/{server_id}/protocols": {
-            "get": {
-              "summary": "",
-              "description": "Application protocols is a awesome feature of our app",
-              "responses": {
-                "200": {
-                  "description": "index the protocols",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "integer",
-                              "description": ""
-                            },
-                            "name": {
-                              "type": "string",
-                              "description": ""
-                            }
+        "components" => %{"securitySchemes" => %{}},
+        "paths" => %{
+          "/servers" => %{
+            "get" => %{
+              "description" => "",
+              "parameters" => [],
+              "security" => [],
+              "summary" => "",
+              "responses" => %{
+                "200" => %{
+                  "description" => "",
+                  "headers" => %{},
+                  "content" => %{
+                    "application/json" => %{
+                      "schema" => %{
+                        "type" => "array",
+                        "items" => %{
+                          "type" => "object",
+                          "properties" => %{
+                            "id" => %{"format" => "int32", "type" => "number"},
+                            "name" => %{"type" => "string"}
                           }
                         }
-                      }
-                    }
-                  },
-                  "headers": {
-                    "content-type": {
-                      "schema": {
-                        "type": "string"
                       }
                     }
                   }
@@ -169,12 +87,11 @@ defmodule Xcribe.SwaggerTest do
               }
             }
           }
-        }
+        },
+        "servers" => [%{"description" => "", "url" => "http://my-api.com"}]
       }
-      """
 
-      assert Jason.decode!(Swagger.generate_doc(requests)) ==
-               Jason.decode!(expected)
+      assert Jason.decode!(Swagger.generate_doc(requests)) == expected
     end
   end
 end

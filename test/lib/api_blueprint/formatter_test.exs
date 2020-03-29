@@ -225,7 +225,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       }
 
       assert Formatter.request_section(struct) ==
-               "+ Request create user with token (application/json; charset=utf-8)\n"
+               "+ Request create user with token (application/json)\n"
     end
   end
 
@@ -534,7 +534,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                            "age": 5,
                            "name": "teste"
                          }
-             + Response 201 (application/json; charset=utf-8)
+             + Response 201 (application/json)
                  + Headers
 
                          cache-control: max-age=0, private, must-revalidate
@@ -584,7 +584,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                            "age": 5,
                            "name": "teste"
                          }
-             + Response 201 (application/json; charset=utf-8)
+             + Response 201 (application/json)
                  + Headers
 
                          cache-control: max-age=0, private, must-revalidate

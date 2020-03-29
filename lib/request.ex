@@ -7,17 +7,17 @@ defmodule Xcribe.Request do
     :action,
     :controller,
     :description,
-    :header_params,
-    :params,
     :path,
-    :path_params,
-    :query_params,
     :request_body,
     :resource,
     :resource_group,
     :resp_body,
-    :resp_headers,
     :status_code,
-    :verb
+    :verb,
+    header_params: [],
+    resp_headers: [],
+    path_params: %{},
+    query_params: %{},
+    params: %{}
   ]
 end
