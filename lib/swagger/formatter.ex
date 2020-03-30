@@ -160,11 +160,11 @@ defmodule Xcribe.Swagger.Formatter do
   end
 
   defp build_schema_for_media(content, "application/json") when is_binary(content) do
-    schema_object_for({:schema, JSON.decode!(content)}, title: false)
+    schema_object_for({:build_schema_for_media, JSON.decode!(content)}, title: false)
   end
 
   defp build_schema_for_media(content, _) when is_map(content) do
-    schema_object_for({:schema, content}, title: false)
+    schema_object_for({:build_schema_for_media, content}, title: false)
   end
 
   defp response_object_add_headers(response_object, headers) do
@@ -203,7 +203,7 @@ defmodule Xcribe.Swagger.Formatter do
     parameter_object_add_required(%{
       name: name,
       in: inn,
-      schema: schema_object_for({nil, value}, title: false),
+      schema: schema_object_for({:parameter_object, value}, title: false),
       example: value
     })
   end
@@ -220,8 +220,16 @@ defmodule Xcribe.Swagger.Formatter do
   defp schema_add_example(schema, value, true), do: Map.put(schema, :example, value)
   defp schema_add_example(schema, _value, false), do: schema
 
+  defp schema_add_items(schema, []) do
+    Map.put(schema, :items, %{type: "string"})
+  end
+
   defp schema_add_items(schema, value) do
-    Map.put(schema, :items, schema_object_for({nil, List.first(value)}, title: false))
+    Map.put(
+      schema,
+      :items,
+      schema_object_for({:schema_add_items, List.first(value)}, title: false)
+    )
   end
 
   defp schema_add_properties(schema, value) do
@@ -231,7 +239,7 @@ defmodule Xcribe.Swagger.Formatter do
   defp reduce_properties(value), do: Enum.reduce(value, %{}, &reduce_properties_func/2)
 
   defp reduce_properties_func({title, value}, properties) do
-    Map.put(properties, title, schema_object_for({nil, value}, title: false))
+    Map.put(properties, title, schema_object_for({:reduce_properties_func, value}, title: false))
   end
 
   defp security_type("Bearer" <> _tail), do: "bearer"

@@ -516,5 +516,34 @@ defmodule Xcribe.Swagger.FormatterTest do
 
       assert Formatter.schema_object_for(data) == expected
     end
+
+    test "schema for a map with an empty list" do
+      data =
+        {"data",
+         [
+           %{"id" => 1, "attributes" => %{"name" => "Jonny", "likes" => []}},
+           %{"id" => 2, "attributes" => %{"name" => "Doug", "likes" => []}}
+         ]}
+
+      expected = %{
+        title: "data",
+        type: "array",
+        items: %{
+          type: "object",
+          properties: %{
+            "attributes" => %{
+              type: "object",
+              properties: %{
+                "name" => %{type: "string"},
+                "likes" => %{type: "array", items: %{type: "string"}}
+              }
+            },
+            "id" => %{type: "number", format: "int32"}
+          }
+        }
+      }
+
+      assert Formatter.schema_object_for(data) == expected
+    end
   end
 end
