@@ -546,4 +546,28 @@ defmodule Xcribe.Swagger.FormatterTest do
       assert Formatter.schema_object_for(data) == expected
     end
   end
+
+  describe "merge_parameter_object_lists/2" do
+    test "keep uniq names and " do
+      base_list = [
+        %{name: "id", in: "path", required: true, schema: %{type: "string"}, example: 6},
+        %{name: "id", in: "header", schema: %{type: "string"}, example: "8"}
+      ]
+
+      new_list = [
+        %{name: "id", in: "path", required: true, schema: %{type: "string"}, example: 9},
+        %{name: "id", in: "query", schema: %{type: "string"}, example: "9090"},
+        %{name: "alias", in: "query", schema: %{type: "string"}, example: "jon"}
+      ]
+
+      expected = [
+        %{name: "alias", in: "query", schema: %{type: "string"}, example: "jon"},
+        %{name: "id", in: "query", schema: %{type: "string"}, example: "9090"},
+        %{name: "id", in: "path", required: true, schema: %{type: "string"}, example: 6},
+        %{name: "id", in: "header", schema: %{type: "string"}, example: "8"}
+      ]
+
+      assert Formatter.merge_parameter_object_lists(base_list, new_list) == expected
+    end
+  end
 end

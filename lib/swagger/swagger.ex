@@ -58,7 +58,7 @@ defmodule Xcribe.Swagger do
   end
 
   defp merge_parameters(params, %{parameters: new_params}),
-    do: Enum.concat(params, new_params -- params)
+    do: Formatter.merge_parameter_object_lists(params, new_params)
 
   defp xcribe_info, do: apply(Config.xcribe_information_source(), :api_info, [])
   defp json_encode(openapi), do: JSON.encode!(openapi)

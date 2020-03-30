@@ -130,6 +130,24 @@ defmodule Xcribe.Swagger.Formatter do
     |> schema_add_example(value, @opt_example in opts)
   end
 
+  @doc """
+  Merge two lists of parameter object keep uniq names
+  """
+  def merge_parameter_object_lists(base_list, new_list) do
+    Enum.reduce(new_list, base_list, &merge_parameter_func/2)
+  end
+
+  defp merge_parameter_func(param, params) do
+    unless Enum.any?(params, &eql_name_and_in(&1, param)) do
+      [param | params]
+    else
+      params
+    end
+  end
+
+  defp eql_name_and_in(%{name: name, in: inn}, %{name: name, in: inn}), do: true
+  defp eql_name_and_in(_base_param, _new_param), do: false
+
   defp path_item_object_add_request_body(%{request_body: body}, path_item_object)
        when body == %{},
        do: path_item_object
