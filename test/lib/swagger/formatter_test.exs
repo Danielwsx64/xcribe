@@ -3,6 +3,7 @@ defmodule Xcribe.Swagger.FormatterTest do
 
   alias Xcribe.Request
   alias Xcribe.Support.Information, as: ExampleInformation
+  alias Xcribe.Support.Samples.SwaggerFormater, as: Samples
   alias Xcribe.Swagger.Formatter
 
   describe "raw_openapi_object/0" do
@@ -568,6 +569,16 @@ defmodule Xcribe.Swagger.FormatterTest do
       ]
 
       assert Formatter.merge_parameter_object_lists(base_list, new_list) == expected
+    end
+  end
+
+  describe "merge_path_item_objects/3" do
+    test "merge 2 object with diferente responses" do
+      object_one = Samples.path_item_object_without_request_body()
+      object_two = Samples.path_item_object_with_request_body()
+      expected = Samples.expected_path_objects_merge()
+
+      assert Formatter.merge_path_item_objects(object_one, object_two, "put") == expected
     end
   end
 end

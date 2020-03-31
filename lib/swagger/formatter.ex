@@ -137,6 +137,38 @@ defmodule Xcribe.Swagger.Formatter do
     Enum.reduce(new_list, base_list, &merge_parameter_func/2)
   end
 
+  @doc """
+  Merge two path item objects
+  """
+  def merge_path_item_objects(item_one, item_two, verb) do
+    Map.update(
+      item_one,
+      verb,
+      item_two[verb],
+      &merge_path_items(&1, item_two[verb])
+    )
+  end
+
+  defp merge_path_items(item_one, %{parameters: params, responses: resp} = item_two) do
+    item_one
+    |> Map.update(:parameters, params, &merge_parameter_object_lists(&1, params))
+    |> Map.update(:responses, resp, &Map.merge(&1, resp))
+    |> merge_request_body_if_needed(item_two)
+  end
+
+  defp merge_request_body_if_needed(%{requestBody: _} = item, %{requestBody: new_body}) do
+    Map.update(item, :requestBody, new_body, &merge_request_body(&1, new_body))
+  end
+
+  defp merge_request_body_if_needed(item, %{requestBody: body}),
+    do: Map.put(item, :requestBody, body)
+
+  defp merge_request_body_if_needed(item, _), do: item
+
+  defp merge_request_body(body, new_body) do
+    %{description: "", content: Map.merge(body.content, new_body.content)}
+  end
+
   defp merge_parameter_func(param, params) do
     unless Enum.any?(params, &eql_name_and_in(&1, param)) do
       [param | params]

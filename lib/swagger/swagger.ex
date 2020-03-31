@@ -41,24 +41,16 @@ defmodule Xcribe.Swagger do
   defp build_paths_object(requests),
     do: Enum.reduce(requests, %{}, &paths_object_func/2)
 
-  defp paths_object_func(%Request{path: path} = request, paths) do
+  defp paths_object_func(%Request{path: path, verb: verb} = request, paths) do
     item = Formatter.path_item_object_from_request(request)
 
-    Map.update(paths, path, item, &merge_path_item(&1, item, request))
+    Map.update(
+      paths,
+      path,
+      item,
+      &Formatter.merge_path_item_objects(&1, item, verb)
+    )
   end
-
-  defp merge_path_item(path_item, new_path_item, %{verb: verb}) do
-    Map.update(path_item, verb, new_path_item[verb], &merge_verb_item(&1, new_path_item[verb]))
-  end
-
-  defp merge_verb_item(verb_item, new_verb_item) do
-    verb_item
-    |> Map.update(:parameters, new_verb_item.parameters, &merge_parameters(&1, new_verb_item))
-    |> Map.update(:responses, %{}, &Map.merge(&1, new_verb_item.responses))
-  end
-
-  defp merge_parameters(params, %{parameters: new_params}),
-    do: Formatter.merge_parameter_object_lists(params, new_params)
 
   defp xcribe_info, do: apply(Config.xcribe_information_source(), :api_info, [])
   defp json_encode(openapi), do: JSON.encode!(openapi)
