@@ -36,10 +36,12 @@
                   "items": {
                     "properties": {
                       "id": {
+                        "example": 1,
                         "format": "int32",
                         "type": "number"
                       },
                       "name": {
+                        "example": "user 1",
                         "type": "string"
                       }
                     },
@@ -76,10 +78,12 @@
               "schema": {
                 "properties": {
                   "age": {
+                    "example": 5,
                     "format": "int32",
                     "type": "number"
                   },
                   "name": {
+                    "example": "teste",
                     "type": "string"
                   }
                 },
@@ -96,10 +100,12 @@
                 "schema": {
                   "properties": {
                     "age": {
+                      "example": 5,
                       "format": "int32",
                       "type": "number"
                     },
                     "name": {
+                      "example": "teste",
                       "type": "string"
                     }
                   },
@@ -180,10 +186,12 @@
                 "schema": {
                   "properties": {
                     "id": {
+                      "example": 1,
                       "format": "int32",
                       "type": "number"
                     },
                     "name": {
+                      "example": "user 1",
                       "type": "string"
                     }
                   },
@@ -228,10 +236,12 @@
               "schema": {
                 "properties": {
                   "age": {
+                    "example": 5,
                     "format": "int32",
                     "type": "number"
                   },
                   "name": {
+                    "example": "teste",
                     "type": "string"
                   }
                 },
@@ -248,10 +258,12 @@
                 "schema": {
                   "properties": {
                     "age": {
+                      "example": 5,
                       "format": "int32",
                       "type": "number"
                     },
                     "name": {
+                      "example": "teste",
                       "type": "string"
                     }
                   },
@@ -335,10 +347,12 @@
                   "items": {
                     "properties": {
                       "id": {
+                        "example": 1,
                         "format": "int32",
                         "type": "number"
                       },
                       "title": {
+                        "example": "user 1",
                         "type": "string"
                       }
                     },
@@ -385,6 +399,7 @@
               "schema": {
                 "properties": {
                   "title": {
+                    "example": "test",
                     "type": "string"
                   }
                 },
@@ -401,9 +416,11 @@
                 "schema": {
                   "properties": {
                     "title": {
+                      "example": "test",
                       "type": "string"
                     },
                     "users_id": {
+                      "example": "1",
                       "type": "string"
                     }
                   },
@@ -459,6 +476,7 @@
               "schema": {
                 "properties": {
                   "title": {
+                    "example": "test",
                     "type": "string"
                   }
                 },
@@ -475,9 +493,11 @@
                 "schema": {
                   "properties": {
                     "title": {
+                      "example": "test",
                       "type": "string"
                     },
                     "users_id": {
+                      "example": "1",
                       "type": "string"
                     }
                   },

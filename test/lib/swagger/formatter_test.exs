@@ -74,20 +74,20 @@ defmodule Xcribe.Swagger.FormatterTest do
       expected = %{
         "get" => %{
           description: "",
-          summary: "",
           parameters: [
             %{
-              name: "fields",
+              example: %{"articles" => "title,body", "people" => "name"},
               in: "query",
+              name: "fields",
               schema: %{
                 properties: %{"articles" => %{type: "string"}, "people" => %{type: "string"}},
                 type: "object"
-              },
-              example: %{"articles" => "title,body", "people" => "name"}
+              }
             },
-            %{name: "include", in: "query", schema: %{type: "string"}, example: "author"}
+            %{example: "author", in: "query", name: "include", schema: %{type: "string"}}
           ],
           security: [%{"api_key" => []}],
+          summary: "",
           responses: %{
             200 => %{
               description: "",
@@ -99,8 +99,8 @@ defmodule Xcribe.Swagger.FormatterTest do
                     items: %{
                       type: "object",
                       properties: %{
-                        "id" => %{format: "int32", type: "number"},
-                        "name" => %{type: "string"}
+                        "id" => %{format: "int32", type: "number", example: 1},
+                        "name" => %{type: "string", example: "user 1"}
                       }
                     }
                   }
@@ -129,25 +129,31 @@ defmodule Xcribe.Swagger.FormatterTest do
 
       expected = %{
         "post" => %{
-          summary: "",
           description: "",
           parameters: [],
+          security: [],
+          summary: "",
           requestBody: %{
             description: "",
             content: %{
               "application/json" => %{
-                schema: %{properties: %{"name" => %{type: "string"}}, type: "object"}
+                schema: %{
+                  type: "object",
+                  properties: %{"name" => %{type: "string", example: "Jonny"}}
+                }
               }
             }
           },
-          security: [],
           responses: %{
             201 => %{
               description: "",
               headers: %{},
               content: %{
                 "application/json" => %{
-                  schema: %{properties: %{"name" => %{type: "string"}}, type: "object"}
+                  schema: %{
+                    type: "object",
+                    properties: %{"name" => %{type: "string", example: "user 1"}}
+                  }
                 }
               }
             }
@@ -179,8 +185,8 @@ defmodule Xcribe.Swagger.FormatterTest do
               items: %{
                 type: "object",
                 properties: %{
-                  "id" => %{type: "number", format: "int32"},
-                  "name" => %{type: "string"}
+                  "id" => %{format: "int32", type: "number", example: 1},
+                  "name" => %{type: "string", example: "user 1"}
                 }
               }
             }
@@ -223,8 +229,11 @@ defmodule Xcribe.Swagger.FormatterTest do
             schema: %{
               type: "object",
               properties: %{
-                "name" => %{type: "string"},
-                "authentication" => %{type: "object", properties: %{"login" => %{type: "string"}}}
+                "authentication" => %{
+                  type: "object",
+                  properties: %{"login" => %{type: "string", example: "userlogin"}}
+                },
+                "name" => %{type: "string", example: "some name"}
               }
             }
           }
@@ -425,6 +434,16 @@ defmodule Xcribe.Swagger.FormatterTest do
                type: "number",
                format: "float",
                example: 1.2
+             }
+
+      assert Formatter.schema_object_for({"name", %{"key" => "value"}}, opt) == %{
+               type: "object",
+               properties: %{"key" => %{type: "string", example: "value"}}
+             }
+
+      assert Formatter.schema_object_for({"name", ["value"]}, opt) == %{
+               type: "array",
+               items: %{type: "string", example: "value"}
              }
     end
 

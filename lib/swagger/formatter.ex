@@ -114,13 +114,13 @@ defmodule Xcribe.Swagger.Formatter do
   def schema_object_for({title, value}, opts) when is_map(value) do
     %{type: "object"}
     |> schema_add_title(title, @opt_no_title in opts)
-    |> schema_add_properties(value)
+    |> schema_add_properties(value, opts)
   end
 
   def schema_object_for({title, value}, opts) when is_list(value) do
     %{type: "array"}
     |> schema_add_title(title, @opt_no_title in opts)
-    |> schema_add_items(value)
+    |> schema_add_items(value, opts)
   end
 
   def schema_object_for({title, value}, opts) do
@@ -170,12 +170,10 @@ defmodule Xcribe.Swagger.Formatter do
   end
 
   defp merge_parameter_func(param, params) do
-    unless Enum.any?(params, &eql_name_and_in(&1, param)) do
-      [param | params]
-    else
-      params
-    end
+    if has_param?(param, params), do: params, else: [param | params]
   end
+
+  defp has_param?(param, params), do: Enum.any?(params, &eql_name_and_in(&1, param))
 
   defp eql_name_and_in(%{name: name, in: inn}, %{name: name, in: inn}), do: true
   defp eql_name_and_in(_base_param, _new_param), do: false
@@ -210,11 +208,14 @@ defmodule Xcribe.Swagger.Formatter do
   end
 
   defp build_schema_for_media(content, "application/json") when is_binary(content) do
-    schema_object_for({:build_schema_for_media, JSON.decode!(content)}, title: false)
+    schema_object_for({:build_schema_for_media, JSON.decode!(content)},
+      title: false,
+      example: true
+    )
   end
 
   defp build_schema_for_media(content, _) when is_map(content) do
-    schema_object_for({:build_schema_for_media, content}, title: false)
+    schema_object_for({:build_schema_for_media, content}, title: false, example: true)
   end
 
   defp response_object_add_headers(response_object, headers) do
@@ -270,26 +271,34 @@ defmodule Xcribe.Swagger.Formatter do
   defp schema_add_example(schema, value, true), do: Map.put(schema, :example, value)
   defp schema_add_example(schema, _value, false), do: schema
 
-  defp schema_add_items(schema, []) do
+  defp schema_add_items(schema, [], _opts) do
     Map.put(schema, :items, %{type: "string"})
   end
 
-  defp schema_add_items(schema, value) do
+  defp schema_add_items(schema, [value | _], opts) do
+    item_opts = Keyword.merge(opts, title: false)
+
     Map.put(
       schema,
       :items,
-      schema_object_for({:schema_add_items, List.first(value)}, title: false)
+      schema_object_for({:schema_add_items, value}, item_opts)
     )
   end
 
-  defp schema_add_properties(schema, value) do
-    Map.put(schema, :properties, reduce_properties(value))
+  defp schema_add_properties(schema, value, opts) do
+    Map.put(schema, :properties, reduce_properties(value, opts))
   end
 
-  defp reduce_properties(value), do: Enum.reduce(value, %{}, &reduce_properties_func/2)
+  defp reduce_properties(properties, opts) do
+    property_opts = Keyword.merge(opts, title: false)
 
-  defp reduce_properties_func({title, value}, properties) do
-    Map.put(properties, title, schema_object_for({:reduce_properties_func, value}, title: false))
+    Enum.reduce(properties, %{}, fn {title, value}, schema ->
+      Map.put(
+        schema,
+        title,
+        schema_object_for({:schema_add_properties, value}, property_opts)
+      )
+    end)
   end
 
   defp security_type("Bearer" <> _tail), do: "bearer"

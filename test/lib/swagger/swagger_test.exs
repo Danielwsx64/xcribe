@@ -51,13 +51,14 @@ defmodule Xcribe.SwaggerTest do
       ]
 
       expected = %{
-        "openapi" => "3.0.3",
+        "components" => %{"securitySchemes" => %{}},
         "info" => %{
           "description" => "The description of the API",
           "title" => "Basic API",
           "version" => "1"
         },
-        "components" => %{"securitySchemes" => %{}},
+        "openapi" => "3.0.3",
+        "servers" => [%{"description" => "", "url" => "http://my-api.com"}],
         "paths" => %{
           "/servers" => %{
             "get" => %{
@@ -76,8 +77,8 @@ defmodule Xcribe.SwaggerTest do
                         "items" => %{
                           "type" => "object",
                           "properties" => %{
-                            "id" => %{"format" => "int32", "type" => "number"},
-                            "name" => %{"type" => "string"}
+                            "id" => %{"format" => "int32", "type" => "number", "example" => 2},
+                            "name" => %{"type" => "string", "example" => "user 2"}
                           }
                         }
                       }
@@ -87,8 +88,7 @@ defmodule Xcribe.SwaggerTest do
               }
             }
           }
-        },
-        "servers" => [%{"description" => "", "url" => "http://my-api.com"}]
+        }
       }
 
       assert Jason.decode!(Swagger.generate_doc(requests)) == expected
