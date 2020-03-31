@@ -11,6 +11,7 @@ defmodule Xcribe.Swagger.Types do
   def type_for(data) when is_number(data), do: "number"
   def type_for(data) when is_binary(data), do: "string"
   def type_for(data) when is_boolean(data), do: "boolean"
+  def type_for(_), do: "string"
 
   @doc ~S"""
   Return the format of given data
