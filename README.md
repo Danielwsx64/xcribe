@@ -15,7 +15,7 @@ mix.exs
 ```elixir
 def deps do
   [
-    {:xcribe, "~> 0.1.0"}
+    {:xcribe, "~> 0.2"}
   ]
 end
 ```
@@ -141,10 +141,10 @@ If Swagger format is configured, [Swagger UI](https://swagger.io/tools/swagger-u
 
 You can add this configurations to your `config/test.ex`
 
-- information_source: the module with doc information
-- output_file: a custom name to the output file
-- doc_format: ApiBlueprint or Swagger formats
-- env_var: a custom name to the env to active XCribe.Formatter
+-   information_source: the module with doc information
+-   output_file: a custom name to the output file
+-   doc_format: ApiBlueprint or Swagger formats
+-   env_var: a custom name to the env to active XCribe.Formatter
 
 Example
 
