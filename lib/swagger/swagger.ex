@@ -9,7 +9,7 @@ defmodule Xcribe.Swagger do
   import Xcribe.Swagger.Formatter, only: [raw_openapi_object: 0]
 
   @doc """
-  Return an OpenAPI Document builted from the given requests list
+  Return an OpenAPI Document builded from the given requests list
   """
   def generate_doc(requests) do
     raw_openapi_object()
