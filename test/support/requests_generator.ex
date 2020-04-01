@@ -8,7 +8,7 @@ defmodule Xcribe.Support.RequestsGenerator do
   import Xcribe.WebRouter.Helpers
 
   @endpoint Xcribe.Endpoint
-  @api_key_auth :md5 |> :crypto.hash("secuyrity_key") |> Base.encode16()
+  @api_key_auth :md5 |> :crypto.hash("security_key") |> Base.encode16()
   @base_auth Base.encode64("username:pass")
   @bearer_auth "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIn0.rTCH8cLoGxAm_xw68z-zXVKi9ie6xJn9tnVWjd_9ftE"
 
