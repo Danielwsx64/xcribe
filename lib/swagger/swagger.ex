@@ -14,7 +14,7 @@ defmodule Xcribe.Swagger do
   def generate_doc(requests) do
     raw_openapi_object()
     |> mount_data_in_raw_object(requests)
-    |> json_encode()
+    |> json_encode!()
   end
 
   defp mount_data_in_raw_object(openapi, requests) do
@@ -53,5 +53,5 @@ defmodule Xcribe.Swagger do
   end
 
   defp xcribe_info, do: apply(Config.xcribe_information_source(), :api_info, [])
-  defp json_encode(openapi), do: JSON.encode!(openapi)
+  defp json_encode!(openapi), do: JSON.encode!(openapi)
 end

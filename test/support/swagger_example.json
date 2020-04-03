@@ -62,11 +62,9 @@
             }
           }
         },
-        "security": [
-          {
-            "basic": []
-          }
-        ],
+        "security": [{
+          "basic": []
+        }],
         "summary": ""
       },
       "post": {
@@ -124,28 +122,24 @@
             }
           }
         },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
+        "security": [{
+          "bearer": []
+        }],
         "summary": ""
       }
     },
     "/users/{id}": {
       "delete": {
         "description": "",
-        "parameters": [
-          {
-            "example": "1",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+        "parameters": [{
+          "example": "1",
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string"
           }
-        ],
+        }],
         "responses": {
           "204": {
             "description": "",
@@ -159,26 +153,22 @@
             }
           }
         },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
+        "security": [{
+          "bearer": []
+        }],
         "summary": ""
       },
       "get": {
         "description": "",
-        "parameters": [
-          {
-            "example": "1",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+        "parameters": [{
+          "example": "1",
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string"
           }
-        ],
+        }],
         "responses": {
           "200": {
             "content": {
@@ -210,26 +200,22 @@
             }
           }
         },
-        "security": [
-          {
-            "basic": []
-          }
-        ],
+        "security": [{
+          "basic": []
+        }],
         "summary": ""
       },
       "put": {
         "description": "",
-        "parameters": [
-          {
-            "example": "1",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+        "parameters": [{
+          "example": "1",
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string"
           }
-        ],
+        }],
         "requestBody": {
           "content": {
             "application/json": {
@@ -282,28 +268,24 @@
             }
           }
         },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
+        "security": [{
+          "bearer": []
+        }],
         "summary": ""
       }
     },
     "/users/{users_id}/cancel": {
       "post": {
         "description": "",
-        "parameters": [
-          {
-            "example": "1",
-            "in": "path",
-            "name": "users_id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+        "parameters": [{
+          "example": "1",
+          "in": "path",
+          "name": "users_id",
+          "required": true,
+          "schema": {
+            "type": "string"
           }
-        ],
+        }],
         "responses": {
           "204": {
             "description": "",
@@ -317,28 +299,24 @@
             }
           }
         },
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
+        "security": [{
+          "api_key": []
+        }],
         "summary": ""
       }
     },
     "/users/{users_id}/posts": {
       "get": {
         "description": "",
-        "parameters": [
-          {
-            "example": "1",
-            "in": "path",
-            "name": "users_id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+        "parameters": [{
+          "example": "1",
+          "in": "path",
+          "name": "users_id",
+          "required": true,
+          "schema": {
+            "type": "string"
           }
-        ],
+        }],
         "responses": {
           "200": {
             "content": {
@@ -373,26 +351,22 @@
             }
           }
         },
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
+        "security": [{
+          "api_key": []
+        }],
         "summary": ""
       },
       "post": {
         "description": "",
-        "parameters": [
-          {
-            "example": "1",
-            "in": "path",
-            "name": "users_id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+        "parameters": [{
+          "example": "1",
+          "in": "path",
+          "name": "users_id",
+          "required": true,
+          "schema": {
+            "type": "string"
           }
-        ],
+        }],
         "requestBody": {
           "content": {
             "application/json": {
@@ -439,19 +413,16 @@
             }
           }
         },
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
+        "security": [{
+          "api_key": []
+        }],
         "summary": ""
       }
     },
     "/users/{users_id}/posts/{id}": {
       "patch": {
         "description": "",
-        "parameters": [
-          {
+        "parameters": [{
             "example": "2",
             "in": "path",
             "name": "id",
@@ -516,19 +487,15 @@
             }
           }
         },
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
+        "security": [{
+          "api_key": []
+        }],
         "summary": ""
       }
     }
   },
-  "servers": [
-    {
-      "description": "",
-      "url": "http://my-api.com"
-    }
-  ]
+  "servers": [{
+    "description": "",
+    "url": "http://my-api.com"
+  }]
 }
