@@ -1,0 +1,501 @@
+{
+  "components": {
+    "securitySchemes": {
+      "api_key": {
+        "in": "header",
+        "name": "authorization",
+        "type": "apiKey"
+      },
+      "basic": {
+        "scheme": "basic",
+        "type": "http"
+      },
+      "bearer": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "The description of the API",
+    "title": "Basic API",
+    "version": "1"
+  },
+  "openapi": "3.0.3",
+  "paths": {
+    "/users": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "id": {
+                        "example": 1,
+                        "format": "int32",
+                        "type": "number"
+                      },
+                      "name": {
+                        "example": "user 1",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "",
+            "headers": {
+              "cache-control": {
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [{
+          "basic": []
+        }],
+        "summary": ""
+      },
+      "post": {
+        "description": "",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "age": {
+                    "example": 5,
+                    "format": "int32",
+                    "type": "number"
+                  },
+                  "name": {
+                    "example": "teste",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": ""
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "age": {
+                      "example": 5,
+                      "format": "int32",
+                      "type": "number"
+                    },
+                    "name": {
+                      "example": "teste",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "",
+            "headers": {
+              "cache-control": {
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [{
+          "bearer": []
+        }],
+        "summary": ""
+      }
+    },
+    "/users/{id}": {
+      "delete": {
+        "description": "",
+        "parameters": [{
+          "example": "1",
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }],
+        "responses": {
+          "204": {
+            "description": "",
+            "headers": {
+              "cache-control": {
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [{
+          "bearer": []
+        }],
+        "summary": ""
+      },
+      "get": {
+        "description": "",
+        "parameters": [{
+          "example": "1",
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "example": 1,
+                      "format": "int32",
+                      "type": "number"
+                    },
+                    "name": {
+                      "example": "user 1",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "",
+            "headers": {
+              "cache-control": {
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [{
+          "basic": []
+        }],
+        "summary": ""
+      },
+      "put": {
+        "description": "",
+        "parameters": [{
+          "example": "1",
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "age": {
+                    "example": 5,
+                    "format": "int32",
+                    "type": "number"
+                  },
+                  "name": {
+                    "example": "teste",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": ""
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "age": {
+                      "example": 5,
+                      "format": "int32",
+                      "type": "number"
+                    },
+                    "name": {
+                      "example": "teste",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "",
+            "headers": {
+              "cache-control": {
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [{
+          "bearer": []
+        }],
+        "summary": ""
+      }
+    },
+    "/users/{users_id}/cancel": {
+      "post": {
+        "description": "",
+        "parameters": [{
+          "example": "1",
+          "in": "path",
+          "name": "users_id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }],
+        "responses": {
+          "204": {
+            "description": "",
+            "headers": {
+              "cache-control": {
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [{
+          "api_key": []
+        }],
+        "summary": ""
+      }
+    },
+    "/users/{users_id}/posts": {
+      "get": {
+        "description": "",
+        "parameters": [{
+          "example": "1",
+          "in": "path",
+          "name": "users_id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "id": {
+                        "example": 1,
+                        "format": "int32",
+                        "type": "number"
+                      },
+                      "title": {
+                        "example": "user 1",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "",
+            "headers": {
+              "cache-control": {
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [{
+          "api_key": []
+        }],
+        "summary": ""
+      },
+      "post": {
+        "description": "",
+        "parameters": [{
+          "example": "1",
+          "in": "path",
+          "name": "users_id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "title": {
+                    "example": "test",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": ""
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "title": {
+                      "example": "test",
+                      "type": "string"
+                    },
+                    "users_id": {
+                      "example": "1",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "",
+            "headers": {
+              "cache-control": {
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [{
+          "api_key": []
+        }],
+        "summary": ""
+      }
+    },
+    "/users/{users_id}/posts/{id}": {
+      "patch": {
+        "description": "",
+        "parameters": [{
+            "example": "2",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "example": "1",
+            "in": "path",
+            "name": "users_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "title": {
+                    "example": "test",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": ""
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "title": {
+                      "example": "test",
+                      "type": "string"
+                    },
+                    "users_id": {
+                      "example": "1",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "",
+            "headers": {
+              "cache-control": {
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [{
+          "api_key": []
+        }],
+        "summary": ""
+      }
+    }
+  },
+  "servers": [{
+    "description": "",
+    "url": "http://my-api.com"
+  }]
+}

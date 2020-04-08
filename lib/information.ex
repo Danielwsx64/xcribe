@@ -4,6 +4,19 @@ defmodule Xcribe.Information do
       import Xcribe.Information
 
       @before_compile Xcribe.Information
+
+      def api_info do
+        %{
+          description: default_description(),
+          host: default_host(),
+          name: default_name()
+        }
+      end
+
+      def namespaces, do: []
+
+      defoverridable api_info: 0
+      defoverridable namespaces: 0
     end
   end
 
@@ -71,20 +84,6 @@ defmodule Xcribe.Information do
       def resource_attributes(_), do: %{}
       def action_description(_, _), do: nil
       def action_parameters(controller, _), do: resource_parameters(controller)
-
-      if(!Module.defines?(__MODULE__, {:api_info, 0})) do
-        def api_info do
-          %{
-            description: default_description(),
-            host: default_host(),
-            name: default_name()
-          }
-        end
-      end
-
-      if(!Module.defines?(__MODULE__, {:namespaces, 0})) do
-        def namespaces, do: []
-      end
     end
   end
 

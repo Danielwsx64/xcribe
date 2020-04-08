@@ -1,129 +1,57 @@
 defmodule Xcribe.Swagger do
   @moduledoc """
-  Treats list of Requests and generates OpenAPI 3.0 JSON
+  Treats list of Requests and generates OpenAPI Document with json format
   """
 
-  alias Xcribe.{Config, JSON}
-  alias Xcribe.Swagger.{Descriptor, Formatter}
+  alias Xcribe.{Config, JSON, Request}
+  alias Xcribe.Swagger.{Formatter}
 
-  @empty_data [nil, %{}, []]
-  @security_scheme %{
-    "securitySchemes" => %{
-      "api_key" => %{"name" => "Authorization", "type" => "apiKey", "in" => "header"}
-    }
-  }
+  import Xcribe.Swagger.Formatter, only: [raw_openapi_object: 0]
 
+  @doc """
+  Return an OpenAPI Document builded from the given requests list
+  """
   def generate_doc(requests) do
-    requests
-    |> build_openapi_object()
-    |> include_security_scheme(requests)
+    raw_openapi_object()
+    |> mount_data_in_raw_object(requests)
     |> json_encode!()
   end
 
-  defp build_openapi_object(requests) do
+  defp mount_data_in_raw_object(openapi, requests) do
     %{
-      "openapi" => "3.0.0",
-      "info" => %{
-        "title" => Map.get(xcribe_info(), :name, ""),
-        "version" => Map.get(xcribe_info(), :version, "0.1.0"),
-        "description" => Map.get(xcribe_info(), :description, "")
-      },
-      "paths" => requests |> Enum.sort_by(& &1.status_code) |> paths_from_requests()
+      openapi
+      | info: Formatter.info_object(xcribe_info()),
+        servers: Formatter.server_object(xcribe_info()),
+        paths: build_paths_object(requests),
+        components: %{
+          securitySchemes: build_security_schemes(requests)
+        }
     }
   end
 
-  defp paths_from_requests(requests),
-    do: Enum.reduce(requests, %{}, &build_path_from_request/2)
-
-  defp build_path_from_request(%{path: path} = request, paths) do
-    Map.update(
-      paths,
-      path,
-      build_path_item_object(request),
-      &build_path_verb_from_request(&1, request)
-    )
-  end
-
-  defp build_path_verb_from_request(path, %{verb: verb} = request) do
-    Map.update(
-      path,
-      verb,
-      build_operation_object(request),
-      &build_responses_from_request(&1, request)
-    )
-  end
-
-  defp build_responses_from_request(operation_object, request) do
-    Map.update(operation_object, "responses", %{}, fn responses ->
-      Map.merge(responses, Formatter.format_responses(request))
+  defp build_security_schemes(requests) do
+    Enum.reduce(requests, %{}, fn request, schemas ->
+      Map.merge(
+        schemas,
+        Formatter.security_scheme_object_from_request(request)
+      )
     end)
   end
 
-  defp build_path_item_object(%{verb: verb} = request),
-    do: %{verb => build_operation_object(request)}
+  defp build_paths_object(requests),
+    do: Enum.reduce(requests, %{}, &paths_object_func/2)
 
-  defp build_operation_object(request) do
-    request
-    |> base_operation_object
-    |> parameters_if_needed(request)
-    |> request_body_if_needed(request)
-    |> security_if_needed(request)
+  defp paths_object_func(%Request{path: path, verb: verb} = request, paths) do
+    item = Formatter.path_item_object_from_request(request)
+
+    Map.update(
+      paths,
+      path,
+      item,
+      &Formatter.merge_path_item_objects(&1, item, verb)
+    )
   end
-
-  defp base_operation_object(request) do
-    %{
-      "summary" => Descriptor.get_action_description(request),
-      "description" => Descriptor.get_request_description(request),
-      "responses" => Formatter.format_responses(request)
-    }
-  end
-
-  defp include_security_scheme(openapi_object, requests) do
-    requests
-    |> Enum.any?(&has_authorization_header?/1)
-    |> put_security_scheme(openapi_object)
-  end
-
-  defp put_security_scheme(false, openapi_object), do: openapi_object
-
-  defp put_security_scheme(true, openapi_object),
-    do: Map.put(openapi_object, "components", @security_scheme)
-
-  defp has_authorization_header?(request) do
-    request
-    |> Map.fetch!(:header_params)
-    |> Enum.any?(fn {h, _} -> String.match?(h, ~r/^authorization$/i) end)
-  end
-
-  defp parameters_if_needed(openapi_object, request) do
-    request
-    |> Map.take([:path_params, :query_params, :header_params])
-    |> Enum.any?(&(elem(&1, 1) not in @empty_data))
-    |> include_parameters(openapi_object, request)
-  end
-
-  defp include_parameters(false, openapi_object, _request), do: openapi_object
-
-  defp include_parameters(true, openapi_object, request) do
-    Map.put(openapi_object, "parameters", Formatter.request_parameters(request))
-  end
-
-  defp request_body_if_needed(openapi_object, %{request_body: body}) when body in @empty_data,
-    do: openapi_object
-
-  defp request_body_if_needed(openapi_object, request) do
-    Map.put(openapi_object, "requestBody", Formatter.request_body(request))
-  end
-
-  defp security_if_needed(openapi_object, request) do
-    if has_authorization_header?(request) do
-      Map.put(openapi_object, "security", [%{"api_key" => []}])
-    else
-      openapi_object
-    end
-  end
-
-  defp json_encode!(map), do: JSON.encode!(map)
 
   defp xcribe_info, do: apply(Config.xcribe_information_source(), :api_info, [])
+  defp json_encode!(openapi), do: JSON.encode!(openapi)
 end
