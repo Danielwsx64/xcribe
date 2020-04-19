@@ -10,15 +10,21 @@ defmodule Xcribe.Config do
         env_var: "CI_ENV_FOR_DOC"
       ]
 
+      :api_blueprint -> "api_doc.apib"
+      :swagger -> "openapi.json"
 
   ### Available configurations:
     * `:information_source` - Module that implements `Xcribe.Information` with
-    API information.
-    * `:output` - The name of file output with generated configuration.
-    * `:format` - Format to generate documentation, allowed :api_blueprint and
-    :swagger.
+    API information. It's required.
+    * `:output` - The name of file output with generated configuration. Default
+    value changes by the format, 'api_blueprint.apib' for Blueprint and
+    'app_doc.json' for swagger.
+    * `:format` - Format to generate documentation, allowed `:api_blueprint` and
+    `:swagger`. Default `:api_blueprint`.
     * `:env_var` - Environment variable name for active Xcribe documentation
-    generator.
+    generator. Default is `XCRIBE_ENV`.
+    * `:json_library` - The library to be used for json decode/encode (Jason
+    and Poison are supported). The default is the same as `Phoenix` configuration.
   """
 
   alias Xcribe.{MissingInformationSource, UnknownFormat}
@@ -33,7 +39,7 @@ defmodule Xcribe.Config do
 
   To configure output name:
 
-      config :xcribe, [
+      config :xcribe, :configuration, [
         output: "custom_name.json"
       ]
   """
@@ -47,7 +53,7 @@ defmodule Xcribe.Config do
 
   To configure the documentation format:
 
-      config :xcribe, [
+      config :xcribe, :configuration, [
         format: :swagger
       ]
   """
@@ -65,7 +71,7 @@ defmodule Xcribe.Config do
 
   The env var name can changed by configuration:
 
-      config :xcribe, [
+      config :xcribe, :configuration, [
         env_var: "CUSTOM_ENV_NAME"
       ]
   """
@@ -78,7 +84,7 @@ defmodule Xcribe.Config do
 
   To configure the source:
 
-      config :xcribe, [
+      config :xcribe, :configuration, [
         information_source: YourApp.YouModuleInformation
       ]
   """
@@ -88,6 +94,20 @@ defmodule Xcribe.Config do
       information_source -> information_source
     end
   end
+
+  @doc """
+  Return configured json library.
+
+  If no custom lib was configured the `Phoenix` configuration will be used.
+
+  To configure:
+
+      config :xcribe, :configuration, [
+        json_library: Jason
+      ]
+
+  """
+  def json_library, do: get_xcribe_config(:json_library, Phoenix.json_library())
 
   defp env_var_name, do: get_xcribe_config(:env_var, "XCRIBE_ENV")
 

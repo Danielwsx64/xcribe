@@ -143,4 +143,16 @@ defmodule Xcribe.ConfigTest do
       Application.delete_env(:xcribe, :information_source)
     end
   end
+
+  describe "json_library/o" do
+    test "return configured json library" do
+      Application.put_env(:xcribe, :configuration, json_library: FakeOne)
+      assert Config.json_library() == FakeOne
+      Application.delete_env(:xcribe, :configuration)
+    end
+
+    test "return Phoenix configured json library" do
+      assert Config.json_library() == Jason
+    end
+  end
 end

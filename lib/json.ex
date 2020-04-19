@@ -4,8 +4,9 @@ defmodule Xcribe.JSON do
 
   Poison and Jason are the most popular json libraries common used in Elixir
   projects. Xcribe works with both. By default Xcribe use the same library as
-  Phoenix. But you can change it by config.
+  Phoenix. But you can change it by config, see `Xcribe.Config`.
   """
+  alias Xcribe.Config
 
   @doc """
   wrapper for json library encode function
@@ -35,5 +36,5 @@ defmodule Xcribe.JSON do
     json_library().decode!(value, options)
   end
 
-  defp json_library, do: Jason
+  defp json_library, do: Config.json_library()
 end
