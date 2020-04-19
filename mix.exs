@@ -88,10 +88,6 @@ defmodule Xcribe.MixProject do
       Helpers: [
         Xcribe.Helpers.Document,
         Xcribe.Helpers.Formatter
-      ],
-      Exceptions: [
-        Xcribe.UnknownFormat,
-        Xcribe.ContentDecoder.UnknownType
       ]
     ]
   end

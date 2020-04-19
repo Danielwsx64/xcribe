@@ -21,7 +21,7 @@ defmodule Xcribe.Config do
     generator.
   """
 
-  alias Xcribe.UnknownFormat
+  alias Xcribe.{MissingInformationSource, UnknownFormat}
 
   @valid_formats [:api_blueprint, :swagger]
 
@@ -42,8 +42,8 @@ defmodule Xcribe.Config do
   @doc """
   Return the format for documentation.
 
-  Default is `:api_blueprint`. If an invalid format is given an exception will
-  raise.
+  Default is `:api_blueprint`. If an invalid format is given an `Xcribe.UnknownFormat`
+  exception will raise.
 
   To configure the documentation format:
 
@@ -74,7 +74,7 @@ defmodule Xcribe.Config do
   @doc """
   Return the iformation module with API information (`Xcribe.Information`).
 
-  If information source is not given an excpiton will raise.
+  If information source is not given an `Xcribe.MissingInformationSource` exception will raise.
 
   To configure the source:
 
@@ -82,8 +82,12 @@ defmodule Xcribe.Config do
         information_source: YourApp.YouModuleInformation
       ]
   """
-  def xcribe_information_source,
-    do: Application.fetch_env!(:xcribe, :information_source)
+  def xcribe_information_source do
+    case get_xcribe_config(:information_source) do
+      nil -> raise MissingInformationSource
+      information_source -> information_source
+    end
+  end
 
   defp env_var_name, do: get_xcribe_config(:env_var, "XCRIBE_ENV")
 
@@ -97,7 +101,7 @@ defmodule Xcribe.Config do
   defp validate_doc_format(format) when format in @valid_formats, do: format
   defp validate_doc_format(format), do: raise(UnknownFormat, format)
 
-  defp get_xcribe_config(key, default) do
+  defp get_xcribe_config(key, default \\ nil) do
     cond do
       value = new_config(key) -> value
       value = old_config(key) -> value

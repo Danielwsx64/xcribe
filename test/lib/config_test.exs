@@ -2,7 +2,7 @@ defmodule Xcribe.ConfigTest do
   use ExUnit.Case, async: false
 
   alias Xcribe.Config
-  alias Xcribe.UnknownFormat
+  alias Xcribe.{MissingInformationSource, UnknownFormat}
 
   describe "output_file/0" do
     test "return configured output name" do
@@ -120,6 +120,27 @@ defmodule Xcribe.ConfigTest do
       end
 
       Application.delete_env(:xcribe, :doc_format)
+    end
+  end
+
+  describe "xcribe_information_source/0" do
+    test "return information source" do
+      Application.put_env(:xcribe, :configuration, information_source: FakeOne)
+      assert Config.xcribe_information_source() == FakeOne
+      Application.delete_env(:xcribe, :configuration)
+    end
+
+    test "when module is not configured" do
+      assert_raise MissingInformationSource, fn ->
+        Config.xcribe_information_source()
+      end
+    end
+
+    test "deprecated configuration" do
+      # return information source
+      Application.put_env(:xcribe, :information_source, FakeOne)
+      assert Config.xcribe_information_source() == FakeOne
+      Application.delete_env(:xcribe, :information_source)
     end
   end
 end

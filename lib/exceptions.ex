@@ -29,3 +29,22 @@ defmodule Xcribe.UnknownFormat do
     %__MODULE__{message: "Configured format #{format} is unknown. \n#{@help_information}"}
   end
 end
+
+defmodule Xcribe.MissingInformationSource do
+  @moduledoc """
+  Raised at runtime when not configured an implementation of `Xcribe.Information`.
+  """
+
+  @help_information ~S"""
+  You must create a module to implement `Xcribe.Information` and configure it:
+
+      config: :xcribe, :configuration, information_source: YourInformationModule
+
+  """
+
+  defexception [:message]
+
+  def exception(_) do
+    %__MODULE__{message: "Information Source module not configured. \n#{@help_information}"}
+  end
+end

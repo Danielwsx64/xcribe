@@ -5,6 +5,12 @@ defmodule Xcribe.ApiBlueprintTest do
 
   alias Xcribe.ApiBlueprint
 
+  setup do
+    Application.put_env(:xcribe, :configuration, information_source: Xcribe.Support.Information)
+
+    :ok
+  end
+
   describe "group_requests/1" do
     test "group requests" do
       assert ApiBlueprint.group_requests(@sample_requests) == @grouped_sample_requests

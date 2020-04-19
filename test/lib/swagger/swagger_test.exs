@@ -6,6 +6,12 @@ defmodule Xcribe.SwaggerTest do
   alias Xcribe.Support.RequestsGenerator
   alias Xcribe.Swagger
 
+  setup do
+    Application.put_env(:xcribe, :configuration, information_source: Xcribe.Support.Information)
+
+    :ok
+  end
+
   describe "generate_doc/1" do
     test "parse requests do string" do
       requests = [

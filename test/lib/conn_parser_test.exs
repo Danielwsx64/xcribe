@@ -4,6 +4,12 @@ defmodule Xcribe.ConnParserTest do
   alias Plug.Conn
   alias Xcribe.{ConnParser, Request}
 
+  setup do
+    Application.put_env(:xcribe, :configuration, information_source: Xcribe.Support.Information)
+
+    :ok
+  end
+
   describe "parse/1" do
     test "extract request data from an index request", %{conn: conn} do
       conn =
