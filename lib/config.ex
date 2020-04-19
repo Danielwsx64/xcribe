@@ -7,7 +7,8 @@ defmodule Xcribe.Config do
         information_source: YourApp.YouModuleInformation,
         format: :swagger,
         output: "app_doc.json",
-        env_var: "CI_ENV_FOR_DOC"
+        env_var: "CI_ENV_FOR_DOC",
+        json_library: Jason
       ]
 
       :api_blueprint -> "api_doc.apib"
