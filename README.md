@@ -1,3 +1,7 @@
+![Hex.pm](https://img.shields.io/hexpm/v/xcribe?style=flat-square)
+![Hex.pm](https://img.shields.io/hexpm/l/xcribe?style=flat-square)
+![Hex.pm](https://img.shields.io/hexpm/dt/xcribe?style=flat-square)
+
 # XCribe
 
 XCribe is a doc generator for Rest APIs built with Phoenix.
