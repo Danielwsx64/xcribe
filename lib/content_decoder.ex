@@ -28,9 +28,10 @@ defmodule Xcribe.ContentDecoder do
   defp decode_for(:json, value), do: JSON.decode!(value)
 
   defp define_format(content_type) do
-    cond do
-      is_json?(content_type) -> :json
-      true -> raise UnknownType, content_type
+    if is_json?(content_type) do
+      :json
+    else
+      raise UnknownType, content_type
     end
   end
 
