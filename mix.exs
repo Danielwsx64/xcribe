@@ -1,7 +1,7 @@
 defmodule Xcribe.MixProject do
   use Mix.Project
 
-  @version "0.2.0"
+  @version "0.3.0"
   @description "A lib to generate API documentation from test specs"
   @links %{"GitHub" => "https://github.com/danielwsx64/xcribe"}
 
@@ -88,6 +88,10 @@ defmodule Xcribe.MixProject do
       Helpers: [
         Xcribe.Helpers.Document,
         Xcribe.Helpers.Formatter
+      ],
+      Exceptions: [
+        Xcribe.UnknownFormat,
+        Xcribe.ContentDecoder.UnknownType
       ]
     ]
   end
