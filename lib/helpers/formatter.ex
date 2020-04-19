@@ -11,7 +11,7 @@ defmodule Xcribe.Helpers.Formatter do
   @mult_spaces_regex ~r/\s+/
   @slash_regex ~r/\/$/
   @path_ending_arg_regex ~r/({\w*}\/$)/
-  @content_type_regex ~r/^(\w*\/\w*),?.*/
+  @content_type_regex ~r{^(\w*\/\w*(\.\w*\+\w*)?);?.*}
 
   @doc """
   return the content type by a list of header params
@@ -142,6 +142,7 @@ defmodule Xcribe.Helpers.Formatter do
 
   defp handle_content_type_regex(nil), do: {:halt, nil}
   defp handle_content_type_regex([content_type]), do: {:halt, content_type}
+  defp handle_content_type_regex([content_type | _vnd_spec]), do: {:halt, content_type}
 
   defp unify_matchs(nil), do: []
   defp unify_matchs(matchs), do: Enum.uniq(matchs)

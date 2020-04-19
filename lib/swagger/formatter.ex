@@ -5,7 +5,7 @@ defmodule Xcribe.Swagger.Formatter do
   To know more about the specifications [OpenAPI 3.0.3](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md)
   """
 
-  alias Xcribe.{JSON, Request}
+  alias Xcribe.{ContentDecoder, Request}
   alias Xcribe.Swagger.Types
 
   import Xcribe.Helpers.Formatter, only: [content_type: 1, authorization: 1]
@@ -207,14 +207,13 @@ defmodule Xcribe.Swagger.Formatter do
     }
   end
 
-  defp build_schema_for_media(content, "application/json") when is_binary(content) do
-    schema_object_for({:build_schema_for_media, JSON.decode!(content)},
-      title: false,
-      example: true
-    )
+  defp build_schema_for_media(content, content_type) when is_binary(content) do
+    content
+    |> ContentDecoder.decode!(content_type)
+    |> build_schema_for_media(content_type)
   end
 
-  defp build_schema_for_media(content, _) when is_map(content) do
+  defp build_schema_for_media(content, _) do
     schema_object_for({:build_schema_for_media, content}, title: false, example: true)
   end
 
