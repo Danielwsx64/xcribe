@@ -3,7 +3,7 @@ defmodule Xcribe.Config do
   Handle Xcribe configurations.
 
   You must configure Xcribe in your test config file `config/test.exs` as:
-      config: xcribe, :configuration, [
+      config :xcribe, :configuration, [
         information_source: YourApp.YouModuleInformation,
         format: :swagger,
         output: "app_doc.json",
