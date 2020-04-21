@@ -5,7 +5,7 @@ defmodule Xcribe.ConnParserTest do
   alias Xcribe.{ConnParser, Request}
 
   setup do
-    Application.put_env(:xcribe, :configuration, information_source: Xcribe.Support.Information)
+    Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
 
     :ok
   end

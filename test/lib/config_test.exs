@@ -6,21 +6,21 @@ defmodule Xcribe.ConfigTest do
 
   describe "output_file/0" do
     test "return configured output name" do
-      Application.put_env(:xcribe, :configuration, output: "example.md")
+      Application.put_env(:xcribe, :output, "example.md")
       assert Config.output_file() == "example.md"
-      Application.delete_env(:xcribe, :configuration)
+      Application.delete_env(:xcribe, :output)
     end
 
     test "return default file name for ApiBlueprint" do
-      Application.put_env(:xcribe, :configuration, format: :api_blueprint)
+      Application.put_env(:xcribe, :format, :api_blueprint)
       assert Config.output_file() == "api_doc.apib"
-      Application.delete_env(:xcribe, :configuration)
+      Application.delete_env(:xcribe, :format)
     end
 
     test "return default file name for Swagger" do
-      Application.put_env(:xcribe, :configuration, format: :swagger)
+      Application.put_env(:xcribe, :format, :swagger)
       assert Config.output_file() == "openapi.json"
-      Application.delete_env(:xcribe, :configuration)
+      Application.delete_env(:xcribe, :format)
     end
 
     test "deprecated configuration" do
@@ -43,18 +43,18 @@ defmodule Xcribe.ConfigTest do
 
   describe "active?/0" do
     test "return true when xcribe env var is defined" do
-      Application.put_env(:xcribe, :configuration, env_var: "EXISTING_ENV_VAR_NEW_CONFIG")
+      Application.put_env(:xcribe, :env_var, "EXISTING_ENV_VAR_NEW_CONFIG")
       System.put_env("EXISTING_ENV_VAR_NEW_CONFIG", "1")
 
       assert Config.active?() == true
-      Application.delete_env(:xcribe, :configuration)
+      Application.delete_env(:xcribe, :env_var)
     end
 
     test "return false when xcribe env var is undefined" do
-      Application.put_env(:xcribe, :configuration, env_var: "UNDEFINED_XCRIBE_ENV_VAR_!@#")
+      Application.put_env(:xcribe, :env_var, "UNDEFINED_XCRIBE_ENV_VAR_!@#")
 
       assert Config.active?() == false
-      Application.delete_env(:xcribe, :configuration)
+      Application.delete_env(:xcribe, :env_var)
     end
 
     test "return true for default env var name" do
@@ -78,27 +78,27 @@ defmodule Xcribe.ConfigTest do
 
   describe "doc_format/0" do
     test "when ApiBlueprint format is specified" do
-      Application.put_env(:xcribe, :configuration, format: :api_blueprint)
+      Application.put_env(:xcribe, :format, :api_blueprint)
 
       assert Config.doc_format() == :api_blueprint
-      Application.delete_env(:xcribe, :configuration)
+      Application.delete_env(:xcribe, :format)
     end
 
     test "when Swagger format is specified" do
-      Application.put_env(:xcribe, :configuration, format: :swagger)
+      Application.put_env(:xcribe, :format, :swagger)
 
       assert Config.doc_format() == :swagger
-      Application.delete_env(:xcribe, :configuration)
+      Application.delete_env(:xcribe, :format)
     end
 
     test "when an invalid format is specified" do
-      Application.put_env(:xcribe, :configuration, format: :invalid)
+      Application.put_env(:xcribe, :format, :invalid)
 
       assert_raise UnknownFormat, fn ->
         Config.doc_format()
       end
 
-      Application.delete_env(:xcribe, :configuration)
+      Application.delete_env(:xcribe, :format)
     end
 
     test "deprecated configuration" do
@@ -125,9 +125,9 @@ defmodule Xcribe.ConfigTest do
 
   describe "xcribe_information_source/0" do
     test "return information source" do
-      Application.put_env(:xcribe, :configuration, information_source: FakeOne)
+      Application.put_env(:xcribe, :information_source, FakeOne)
       assert Config.xcribe_information_source() == FakeOne
-      Application.delete_env(:xcribe, :configuration)
+      Application.delete_env(:xcribe, :information_source)
     end
 
     test "when module is not configured" do
@@ -146,9 +146,9 @@ defmodule Xcribe.ConfigTest do
 
   describe "json_library/o" do
     test "return configured json library" do
-      Application.put_env(:xcribe, :configuration, json_library: FakeOne)
+      Application.put_env(:xcribe, :json_library, FakeOne)
       assert Config.json_library() == FakeOne
-      Application.delete_env(:xcribe, :configuration)
+      Application.delete_env(:xcribe, :json_library)
     end
 
     test "return Phoenix configured json library" do

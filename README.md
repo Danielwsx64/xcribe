@@ -149,12 +149,12 @@ You can add this configurations to your `config/test.ex`
 -   output: a custom name to the output file
 -   format: ApiBlueprint or Swagger formats
 -   env_var: a custom name to the env to active XCribe.Formatter
--   json_library: The library to be used for json decode/encode
+-   json_library: The library to be used for json decode/encode. See `Xcribe.JSON`
 
 Example
 
 ```elixir
-config :xcribe, :configuration, [
+config :xcribe, [
   information_source: YourAppWeb.Information,
   output: "API-DOCUMENTATION.apib",
   format: :swagger # or :api_blueprint,

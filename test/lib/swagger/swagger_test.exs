@@ -7,7 +7,7 @@ defmodule Xcribe.SwaggerTest do
   alias Xcribe.Swagger
 
   setup do
-    Application.put_env(:xcribe, :configuration, information_source: Xcribe.Support.Information)
+    Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
 
     :ok
   end

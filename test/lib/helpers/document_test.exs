@@ -6,9 +6,8 @@ defmodule Xcribe.Helpers.DocumentTest do
   import Xcribe.Helpers.Document
 
   setup do
-    Application.put_env(:xcribe, :configuration,
-      env_var: "PWD",
-      information_source: Xcribe.Support.Information
+    Application.put_all_env(
+      xcribe: [env_var: "PWD", information_source: Xcribe.Support.Information]
     )
 
     :ok
@@ -47,7 +46,7 @@ defmodule Xcribe.Helpers.DocumentTest do
     end
 
     test "dont document when env var is not defined", %{conn: conn} do
-      Application.delete_env(:xcribe, :configuration)
+      Application.delete_env(:xcribe, :env_var)
 
       Recorder.start_link()
 

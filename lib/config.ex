@@ -3,7 +3,8 @@ defmodule Xcribe.Config do
   Handle Xcribe configurations.
 
   You must configure Xcribe in your test config file `config/test.exs` as:
-      config :xcribe, :configuration, [
+
+      config: xcribe, [
         information_source: YourApp.YouModuleInformation,
         format: :swagger,
         output: "app_doc.json",
@@ -40,7 +41,7 @@ defmodule Xcribe.Config do
 
   To configure output name:
 
-      config :xcribe, :configuration, [
+      config :xcribe, [
         output: "custom_name.json"
       ]
   """
@@ -54,7 +55,7 @@ defmodule Xcribe.Config do
 
   To configure the documentation format:
 
-      config :xcribe, :configuration, [
+      config :xcribe, [
         format: :swagger
       ]
   """
@@ -72,7 +73,7 @@ defmodule Xcribe.Config do
 
   The env var name can changed by configuration:
 
-      config :xcribe, :configuration, [
+      config :xcribe, [
         env_var: "CUSTOM_ENV_NAME"
       ]
   """
@@ -85,7 +86,7 @@ defmodule Xcribe.Config do
 
   To configure the source:
 
-      config :xcribe, :configuration, [
+      config :xcribe, [
         information_source: YourApp.YouModuleInformation
       ]
   """
@@ -103,7 +104,7 @@ defmodule Xcribe.Config do
 
   To configure:
 
-      config :xcribe, :configuration, [
+      config :xcribe, [
         json_library: Jason
       ]
 
@@ -130,11 +131,7 @@ defmodule Xcribe.Config do
     end
   end
 
-  defp new_config(key) do
-    :xcribe
-    |> Application.get_env(:configuration, [])
-    |> Keyword.get(key)
-  end
+  defp new_config(key), do: Application.get_env(:xcribe, key)
 
   defp old_config(key), do: Application.get_env(:xcribe, rename_key(key))
 
