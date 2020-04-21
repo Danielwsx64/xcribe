@@ -131,6 +131,8 @@ defmodule Xcribe.ConfigTest do
     end
 
     test "when module is not configured" do
+      Application.delete_env(:xcribe, :information_source)
+
       assert_raise MissingInformationSource, fn ->
         Config.xcribe_information_source()
       end
