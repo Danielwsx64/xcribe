@@ -6,9 +6,8 @@ defmodule Xcribe.Helpers.DocumentTest do
   import Xcribe.Helpers.Document
 
   setup do
-    Application.put_all_env(
-      xcribe: [env_var: "PWD", information_source: Xcribe.Support.Information]
-    )
+    Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
+    Application.put_env(:xcribe, :env_var, "PWD")
 
     :ok
   end
