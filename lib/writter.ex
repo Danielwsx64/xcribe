@@ -9,7 +9,13 @@ defmodule Xcribe.Writter do
   This writes the given text to the configured output file
   """
   def write(text) do
-    {:ok, file} = File.open(Config.output_file(), [:write])
+    output_file = Config.output_file()
+
+    output_file
+    |> Path.dirname()
+    |> File.mkdir_p!()
+
+    {:ok, file} = File.open(output_file, [:write])
 
     IO.binwrite(file, text)
 
