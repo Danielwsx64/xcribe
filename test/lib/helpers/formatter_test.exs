@@ -18,6 +18,11 @@ defmodule Xcribe.Helpers.FormatterTest do
       assert Formatter.content_type(headers_three) == nil
     end
 
+    test "handle composed vnd type" do
+      headers = [{"content-type", "application/vnd.api+json; charset=utf-8"}]
+      assert Formatter.content_type(headers) == "application/vnd.api+json"
+    end
+
     test "return default value when not found" do
       headers_one = [
         {"content-type", "application/json; charset=utf-8"},
