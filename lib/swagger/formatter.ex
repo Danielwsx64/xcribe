@@ -50,7 +50,8 @@ defmodule Xcribe.Swagger.Formatter do
             summary: "",
             responses: responses_object_from_request(request),
             parameters: parameter_objects_from_request(request),
-            security: security_requirement_object_by_request(request)
+            security: security_requirement_object_by_request(request),
+            tags: [request.resource]
           }
         )
     }

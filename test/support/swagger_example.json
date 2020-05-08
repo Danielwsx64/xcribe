@@ -65,7 +65,8 @@
         "security": [{
           "basic": []
         }],
-        "summary": ""
+        "summary": "",
+        "tags": ["users"]
       },
       "post": {
         "description": "",
@@ -125,7 +126,8 @@
         "security": [{
           "bearer": []
         }],
-        "summary": ""
+        "summary": "",
+        "tags": ["users"]
       }
     },
     "/users/{id}": {
@@ -156,7 +158,8 @@
         "security": [{
           "bearer": []
         }],
-        "summary": ""
+        "summary": "",
+        "tags": ["users"]
       },
       "get": {
         "description": "",
@@ -203,7 +206,8 @@
         "security": [{
           "basic": []
         }],
-        "summary": ""
+        "summary": "",
+        "tags": ["users"]
       },
       "put": {
         "description": "",
@@ -271,7 +275,8 @@
         "security": [{
           "bearer": []
         }],
-        "summary": ""
+        "summary": "",
+        "tags": ["users"]
       }
     },
     "/users/{users_id}/cancel": {
@@ -302,7 +307,8 @@
         "security": [{
           "api_key": []
         }],
-        "summary": ""
+        "summary": "",
+        "tags": ["users_cancel"]
       }
     },
     "/users/{users_id}/posts": {
@@ -354,7 +360,8 @@
         "security": [{
           "api_key": []
         }],
-        "summary": ""
+        "summary": "",
+        "tags": ["users_posts"]
       },
       "post": {
         "description": "",
@@ -416,7 +423,8 @@
         "security": [{
           "api_key": []
         }],
-        "summary": ""
+        "summary": "",
+        "tags": ["users_posts"]
       }
     },
     "/users/{users_id}/posts/{id}": {
@@ -490,7 +498,8 @@
         "security": [{
           "api_key": []
         }],
-        "summary": ""
+        "summary": "",
+        "tags": ["users_posts"]
       }
     }
   },

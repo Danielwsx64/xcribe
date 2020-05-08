@@ -61,6 +61,7 @@ defmodule Xcribe.Swagger.FormatterTest do
         ],
         status_code: 200,
         verb: "get",
+        resource: "users",
         params: %{
           "fields" => %{"articles" => "title,body", "people" => "name"},
           "include" => "author"
@@ -88,6 +89,7 @@ defmodule Xcribe.Swagger.FormatterTest do
           ],
           security: [%{"api_key" => []}],
           summary: "",
+          tags: ["users"],
           responses: %{
             200 => %{
               description: "",
@@ -123,6 +125,7 @@ defmodule Xcribe.Swagger.FormatterTest do
         resp_headers: [{"content-type", "application/json; charset=utf-8"}],
         status_code: 201,
         verb: "post",
+        resource: "users",
         params: %{},
         query_params: %{}
       }
@@ -133,6 +136,7 @@ defmodule Xcribe.Swagger.FormatterTest do
           parameters: [],
           security: [],
           summary: "",
+          tags: ["users"],
           requestBody: %{
             description: "",
             content: %{

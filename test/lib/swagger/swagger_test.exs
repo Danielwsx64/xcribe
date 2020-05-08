@@ -72,6 +72,7 @@ defmodule Xcribe.SwaggerTest do
               "parameters" => [],
               "security" => [],
               "summary" => "",
+              "tags" => ["protocols"],
               "responses" => %{
                 "200" => %{
                   "description" => "",
