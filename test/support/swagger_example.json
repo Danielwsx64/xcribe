@@ -308,7 +308,7 @@
           "api_key": []
         }],
         "summary": "",
-        "tags": ["users_cancel"]
+        "tags": ["users cancel"]
       }
     },
     "/users/{users_id}/posts": {
@@ -361,7 +361,7 @@
           "api_key": []
         }],
         "summary": "",
-        "tags": ["users_posts"]
+        "tags": ["users posts"]
       },
       "post": {
         "description": "",
@@ -424,7 +424,7 @@
           "api_key": []
         }],
         "summary": "",
-        "tags": ["users_posts"]
+        "tags": ["users posts"]
       }
     },
     "/users/{users_id}/posts/{id}": {
@@ -499,7 +499,7 @@
           "api_key": []
         }],
         "summary": "",
-        "tags": ["users_posts"]
+        "tags": ["users posts"]
       }
     }
   },
