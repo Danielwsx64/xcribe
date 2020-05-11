@@ -50,7 +50,8 @@ defmodule Xcribe.Swagger.Formatter do
             summary: "",
             responses: responses_object_from_request(request),
             parameters: parameter_objects_from_request(request),
-            security: security_requirement_object_by_request(request)
+            security: security_requirement_object_by_request(request),
+            tags: format_tags_from_resource(request.resource)
           }
         )
     }
@@ -193,6 +194,8 @@ defmodule Xcribe.Swagger.Formatter do
   defp responses_object_from_request(%Request{status_code: status} = request) do
     %{status => response_object_from_request(request)}
   end
+
+  defp format_tags_from_resource(resource), do: [String.replace(resource, "_", " ")]
 
   defp media_type_object(_headers, ""), do: %{description: ""}
 

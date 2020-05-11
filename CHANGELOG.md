@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- New "tags" parameter to operations object in Swagger format.
 - Add changelog and Makefile.
 
 [Unreleased]: https://github.com/brainn-co/xcribe/compa...master
