@@ -37,3 +37,16 @@ jobs:
         run: mix deps.get
       - name: Run Formatter
         run: mix format --check-formatted
+  mix_verify_version:
+    name: mix format (Elixir 1.10.2 OTP 22.3)
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-elixir@v1.0.0
+        with:
+          otp-version: "22.3"
+          elixir-version: "1.10.2"
+      - name: Install Dependencies
+        run: mix deps.get
+      - name: Check version
+        run: mix run bin/verify_version.exs
