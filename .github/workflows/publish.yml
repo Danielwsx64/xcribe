@@ -1,0 +1,19 @@
+name: Publish
+on:
+  push:
+    branches:
+      - master
+jobs:
+  mix_publish:
+    name: Publish (Elixir 1.10.2 OTP 22.3)
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-elixir@v1.0.0
+        with:
+          otp-version: "22.3"
+          elixir-version: "1.10.2"
+      - name: Install Dependencies
+        run: mix do deps.get, deps.compile, compile
+      - name: Publish
+        run: mix hex.publish --yes
