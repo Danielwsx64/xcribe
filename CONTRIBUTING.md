@@ -1,4 +1,4 @@
-# Contributing to vanilla-commons
+# Contributing to xcribe
 First off, thanks for taking the time to contribute!
 
 ## Publish
