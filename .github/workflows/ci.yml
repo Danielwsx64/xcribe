@@ -49,4 +49,6 @@ jobs:
       - name: Install Dependencies
         run: mix deps.get
       - name: Check version
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
         run: mix run bin/check_version.exs
