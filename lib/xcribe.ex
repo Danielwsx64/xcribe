@@ -2,8 +2,6 @@ defmodule Xcribe do
   @moduledoc """
   Xcribe is a library for API documentation. It generates docs from your test specs.
 
-  ## Documenting API
-
   Xcribe use `Plug.Conn` struct to fetch information about requests and use them
   to document your API.  You must give requests examples (from your tests ) to Xcribe
   be able to document your routes.
