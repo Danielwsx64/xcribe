@@ -2,11 +2,15 @@ defmodule Xcribe.ConnParser do
   @moduledoc false
 
   alias Plug.Conn
-  alias Xcribe.{Config, Request}
+  alias Xcribe.{Config, Request, Request.Error}
+
+  @error_struct %Error{type: :parsing}
 
   @doc """
   Parse the given `Plug.Conn` and transform it to a `Xcribe.Request`. A
   description can be provided.
+
+  If any error occurs a `Xcribe.Request.Error` is returned
   """
   def execute(conn, description \\ "")
 
@@ -16,9 +20,9 @@ defmodule Xcribe.ConnParser do
     |> parse_conn(conn, description)
   end
 
-  def execute(_conn, _description), do: {:error, "a Plug.Conn is needed"}
+  def execute(_conn, _description), do: Map.put(@error_struct, :message, "a Plug.Conn is needed")
 
-  defp parse_conn({:error, _} = error, _conn, _description), do: error
+  defp parse_conn(%Error{} = error, _conn, _description), do: error
 
   defp parse_conn(route, conn, description) do
     path = format_path(route.route, conn.path_params)
@@ -48,7 +52,7 @@ defmodule Xcribe.ConnParser do
     |> apply(:__match_route__, [method, decode_uri(path), host])
     |> extract_route_info()
   rescue
-    _ -> {:error, "invalid Router or invalid Conn"}
+    _ -> Map.put(@error_struct, :message, "invalid Router or invalid Conn")
   end
 
   defp router_module(%{private: %{phoenix_router: router}}), do: router
@@ -58,7 +62,7 @@ defmodule Xcribe.ConnParser do
   defp extract_route_info({%{} = route_info, _callback_one, _callback_two, _plug_info}),
     do: route_info
 
-  defp extract_route_info(_), do: {:error, "route not found"}
+  defp extract_route_info(_), do: Map.put(@error_struct, :message, "route not found")
 
   defp router_options(%{plug_opts: opts}), do: opts
   defp router_options(%{opts: opts}), do: opts

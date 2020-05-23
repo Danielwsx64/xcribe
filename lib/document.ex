@@ -3,7 +3,7 @@ defmodule Xcribe.Document do
   Exposes document/2 macro to be used in test specs.
   """
 
-  alias Xcribe.{Config, ConnParser, Recorder, Request, Request.Error}
+  alias Xcribe.{Config, ConnParser, Recorder}
 
   @doc """
   Document a request by a given `Plug.Conn`.
@@ -41,18 +41,13 @@ defmodule Xcribe.Document do
       if Config.active?() do
         conn
         |> ConnParser.execute(request_description(options))
-        |> append_meta(meta)
+        |> Map.put(:__meta__, meta)
         |> Recorder.save()
       end
 
       conn
     end
   end
-
-  def append_meta(%Request{} = request, meta), do: Map.put(request, :__meta__, meta)
-
-  def append_meta({:error, message}, meta),
-    do: Map.put(%Error{type: :parsing, message: message}, :__meta__, meta)
 
   @doc false
   def request_description(options), do: Keyword.fetch!(options, :as)
