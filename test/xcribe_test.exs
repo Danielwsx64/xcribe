@@ -18,4 +18,20 @@ defmodule XcribeTest do
 
     assert Version.match?(app_version, readme_versions)
   end
+
+  describe "__using__/1" do
+    test "using in conn case" do
+      use Xcribe, :case
+
+      assert document(%{}) == %{}
+    end
+
+    defmodule MyInformation do
+      use Xcribe, :information
+    end
+
+    test "using in information module" do
+      assert MyInformation.api_info()
+    end
+  end
 end

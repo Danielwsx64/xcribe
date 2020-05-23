@@ -24,4 +24,23 @@ defmodule Xcribe do
 
     [worker(Xcribe.Recorder, [])]
   end
+
+  @doc false
+  def case do
+    quote do
+      import Xcribe.Helpers.Document
+    end
+  end
+
+  @doc false
+  def information do
+    quote do
+      use Xcribe.Information
+    end
+  end
+
+  @doc false
+  defmacro __using__(mode) when is_atom(mode) do
+    apply(__MODULE__, mode, [])
+  end
 end
