@@ -30,7 +30,7 @@ Update deps
 mix deps.get
 ```
 
-Xcribe requires that you create an "Information Module". This module define
+Xcribe requires that you create an "Information Module". This module defines
 the custom information about your API documentation.
 
 Create a module that uses `Xcribe` as:
@@ -41,7 +41,7 @@ defmodule YourAppWeb.Support.DocInformation do
 
   xcribe_info do
     name "Your awesome API"
-    description "The best API on the world"
+    description "The best API in the world"
     host("http://your-api.us")
   end
 end
@@ -52,8 +52,11 @@ Add a new configuration with the created module
 config/test.exs
 
 ```elixir
-  config :xcribe, :information_source, YourAppWeb.Support.DocInformation
-  config :xcribe, :doc_format, :api_blueprint # or :swagger
+  config: xcribe, [
+    information_source: YourAppWeb.Support.DocInformation,
+    format: :swagger,
+    output: "app_doc.json"
+  ]
 ```
 
 Next, in your `test/test_helper.exs` you should configure ExUnit to use Xcribe
@@ -157,7 +160,7 @@ Example
 config :xcribe, [
   information_source: YourAppWeb.Information,
   output: "API-DOCUMENTATION.apib",
-  format: :swagger # or :api_blueprint,
+  format: :api_blueprint # or :swagger,
   env_var: "DOC_API",
   json_library: Jason
 ]
