@@ -28,25 +28,20 @@ defmodule Xcribe.Document do
   """
   defmacro document(conn, opts \\ []) do
     test_description = __CALLER__.function |> elem(0) |> to_string
-    test_file = __CALLER__.file
-    call_line = __CALLER__.line
-
     "test " <> suggest_from_test = test_description
 
-    quote bind_quoted: [
-            conn: conn,
-            opts: opts,
-            description: test_description,
-            file: test_file,
-            line: call_line,
-            suggestion: suggest_from_test
-          ] do
+    meta =
+      Macro.escape(%{
+        call: %{description: test_description, file: __CALLER__.file, line: __CALLER__.line}
+      })
+
+    quote bind_quoted: [conn: conn, opts: opts, suggestion: suggest_from_test, meta: meta] do
       options = Keyword.merge([as: suggestion], opts)
 
       if Config.active?() do
         conn
         |> ConnParser.execute(request_description(options))
-        |> append_meta(description, file, line)
+        |> Map.put(:__meta__, meta)
         |> Recorder.save()
       end
 
