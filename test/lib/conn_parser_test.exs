@@ -10,7 +10,7 @@ defmodule Xcribe.ConnParserTest do
     :ok
   end
 
-  describe "parse/1" do
+  describe "execute/2" do
     test "extract request data from an index request", %{conn: conn} do
       conn =
         conn
@@ -408,6 +408,17 @@ defmodule Xcribe.ConnParserTest do
       }
 
       assert ConnParser.execute(conn) == {:error, "route not found"}
+    end
+
+    test "invalid router" do
+      conn = %Conn{private: %{:phoenix_router => __MODULE__}}
+
+      assert ConnParser.execute(conn) == {:error, "invalid Router or invalid Conn"}
+      assert ConnParser.execute(%Conn{}) == {:error, "invalid Router or invalid Conn"}
+    end
+
+    test "invalid conn" do
+      assert ConnParser.execute(%{}) == {:error, "a Plug.Conn is needed"}
     end
   end
 end

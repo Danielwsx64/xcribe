@@ -1,17 +1,22 @@
 defmodule Xcribe.ConnParser do
   @moduledoc false
 
+  alias Plug.Conn
   alias Xcribe.{Config, Request}
 
   @doc """
   Parse the given `Plug.Conn` and transform it to a `Xcribe.Request`. A
   description can be provided.
   """
-  def execute(conn, description \\ "") do
+  def execute(conn, description \\ "")
+
+  def execute(%Conn{} = conn, description) do
     conn
     |> identify_route()
     |> parse_conn(conn, description)
   end
+
+  def execute(_conn, _description), do: {:error, "a Plug.Conn is needed"}
 
   defp parse_conn({:error, _} = error, _conn, _description), do: error
 
@@ -42,6 +47,8 @@ defmodule Xcribe.ConnParser do
     |> router_module()
     |> apply(:__match_route__, [method, decode_uri(path), host])
     |> extract_route_info()
+  rescue
+    _ -> {:error, "invalid Router or invalid Conn"}
   end
 
   defp router_module(%{private: %{phoenix_router: router}}), do: router
