@@ -134,8 +134,10 @@ defmodule Xcribe.Swagger.Formatter do
   @doc """
   Merge two lists of parameter object keep uniq names
   """
-  def merge_parameter_object_lists(base_list, new_list) do
-    Enum.reduce(new_list, base_list, &merge_parameter_func/2)
+  def merge_parameter_object_lists(base_list, new_list, mode \\ :keep) do
+    new_list
+    |> Enum.reduce(base_list, &merge_parameter_func(&1, &2, mode))
+    |> Enum.sort(&(&1.name < &2.name))
   end
 
   @doc """
@@ -170,9 +172,15 @@ defmodule Xcribe.Swagger.Formatter do
     %{description: "", content: Map.merge(body.content, new_body.content)}
   end
 
-  defp merge_parameter_func(param, params) do
-    if has_param?(param, params), do: params, else: [param | params]
+  defp merge_parameter_func(new_param, params, :keep) do
+    if has_param?(new_param, params), do: params, else: [new_param | params]
   end
+
+  defp merge_parameter_func(new_param, params, :overwrite) do
+    [new_param | drop_eql_param(new_param, params)]
+  end
+
+  defp drop_eql_param(param, params), do: Enum.reject(params, &eql_name_and_in(&1, param))
 
   defp has_param?(param, params), do: Enum.any?(params, &eql_name_and_in(&1, param))
 

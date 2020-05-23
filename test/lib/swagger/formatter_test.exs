@@ -572,31 +572,50 @@ defmodule Xcribe.Swagger.FormatterTest do
   end
 
   describe "merge_parameter_object_lists/2" do
-    test "keep uniq names and " do
-      base_list = [
+    test "keep uniq names and order by name" do
+      parameters = [
         %{name: "id", in: "path", required: true, schema: %{type: "string"}, example: 6},
         %{name: "id", in: "header", schema: %{type: "string"}, example: "8"}
       ]
 
-      new_list = [
+      new_params = [
         %{name: "id", in: "path", required: true, schema: %{type: "string"}, example: 9},
-        %{name: "id", in: "query", schema: %{type: "string"}, example: "9090"},
-        %{name: "alias", in: "query", schema: %{type: "string"}, example: "jon"}
+        %{name: "alias", in: "query", schema: %{type: "string"}, example: "jon"},
+        %{name: "id", in: "query", schema: %{type: "string"}, example: "9090"}
       ]
 
       expected = [
         %{name: "alias", in: "query", schema: %{type: "string"}, example: "jon"},
-        %{name: "id", in: "query", schema: %{type: "string"}, example: "9090"},
+        %{name: "id", in: "header", schema: %{type: "string"}, example: "8"},
         %{name: "id", in: "path", required: true, schema: %{type: "string"}, example: 6},
-        %{name: "id", in: "header", schema: %{type: "string"}, example: "8"}
+        %{name: "id", in: "query", schema: %{type: "string"}, example: "9090"}
       ]
 
-      assert Formatter.merge_parameter_object_lists(base_list, new_list) == expected
+      assert Formatter.merge_parameter_object_lists(parameters, new_params) == expected
+    end
+
+    test "overwrite params with new one" do
+      parameters = [
+        %{
+          name: "id",
+          in: "path",
+          required: true,
+          schema: %{type: "string"},
+          example: "invalid-id"
+        }
+      ]
+
+      new_params = [
+        %{name: "id", in: "path", required: true, schema: %{type: "string"}, example: "valid-id"}
+      ]
+
+      assert Formatter.merge_parameter_object_lists(parameters, new_params, :overwrite) ==
+               new_params
     end
   end
 
   describe "merge_path_item_objects/3" do
-    test "merge 2 object with diferente responses" do
+    test "merge objects with diferente responses and choose correct examples" do
       object_one = Samples.path_item_object_without_request_body()
       object_two = Samples.path_item_object_with_request_body()
       expected = Samples.expected_path_objects_merge()
