@@ -67,28 +67,11 @@ defmodule Xcribe.MixProject do
       source_ref: "v#{@version}",
       main: "readme",
       extras: [
-        "README.md": [title: "README"]
+        "README.md": [title: "Get starting"]
       ],
       groups_for_modules: doc_groups_for_modules()
     ]
   end
 
-  defp doc_groups_for_modules do
-    [
-      BluePrint: [
-        Xcribe.ApiBlueprint,
-        Xcribe.ApiBlueprint.Formatter,
-        Xcribe.ApiBlueprint.Templates
-      ],
-      Swagger: [
-        Xcribe.Swagger,
-        Xcribe.Swagger.Descriptor,
-        Xcribe.Swagger.Formatter
-      ],
-      Helpers: [
-        Xcribe.Helpers.Document,
-        Xcribe.Helpers.Formatter
-      ]
-    ]
-  end
+  defp doc_groups_for_modules, do: []
 end
