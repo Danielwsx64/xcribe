@@ -42,7 +42,7 @@ defmodule YourAppWeb.Support.DocInformation do
   xcribe_info do
     name "Your awesome API"
     description "The best API in the world"
-    host("http://your-api.us")
+    host "http://your-api.us"
   end
 end
 ```
