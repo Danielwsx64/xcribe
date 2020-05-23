@@ -1,4 +1,6 @@
 defmodule Xcribe.Helpers.Document do
+  @moduledoc false
+
   alias Xcribe.{Config, ConnParser, Recorder}
 
   defmacro document(conn, opts \\ []) do

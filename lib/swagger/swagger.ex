@@ -1,7 +1,5 @@
 defmodule Xcribe.Swagger do
-  @moduledoc """
-  Treats list of Requests and generates OpenAPI Document with json format
-  """
+  @moduledoc false
 
   alias Xcribe.{Config, JSON, Request}
   alias Xcribe.Swagger.{Formatter}

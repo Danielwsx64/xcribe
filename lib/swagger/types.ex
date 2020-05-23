@@ -1,9 +1,5 @@
 defmodule Xcribe.Swagger.Types do
-  @moduledoc ~S"""
-  Handle primitive data types.
-
-  To know more about the primitive types [Data Types](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md#dataTypes)
-  """
+  @moduledoc false
 
   @doc ~S"""
   Return the type of given data
