@@ -1,8 +1,6 @@
 defmodule Xcribe do
   @moduledoc """
-  This is the documentation for the XCribe Project
-
-  XCribe was built to generate API documentation for your app tests.
+  Xcribe is a library for API documentation. It generates docs from your test specs.
   """
   use Application
 

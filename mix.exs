@@ -9,7 +9,7 @@ defmodule Xcribe.MixProject do
     [
       app: :xcribe,
       version: @version,
-      name: "XCribe",
+      name: "Xcribe",
       docs: docs(),
       description: @description,
       elixir: "~> 1.8",
