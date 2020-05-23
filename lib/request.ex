@@ -2,6 +2,7 @@ defmodule Xcribe.Request do
   @moduledoc false
 
   defstruct [
+    :__meta__,
     :action,
     :controller,
     :description,

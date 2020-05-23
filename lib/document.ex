@@ -3,7 +3,7 @@ defmodule Xcribe.Document do
   Exposes document/2 macro to be used in test specs.
   """
 
-  alias Xcribe.{Config, ConnParser, Recorder}
+  alias Xcribe.{Config, ConnParser, Recorder, Request}
 
   @doc """
   Document a request by a given `Plug.Conn`.
@@ -27,20 +27,35 @@ defmodule Xcribe.Document do
   If no description is given the current test description will be used.
   """
   defmacro document(conn, opts \\ []) do
-    "test " <> test_name = __CALLER__.function |> elem(0) |> to_string
+    test_description = __CALLER__.function |> elem(0) |> to_string
+    test_file = __CALLER__.file
+    call_line = __CALLER__.line
 
-    quote bind_quoted: [conn: conn, test_name: test_name, opts: opts] do
-      options = Keyword.merge([as: test_name], opts)
+    "test " <> suggest_from_test = test_description
+
+    quote bind_quoted: [
+            conn: conn,
+            opts: opts,
+            description: test_description,
+            file: test_file,
+            line: call_line,
+            suggestion: suggest_from_test
+          ] do
+      options = Keyword.merge([as: suggestion], opts)
 
       if Config.active?() do
         conn
         |> ConnParser.execute(request_description(options))
+        |> append_meta(description, file, line)
         |> Recorder.save()
       end
 
       conn
     end
   end
+
+  def append_meta(%Request{} = resquest, description, file, line),
+    do: Map.put(resquest, :__meta__, %{call: %{description: description, file: file, line: line}})
 
   @doc false
   def request_description(options), do: Keyword.fetch!(options, :as)
