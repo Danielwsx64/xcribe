@@ -3,7 +3,7 @@ defmodule Xcribe.Swagger.FormatterTest do
 
   alias Xcribe.Request
   alias Xcribe.Support.Information, as: ExampleInformation
-  alias Xcribe.Support.Samples.SwaggerFormater, as: Samples
+  alias Xcribe.Support.Samples.SwaggerFormater.PathItemObject, as: Samples
   alias Xcribe.Swagger.Formatter
 
   describe "raw_openapi_object/0" do
@@ -616,11 +616,30 @@ defmodule Xcribe.Swagger.FormatterTest do
 
   describe "merge_path_item_objects/3" do
     test "merge objects with diferente responses and choose correct examples" do
-      object_one = Samples.path_item_object_without_request_body()
-      object_two = Samples.path_item_object_with_request_body()
-      expected = Samples.expected_path_objects_merge()
+      not_found = Samples.not_found_without_req_body()
+      bad_request = Samples.bad_request_with_req_body()
+      success = Samples.success_with_req_body()
 
-      assert Formatter.merge_path_item_objects(object_one, object_two, "put") == expected
+      first_sequence =
+        not_found
+        |> Formatter.merge_path_item_objects(bad_request, "put")
+        |> Formatter.merge_path_item_objects(success, "put")
+
+      second_sequence =
+        success
+        |> Formatter.merge_path_item_objects(not_found, "put")
+        |> Formatter.merge_path_item_objects(bad_request, "put")
+
+      third_sequence =
+        bad_request
+        |> Formatter.merge_path_item_objects(success, "put")
+        |> Formatter.merge_path_item_objects(not_found, "put")
+
+      expected = Samples.all_merged()
+
+      assert first_sequence == expected
+      assert second_sequence == expected
+      assert third_sequence == expected
     end
   end
 end
