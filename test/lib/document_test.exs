@@ -1,7 +1,7 @@
 defmodule Xcribe.DocumentTest do
   use Xcribe.ConnCase, async: false
 
-  alias Xcribe.{ConnParser, Recorder}
+  alias Xcribe.{ConnParser, Recorder, Request.Error}
 
   import Xcribe.Document
 
@@ -61,6 +61,27 @@ defmodule Xcribe.DocumentTest do
             description: test_name,
             file: file_name,
             line: 51
+          }
+        })
+
+      assert Recorder.get_all() == [parsed_request_with_meta]
+    end
+
+    test "handle parse errors" do
+      Recorder.start_link()
+
+      document(%{})
+
+      test_name = "test document/1 handle parse errors"
+      file_name = File.cwd!() <> "/test/lib/document_test.exs"
+
+      parsed_request_with_meta =
+        %Error{message: "a Plug.Conn is needed", type: :parsing}
+        |> Map.put(:__meta__, %{
+          call: %{
+            description: test_name,
+            file: file_name,
+            line: 73
           }
         })
 
