@@ -3,7 +3,7 @@ defmodule Xcribe.ApiBlueprintTest do
   use Xcribe.RequestsExamples
   use Xcribe.ApiBlueprintExamples
 
-  alias Xcribe.ApiBlueprint
+  alias Xcribe.{ApiBlueprint, DocException}
 
   setup do
     Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
@@ -143,6 +143,24 @@ defmodule Xcribe.ApiBlueprintTest do
                            }
                          ]
              """
+    end
+
+    test "test name" do
+      requests = [
+        %Request{
+          __meta__: %{
+            call: %{
+              description: "conn test",
+              file: File.cwd!() <> "/test/lib/cli/output_test.exs",
+              line: 25
+            }
+          }
+        }
+      ]
+
+      assert_raise DocException, "An exception was raised. Elixir.FunctionClauseError", fn ->
+        ApiBlueprint.generate_doc(requests)
+      end
     end
   end
 end

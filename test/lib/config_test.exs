@@ -24,6 +24,7 @@ defmodule Xcribe.ConfigTest do
   describe "output_file/0" do
     test "return configured output name" do
       Application.put_env(:xcribe, :output, "example.md")
+      Application.delete_env(:xcribe, :output_file)
       assert Config.output_file() == "example.md"
     end
 

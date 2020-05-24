@@ -4,7 +4,7 @@ defmodule Xcribe.SwaggerTest do
   use Xcribe.SwaggerExamples
 
   alias Xcribe.Support.RequestsGenerator
-  alias Xcribe.Swagger
+  alias Xcribe.{DocException, Swagger}
 
   setup do
     Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
@@ -99,6 +99,24 @@ defmodule Xcribe.SwaggerTest do
       }
 
       assert Jason.decode!(Swagger.generate_doc(requests)) == expected
+    end
+
+    test "handle excptions into Request Error structs" do
+      requests = [
+        %Request{
+          __meta__: %{
+            call: %{
+              description: "conn test",
+              file: File.cwd!() <> "/test/lib/cli/output_test.exs",
+              line: 25
+            }
+          }
+        }
+      ]
+
+      assert_raise DocException, "An exception was raised. Elixir.FunctionClauseError", fn ->
+        Swagger.generate_doc(requests)
+      end
     end
   end
 end
