@@ -14,12 +14,26 @@ defmodule Xcribe.Formatter do
 
   The  document will be generated if the pre-configured env var has a truthy value.
   Other wise the Formatter will ignore the finished event.
+
+  All request documented with macro `document/2` (See `Xcribe`) will be parsed
+  by Xcribe. When the test suite finish `Xcribe.Formatter` will check if all
+  colleted requests are valid. If some invalid request is found an error output
+  will apears and documentation will not be generated.
   """
   use GenServer
 
   require Logger
 
-  alias Xcribe.{ApiBlueprint, Config, Recorder, Swagger, Writter}
+  alias Xcribe.{
+    ApiBlueprint,
+    CLI.Output,
+    Config,
+    Recorder,
+    Request,
+    Request.Error,
+    Swagger,
+    Writter
+  }
 
   @doc false
   def init(_config) do
@@ -30,6 +44,7 @@ defmodule Xcribe.Formatter do
   def handle_cast({:suite_finished, _run_us, _load_us}, nil) do
     if Config.active?() do
       Recorder.get_all()
+      |> validate_records()
       |> generate_docs(Config.doc_format())
       |> write()
     end
@@ -40,10 +55,33 @@ defmodule Xcribe.Formatter do
   @doc false
   def handle_cast(_event, nil), do: {:noreply, nil}
 
+  defp validate_records(records) do
+    records
+    |> check_errors()
+    |> handle_errors()
+  end
+
+  defp check_errors(records), do: Enum.reduce(records, {:ok, []}, &reduce_records/2)
+
+  defp reduce_records(%Request{} = request, {:ok, requests}), do: {:ok, [request | requests]}
+  defp reduce_records(%Request{}, {:error, _errs} = err), do: err
+
+  defp reduce_records(%Error{} = err, {:ok, _requests}), do: {:error, [err]}
+  defp reduce_records(%Error{} = err, {:error, errs}), do: {:error, [err | errs]}
+
+  defp handle_errors({:error, errs}) do
+    Output.print_request_errors(errs)
+    :error
+  end
+
+  defp handle_errors({:ok, requests}), do: requests
+
+  defp generate_docs(:error, _format), do: :error
   defp generate_docs(requests, :api_blueprint), do: ApiBlueprint.generate_doc(requests)
   defp generate_docs(requests, :swagger), do: Swagger.generate_doc(requests)
   defp generate_docs(_, _), do: {:error, "invalid format"}
 
+  defp write(:error), do: :error
   defp write({:error, reason}), do: Logger.warn("Could not write file for reason: #{reason}")
   defp write(text), do: Writter.write(text)
 end
