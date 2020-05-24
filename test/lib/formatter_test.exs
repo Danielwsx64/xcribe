@@ -16,6 +16,9 @@ defmodule XcribeFormatterTest do
     Application.put_env(:xcribe, :env_var, "PWD")
     Application.put_env(:xcribe, :output, @output_path)
     Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
+    Application.put_env(:xcribe, :format, :swagger)
+    Application.delete_env(:xcribe, :json_library)
+
     Recorder.start_link()
 
     on_exit(fn ->
@@ -90,6 +93,22 @@ defmodule XcribeFormatterTest do
     end
 
     test "handle invalid configuration" do
+      # Deprecated config keys
+      Application.delete_env(:xcribe, :output_file)
+      Application.delete_env(:xcribe, :doc_format)
+
+      Application.put_env(:xcribe, :format, :invalid)
+      Application.put_env(:xcribe, :json_library, Fake)
+      Application.put_env(:xcribe, :information_source, Fake)
+
+      output =
+        capture_io(fn ->
+          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
+        end)
+
+      assert output =~ "Config key: json_library"
+      assert output =~ "Config key: format"
+      assert output =~ "Config key: information_source"
     end
   end
 end

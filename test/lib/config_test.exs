@@ -172,6 +172,7 @@ defmodule Xcribe.ConfigTest do
     end
 
     test "return Phoenix configured json library" do
+      Application.delete_env(:xcribe, :json_library)
       assert Config.json_library() == Jason
     end
   end

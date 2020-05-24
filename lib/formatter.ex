@@ -36,17 +36,16 @@ defmodule Xcribe.Formatter do
   }
 
   @doc false
-  def init(_config) do
-    {:ok, nil}
-  end
+  def init(_config), do: {:ok, nil}
 
   @doc false
   def handle_cast({:suite_finished, _run_us, _load_us}, nil) do
     if Config.active?() do
-      Recorder.get_all()
+      check_configurations()
+      |> get_recorded_requests()
       |> validate_records()
       |> order_by_path()
-      |> generate_docs(Config.doc_format!())
+      |> generate_docs()
       |> write()
     end
 
@@ -56,7 +55,19 @@ defmodule Xcribe.Formatter do
   @doc false
   def handle_cast(_event, nil), do: {:noreply, nil}
 
-  defp validate_records(records) do
+  defp check_configurations do
+    case Config.check_configurations() do
+      {:error, errs} -> Output.print_configuration_errors(errs) && :error
+      :ok -> :ok
+    end
+  end
+
+  defp get_recorded_requests(:ok), do: Recorder.get_all()
+  defp get_recorded_requests(:error), do: :error
+
+  defp validate_records(:error), do: :error
+
+  defp validate_records(records) when is_list(records) do
     records
     |> check_errors()
     |> handle_errors()
@@ -76,12 +87,15 @@ defmodule Xcribe.Formatter do
   defp order_by_path(:error), do: :error
   defp order_by_path(requests), do: Enum.sort(requests, &(&1.path >= &2.path))
 
-  defp generate_docs(:error, _format), do: :error
-  defp generate_docs(requests, :api_blueprint), do: ApiBlueprint.generate_doc(requests)
-  defp generate_docs(requests, :swagger), do: Swagger.generate_doc(requests)
-  defp generate_docs(_, _), do: {:error, "invalid format"}
+  defp generate_docs(:error), do: :error
+
+  defp generate_docs(requests) when is_list(requests) do
+    case Config.doc_format!() do
+      :api_blueprint -> ApiBlueprint.generate_doc(requests)
+      :swagger -> Swagger.generate_doc(requests)
+    end
+  end
 
   defp write(:error), do: :error
-  defp write({:error, reason}), do: Logger.warn("Could not write file for reason: #{reason}")
-  defp write(text), do: Writter.write(text)
+  defp write(text) when is_binary(text), do: Writter.write(text)
 end

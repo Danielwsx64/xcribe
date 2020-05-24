@@ -1,5 +1,5 @@
 defmodule Xcribe.Support.Information do
-  use Xcribe, :information
+  use Xcribe.Information
 
   xcribe_info do
     name("Basic API")
