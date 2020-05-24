@@ -42,5 +42,6 @@ defmodule Xcribe.Document do
     end
   end
 
+  @doc false
   def request_description(options), do: Keyword.fetch!(options, :as)
 end
