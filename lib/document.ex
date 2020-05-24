@@ -1,4 +1,4 @@
-defmodule Xcribe.Helpers.Document do
+defmodule Xcribe.Document do
   @moduledoc false
 
   alias Xcribe.{Config, ConnParser, Recorder}

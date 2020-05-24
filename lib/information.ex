@@ -3,10 +3,10 @@ defmodule Xcribe.Information do
   Add custom information for your API documentation.
 
   You must create a module to handle custom information about your API. That
-  module must use `Xcribe` with `:information` mode.
+  module must use `Xcribe.Information`.
 
       defmodule YourModuleInformation do
-        use Xcribe, :information
+        use Xcribe.Information
       end
 
   The basic information is required and must be given inside `xcribe_info` block.

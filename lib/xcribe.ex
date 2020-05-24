@@ -26,7 +26,8 @@ defmodule Xcribe do
 
   ## API information
 
-  You must provide your API information by create a mudule that use Xcribe macros.
+  You must provide your API information by creatint a mudule that use
+  `Xcribe.Information` macros.
 
   The required infor are:
 
@@ -37,7 +38,7 @@ defmodule Xcribe do
   This information is set by Xcribe macros inside the block `xcribe_info`. eg:
 
       defmodule YourModuleInformation do
-        use Xcribe, :information
+        use Xcribe.Information
 
         xcribe_info do
           name "Your awesome API"
@@ -83,6 +84,8 @@ defmodule Xcribe do
   """
   use Application
 
+  require Xcribe.Helpers.Document
+
   @doc false
   def start(_type, _opts) do
     opts = [strategy: :one_for_one, name: Xcribe.Supervisor]
@@ -100,24 +103,5 @@ defmodule Xcribe do
     import Supervisor.Spec
 
     [worker(Xcribe.Recorder, [])]
-  end
-
-  @doc false
-  def case do
-    quote do
-      import Xcribe.Helpers.Document
-    end
-  end
-
-  @doc false
-  def information do
-    quote do
-      use Xcribe.Information
-    end
-  end
-
-  @doc false
-  defmacro __using__(mode) when is_atom(mode) do
-    apply(__MODULE__, mode, [])
   end
 end

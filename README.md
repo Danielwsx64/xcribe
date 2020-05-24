@@ -33,11 +33,11 @@ mix deps.get
 Xcribe requires that you create an "Information Module". This module defines
 the custom information about your API documentation.
 
-Create a module that uses `Xcribe` as:
+Create a module that uses `Xcribe.Information` as:
 
 ```elixir
 defmodule YourAppWeb.Support.DocInformation do
-  use Xcribe, :information
+  use Xcribe.Information
 
   xcribe_info do
     name "Your awesome API"
@@ -74,8 +74,8 @@ test/test_helper.exs
 Xcribe generates documentation from `Plug.Conn` struct used on your tests. To
 document a route you need pass the `conn` struct to macro `document`.
 
-First you need add an `use` macro in your `ConnCase` file (usally located in `/test/support/conn_case.ex`).
-Doing that, `document` macro will be available into your test specs.
+First you need import `Xcribe.Document` macro in your `ConnCase` file (usally located in `/test/support/conn_case.ex`).
+Doing that, `document/2` macro will be available into your test specs.
 
 /test/support/conn_case.ex
 
@@ -88,8 +88,8 @@ defmodule YourAppWeb.ConnCase do
 
      ...
 
-      # use Xcribe macro
-      use Xcribe, :case
+      # import Xcribe `document/2` macro
+      import Xcribe.Document
 
      ...
 
