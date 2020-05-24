@@ -64,7 +64,8 @@ defmodule Xcribe.CLI.Output do
   defp space(count), do: String.duplicate(" ", count)
 
   def get_line(filename, line) do
-    File.stream!(filename)
+    filename
+    |> File.stream!()
     |> Stream.with_index()
     |> Stream.filter(fn {_value, index} -> index == line - 1 end)
     |> Enum.at(0)

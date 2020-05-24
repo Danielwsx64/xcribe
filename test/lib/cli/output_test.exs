@@ -1,8 +1,8 @@
 defmodule Xcribe.CLI.OutputTest do
   use ExUnit.Case, async: true
 
-  alias Xcribe.Request.Error
   alias Xcribe.CLI.Output
+  alias Xcribe.Request.Error
 
   import ExUnit.CaptureIO
 
