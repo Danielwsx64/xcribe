@@ -45,6 +45,7 @@ defmodule Xcribe.Formatter do
     if Config.active?() do
       Recorder.get_all()
       |> validate_records()
+      |> order_by_path()
       |> generate_docs(Config.doc_format())
       |> write()
     end
@@ -69,12 +70,11 @@ defmodule Xcribe.Formatter do
   defp reduce_records(%Error{} = err, {:ok, _requests}), do: {:error, [err]}
   defp reduce_records(%Error{} = err, {:error, errs}), do: {:error, [err | errs]}
 
-  defp handle_errors({:error, errs}) do
-    Output.print_request_errors(errs)
-    :error
-  end
-
+  defp handle_errors({:error, errs}), do: Output.print_request_errors(errs) && :error
   defp handle_errors({:ok, requests}), do: requests
+
+  defp order_by_path(:error), do: :error
+  defp order_by_path(requests), do: Enum.sort(requests, &(&1.path >= &2.path))
 
   defp generate_docs(:error, _format), do: :error
   defp generate_docs(requests, :api_blueprint), do: ApiBlueprint.generate_doc(requests)
