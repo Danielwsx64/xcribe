@@ -88,5 +88,8 @@ defmodule XcribeFormatterTest do
       assert output =~ "route not found"
       assert output =~ "formatter_test.exs"
     end
+
+    test "handle invalid configuration" do
+    end
   end
 end

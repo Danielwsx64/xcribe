@@ -95,17 +95,17 @@ defmodule Xcribe.ApiBlueprint do
   defp api_metadata, do: Formatter.metadata_section(xcribe_info())
 
   defp resource_description(%{controller: controller}),
-    do: apply(Config.xcribe_information_source(), :resource_description, [controller])
+    do: apply(Config.xcribe_information_source!(), :resource_description, [controller])
 
   defp resource_parameters(%{controller: controller}),
-    do: apply(Config.xcribe_information_source(), :resource_parameters, [controller])
+    do: apply(Config.xcribe_information_source!(), :resource_parameters, [controller])
 
   defp resource_attributes(%{controller: controller}),
-    do: apply(Config.xcribe_information_source(), :resource_attributes, [controller])
+    do: apply(Config.xcribe_information_source!(), :resource_attributes, [controller])
 
   defp action_description(%{controller: controller, action: action}),
-    do: apply(Config.xcribe_information_source(), :action_description, [controller, action])
+    do: apply(Config.xcribe_information_source!(), :action_description, [controller, action])
 
   defp xcribe_info,
-    do: apply(Config.xcribe_information_source(), :api_info, [])
+    do: apply(Config.xcribe_information_source!(), :api_info, [])
 end

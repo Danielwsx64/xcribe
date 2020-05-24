@@ -50,6 +50,6 @@ defmodule Xcribe.Swagger do
     )
   end
 
-  defp xcribe_info, do: apply(Config.xcribe_information_source(), :api_info, [])
+  defp xcribe_info, do: apply(Config.xcribe_information_source!(), :api_info, [])
   defp json_encode!(openapi), do: JSON.encode!(openapi)
 end

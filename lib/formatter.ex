@@ -46,7 +46,7 @@ defmodule Xcribe.Formatter do
       Recorder.get_all()
       |> validate_records()
       |> order_by_path()
-      |> generate_docs(Config.doc_format())
+      |> generate_docs(Config.doc_format!())
       |> write()
     end
 
