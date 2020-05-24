@@ -29,7 +29,7 @@ defmodule Xcribe do
   You must provide your API information by creatint a mudule that use
   `Xcribe.Information` macros.
 
-  The required infor are:
+  The required info are:
 
   - `name` - a name for your API.
   - `description` - a description about your API.
@@ -67,7 +67,6 @@ defmodule Xcribe do
         format: :swagger
       ]
 
-
   #### Available configurations:
 
     * `:information_source` - Module that implements `Xcribe.Information` with
@@ -83,8 +82,6 @@ defmodule Xcribe do
     and Poison are supported). The default is the same as `Phoenix` configuration.
   """
   use Application
-
-  require Xcribe.Helpers.Document
 
   @doc false
   def start(_type, _opts) do

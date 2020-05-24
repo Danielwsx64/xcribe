@@ -40,7 +40,29 @@ defmodule Xcribe.Information do
     end
   end
 
-  @doc false
+  @doc """
+  Defines the API custom information.
+
+  This information will be used to build the final documentation.
+
+  The required info are:
+
+  - `name` - a name for your API.
+  - `description` - a description about your API.
+  - `host` - your API host url
+
+  Example:
+
+      defmodule YourModuleInformation do
+        use Xcribe.Information
+
+        xcribe_info do
+          name "Your awesome API"
+          description "The best API in the world"
+          host "http://your-api.us"
+        end
+      end  
+  """
   defmacro xcribe_info(do: information) do
     name = fetch_information(information, :name, default_name())
     description = fetch_information(information, :description, default_description())
