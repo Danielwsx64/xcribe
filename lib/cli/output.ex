@@ -3,33 +3,29 @@ defmodule Xcribe.CLI.Output do
 
   @blue IO.ANSI.blue()
   @dark_blue IO.ANSI.color(25)
+  @dark_green IO.ANSI.color(100)
   @gray IO.ANSI.color(240)
+  @green IO.ANSI.green()
   @light_green IO.ANSI.color(37)
   @white IO.ANSI.white()
   @yellow IO.ANSI.yellow()
   @bg_blue IO.ANSI.blue_background()
+  @bg_green IO.ANSI.green_background()
   @reset IO.ANSI.reset()
 
+  @bar_size 95
+
   def print_request_errors(errors) do
-    print_header_error("Xcribe found errors")
+    print_header_error("[ Xcribe ] Parsing Errors", @bg_blue)
 
-    errors
-    |> print_and_remove(:parsing)
-
-    :ok
+    Enum.each(errors, &print_error/1)
   end
 
-  defp print_and_remove(errors, type) do
-    Enum.reduce(errors, [], &reduce_errors(&1, &2, type))
+  def print_configuration_errors(errors) do
+    print_header_error("[ Xcribe ] Configuration Errors", @bg_green)
+
+    Enum.each(errors, &print_error/1)
   end
-
-  defp reduce_errors(%{type: typ} = err, errs, typ) do
-    print_error(err)
-
-    errs
-  end
-
-  defp reduce_errors(err, errs, _typ), do: [err, errs]
 
   defp print_error(%{type: :parsing, message: msg, __meta__: %{call: call}}) do
     line_call = get_line(call.file, call.line)
@@ -46,13 +42,24 @@ defmodule Xcribe.CLI.Output do
     """)
   end
 
+  defp print_error({config, value, msg, info}) do
+    IO.puts("""
+    #{tab(@green)}
+    #{tab(@green)} [C] → #{@blue} #{msg}
+    #{tab(@green)} #{space(6)} #{@gray}> Config key: #{config}
+    #{tab(@dark_green)}
+    #{tab(@dark_green)} #{space(6)} Given value: #{@light_green}#{inspect(value)}
+    #{tab(@dark_green)} #{space(6)} #{@dark_green}#{info}
+    #{tab(@dark_green)}
+    """)
+  end
+
   defp format_file_path(path), do: String.replace(path, File.cwd!(), "")
 
   defp tab(color), do: "#{color}┃#{@reset}"
 
-  defp print_header_error(message) do
-    IO.puts("#{@bg_blue}#{@white}  #{message}#{space_for(message)}#{@reset}")
-  end
+  defp print_header_error(message, bg),
+    do: IO.puts("#{bg}#{@white}  #{message}#{space_for(message)}#{@reset}")
 
   defp pointer_for(message) do
     message
@@ -60,7 +67,7 @@ defmodule Xcribe.CLI.Output do
     |> String.replace(~r"[^\^]", " ")
   end
 
-  defp space_for(message), do: String.duplicate(" ", 80 - String.length(message))
+  defp space_for(message), do: String.duplicate(" ", @bar_size - String.length(message))
   defp space(count), do: String.duplicate(" ", count)
 
   def get_line(filename, line) do
