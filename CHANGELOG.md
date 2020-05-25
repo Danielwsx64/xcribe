@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Requests are ordered by path to avoid big diffs btw docs
 -   Write a message with output file path
 
+## Fixed
+
+-   Use success requests to build Swagger parameter and request body examples
+
 ## Enhancements
 
 -   Xcribe documentation

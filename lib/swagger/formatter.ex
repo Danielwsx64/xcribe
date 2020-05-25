@@ -130,45 +130,67 @@ defmodule Xcribe.Swagger.Formatter do
   @doc """
   Merge two lists of parameter object keep uniq names
   """
-  def merge_parameter_object_lists(base_list, new_list) do
-    Enum.reduce(new_list, base_list, &merge_parameter_func/2)
+  def merge_parameter_object_lists(base_list, new_list, mode \\ :keep) do
+    new_list
+    |> Enum.reduce(base_list, &merge_parameter_func(&1, &2, mode))
+    |> Enum.sort(&(&1.name < &2.name))
   end
 
   @doc """
   Merge two path item objects
   """
-  def merge_path_item_objects(item_one, item_two, verb) do
+  def merge_path_item_objects(base, new_item, verb) do
     Map.update(
-      item_one,
+      base,
       verb,
-      item_two[verb],
-      &merge_path_items(&1, item_two[verb])
+      new_item[verb],
+      &merge_path_items(&1, new_item[verb])
     )
   end
 
-  defp merge_path_items(item_one, %{parameters: params, responses: resp} = item_two) do
-    item_one
-    |> Map.update(:parameters, params, &merge_parameter_object_lists(&1, params))
+  defp merge_path_items(base, %{parameters: params, responses: resp} = new_item) do
+    mode = overwrite_mode(resp)
+
+    base
+    |> Map.update(:parameters, params, &merge_parameter_object_lists(&1, params, mode))
     |> Map.update(:responses, resp, &Map.merge(&1, resp))
-    |> merge_request_body_if_needed(item_two)
+    |> merge_request_body_if_needed(new_item, mode)
   end
 
-  defp merge_request_body_if_needed(%{requestBody: _} = item, %{requestBody: new_body}) do
-    Map.update(item, :requestBody, new_body, &merge_request_body(&1, new_body))
+  defp overwrite_mode(responses) do
+    code = responses |> Map.keys() |> List.first()
+
+    if code >= 200 and code < 300, do: :overwrite, else: :keep
   end
 
-  defp merge_request_body_if_needed(item, %{requestBody: body}),
+  defp merge_request_body_if_needed(%{requestBody: _body} = item, %{requestBody: new}, mode) do
+    Map.update(
+      item,
+      :requestBody,
+      new,
+      &%{description: "", content: merge_request_body(&1, new, mode)}
+    )
+  end
+
+  defp merge_request_body_if_needed(item, %{requestBody: body}, _mode),
     do: Map.put(item, :requestBody, body)
 
-  defp merge_request_body_if_needed(item, _), do: item
+  defp merge_request_body_if_needed(item, _new_item, _mode), do: item
 
-  defp merge_request_body(body, new_body) do
-    %{description: "", content: Map.merge(body.content, new_body.content)}
+  defp merge_request_body(body, new_body, :keep), do: Map.merge(new_body.content, body.content)
+
+  defp merge_request_body(body, new_body, :overwrite),
+    do: Map.merge(body.content, new_body.content)
+
+  defp merge_parameter_func(new_param, params, :keep) do
+    if has_param?(new_param, params), do: params, else: [new_param | params]
   end
 
-  defp merge_parameter_func(param, params) do
-    if has_param?(param, params), do: params, else: [param | params]
+  defp merge_parameter_func(new_param, params, :overwrite) do
+    [new_param | drop_eql_param(new_param, params)]
   end
+
+  defp drop_eql_param(param, params), do: Enum.reject(params, &eql_name_and_in(&1, param))
 
   defp has_param?(param, params), do: Enum.any?(params, &eql_name_and_in(&1, param))
 
