@@ -1,7 +1,5 @@
 defmodule Xcribe.Request do
-  @moduledoc """
-  The struct of a parsed request
-  """
+  @moduledoc false
 
   defstruct [
     :action,

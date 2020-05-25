@@ -1,33 +1,5 @@
 defmodule Xcribe.Config do
-  @moduledoc """
-  Handle Xcribe configurations.
-
-  You must configure Xcribe in your test config file `config/test.exs` as:
-
-      config: xcribe, [
-        information_source: YourApp.YouModuleInformation,
-        format: :swagger,
-        output: "app_doc.json",
-        env_var: "CI_ENV_FOR_DOC",
-        json_library: Jason
-      ]
-
-      :api_blueprint -> "api_doc.apib"
-      :swagger -> "openapi.json"
-
-  ### Available configurations:
-    * `:information_source` - Module that implements `Xcribe.Information` with
-    API information. It's required.
-    * `:output` - The name of file output with generated configuration. Default
-    value changes by the format, 'api_blueprint.apib' for Blueprint and
-    'app_doc.json' for swagger.
-    * `:format` - Format to generate documentation, allowed `:api_blueprint` and
-    `:swagger`. Default `:api_blueprint`.
-    * `:env_var` - Environment variable name for active Xcribe documentation
-    generator. Default is `XCRIBE_ENV`.
-    * `:json_library` - The library to be used for json decode/encode (Jason
-    and Poison are supported). The default is the same as `Phoenix` configuration.
-  """
+  @moduledoc false
 
   alias Xcribe.{MissingInformationSource, UnknownFormat}
 

@@ -1,4 +1,6 @@
 defmodule Xcribe.ApiBlueprint do
+  @moduledoc false
+
   alias Xcribe.ApiBlueprint.Formatter
   alias Xcribe.Config
 

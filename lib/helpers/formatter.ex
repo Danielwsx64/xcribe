@@ -1,7 +1,5 @@
 defmodule Xcribe.Helpers.Formatter do
-  @moduledoc ~S"""
-  This module implements a set of useful functions for formatter modules.
-  """
+  @moduledoc false
 
   alias Xcribe.JSON
 

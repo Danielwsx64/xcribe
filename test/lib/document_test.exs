@@ -1,9 +1,9 @@
-defmodule Xcribe.Helpers.DocumentTest do
+defmodule Xcribe.DocumentTest do
   use Xcribe.ConnCase, async: false
 
   alias Xcribe.{ConnParser, Recorder}
 
-  import Xcribe.Helpers.Document
+  import Xcribe.Document
 
   setup do
     Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)

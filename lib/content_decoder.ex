@@ -1,10 +1,5 @@
 defmodule Xcribe.ContentDecoder do
-  @moduledoc """
-  Used to decode requests content to an elixir collection (map, list, etc)
-
-  Currently only json is supported and the module `Xcribe.JSON` is used to
-  decode given value.
-  """
+  @moduledoc false
 
   alias Xcribe.ContentDecoder.UnknownType
   alias Xcribe.JSON
