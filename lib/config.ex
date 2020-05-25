@@ -99,8 +99,8 @@ defmodule Xcribe.Config do
   def check_configurations,
     do: Enum.reduce([:format, :information_source, :json_library], :ok, &validate_config/2)
 
-  @format_message "Xcribe doe't support the configured documentaion format"
-  @format_instructions "Xcribe supports Swagger and Blueprint, configure as: `config :xcribe, [format: :swagger]`"
+  @format_message "Xcribe doesn't support the configured documentation format"
+  @format_instructions "Xcribe supports Swagger and Blueprint, configure as: `config :xcribe, format: :swagger`"
   defp validate_config(:format, results) do
     format = doc_format()
 
@@ -130,7 +130,7 @@ defmodule Xcribe.Config do
   end
 
   @json_lib_message "The configured json library doesn't implement the needed functions"
-  @json_lib_instructions "Try configure Xcribe with Jason or Poison `config :xcribe, [json_library: Jason]`"
+  @json_lib_instructions "Try configure Xcribe with Jason or Poison `config :xcribe, json_library: Jason`"
   defp validate_config(:json_library, results) do
     lib = json_library()
 

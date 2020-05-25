@@ -21,7 +21,7 @@ defmodule Xcribe.ConnParser do
   end
 
   def execute(_conn, _description),
-    do: Map.put(@error_struct, :message, "A Plug.Conn must be given")
+    do: %{@error_struct | message: "A Plug.Conn must be given"}
 
   defp parse_conn(%Error{} = error, _conn, _description), do: error
 
@@ -53,12 +53,7 @@ defmodule Xcribe.ConnParser do
     |> apply(:__match_route__, [method, decode_uri(path), host])
     |> extract_route_info()
   rescue
-    _ ->
-      Map.put(
-        @error_struct,
-        :message,
-        "An invalid Plug.Conn was given or maybe an invalid Router"
-      )
+    _ -> %{@error_struct | message: "An invalid Plug.Conn was given or maybe an invalid Router"}
   end
 
   defp router_module(%{private: %{phoenix_router: router}}), do: router
