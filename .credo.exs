@@ -136,7 +136,7 @@
         {Credo.Check.Warning.UnusedRegexOperation, []},
         {Credo.Check.Warning.UnusedStringOperation, []},
         {Credo.Check.Warning.UnusedTupleOperation, []},
-        {Credo.Check.Warning.RaiseInsideRescue, []},
+        {Credo.Check.Warning.RaiseInsideRescue, false},
 
         #
         # Controversial and experimental checks (opt-in, just remove `, false`)

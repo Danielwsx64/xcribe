@@ -2,7 +2,7 @@ defmodule Xcribe.ConnParserTest do
   use Xcribe.ConnCase, async: true
 
   alias Plug.Conn
-  alias Xcribe.{ConnParser, Request}
+  alias Xcribe.{ConnParser, Request, Request.Error}
 
   setup do
     Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
@@ -10,7 +10,7 @@ defmodule Xcribe.ConnParserTest do
     :ok
   end
 
-  describe "parse/1" do
+  describe "execute/2" do
     test "extract request data from an index request", %{conn: conn} do
       conn =
         conn
@@ -407,7 +407,31 @@ defmodule Xcribe.ConnParserTest do
         }
       }
 
-      assert ConnParser.execute(conn) == {:error, "route not found"}
+      assert ConnParser.execute(conn) == %Error{
+               type: :parsing,
+               message: "A route wasn't found for given Conn"
+             }
+    end
+
+    test "invalid router" do
+      conn = %Conn{private: %{:phoenix_router => __MODULE__}}
+
+      assert ConnParser.execute(conn) == %Error{
+               type: :parsing,
+               message: "An invalid Plug.Conn was given or maybe an invalid Router"
+             }
+
+      assert ConnParser.execute(%Conn{}) == %Error{
+               type: :parsing,
+               message: "An invalid Plug.Conn was given or maybe an invalid Router"
+             }
+    end
+
+    test "invalid conn" do
+      assert ConnParser.execute(%{}) == %Error{
+               type: :parsing,
+               message: "A Plug.Conn must be given"
+             }
     end
   end
 end

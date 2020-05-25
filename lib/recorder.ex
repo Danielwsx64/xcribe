@@ -3,7 +3,7 @@ defmodule Xcribe.Recorder do
 
   use GenServer
 
-  alias Xcribe.Request
+  alias Xcribe.{Request, Request.Error}
 
   def start_link do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
@@ -15,6 +15,10 @@ defmodule Xcribe.Recorder do
 
   def save(%Request{} = request) do
     GenServer.cast(__MODULE__, {:save, request})
+  end
+
+  def save(%Error{} = error) do
+    GenServer.cast(__MODULE__, {:save, error})
   end
 
   def get_all do

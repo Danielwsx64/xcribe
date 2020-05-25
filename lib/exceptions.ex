@@ -14,7 +14,7 @@ defmodule Xcribe.UnknownFormat do
   Current supported formats are :api_blueprint and :swagger.
 
   You should configure it in your `test/config` as:
-      config: :xcribe, :configuration, format: :swagger
+  config: :xcribe, :configuration, format: :swagger
 
   """
 
@@ -25,13 +25,35 @@ defmodule Xcribe.UnknownFormat do
   end
 end
 
+defmodule Xcribe.DocException do
+  @moduledoc false
+  defexception [:message, :request_error, :exception, :stacktrace]
+
+  alias Xcribe.Request.Error
+
+  def exception({request, exception, stacktrace}) do
+    message = "An exception was raised. #{exception.__struct__}"
+
+    %__MODULE__{
+      message: message,
+      exception: exception,
+      stacktrace: Exception.format(:error, exception, stacktrace),
+      request_error: %Error{
+        __meta__: request.__meta__,
+        type: :exception,
+        message: message
+      }
+    }
+  end
+end
+
 defmodule Xcribe.MissingInformationSource do
   @moduledoc false
 
   @help_information ~S"""
   You must create a module to implement `Xcribe.Information` and configure it:
 
-      config: :xcribe, :configuration, information_source: YourInformationModule
+  config: :xcribe, :configuration, information_source: YourInformationModule
 
   """
 

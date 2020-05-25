@@ -46,6 +46,7 @@ defmodule Xcribe.MixProject do
       # Dev environment
       {:earmark, "~> 1.2", only: :dev},
       {:ex_doc, "~> 0.19", only: :dev},
+      {:plug, "~> 1.0"},
 
       # Test environment
       {:jason, "~> 1.1", only: [:dev, :test]},
