@@ -62,10 +62,9 @@ defmodule Xcribe do
 
   eg
 
-      config: xcribe, [
+      config :xcribe, 
         information_source: YourApp.YouModuleInformation,
         format: :swagger
-      ]
 
   #### Available configurations:
 

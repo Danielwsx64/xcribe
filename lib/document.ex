@@ -34,14 +34,11 @@ defmodule Xcribe.Document do
 
       if Config.active?() do
         conn
-        |> ConnParser.execute(request_description(options))
+        |> ConnParser.execute(Keyword.fetch!(options, :as))
         |> Recorder.save()
       end
 
       conn
     end
   end
-
-  @doc false
-  def request_description(options), do: Keyword.fetch!(options, :as)
 end
