@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.RedundantBlankLines
 defmodule Xcribe.CLI.OutputTest do
   use ExUnit.Case, async: true
 
@@ -18,7 +19,7 @@ defmodule Xcribe.CLI.OutputTest do
           call: %{
             description: "test name",
             file: File.cwd!() <> "/test/lib/cli/output_test.exs",
-            line: 12
+            line: 13
           }
         }
       }
@@ -32,7 +33,7 @@ defmodule Xcribe.CLI.OutputTest do
           call: %{
             description: "conn test",
             file: File.cwd!() <> "/test/lib/cli/output_test.exs",
-            line: 26
+            line: 27
           }
         }
       }
@@ -41,7 +42,7 @@ defmodule Xcribe.CLI.OutputTest do
       \e[44m\e[37m  [ Xcribe ] Parsing Errors                                                                      \e[0m
       \e[34m┃\e[0m
       \e[34m┃\e[0m [P] → \e[33m route not found
-      \e[34m┃\e[0m        \e[34m> test name\n\e[34m┃\e[0m        \e[38;5;240m/test/lib/cli/output_test.exs:12
+      \e[34m┃\e[0m        \e[34m> test name\n\e[34m┃\e[0m        \e[38;5;240m/test/lib/cli/output_test.exs:13
       \e[38;5;25m┃\e[0m
       \e[38;5;25m┃\e[0m        \e[38;5;37m# |> document(as: "some cool description")
       \e[38;5;25m┃\e[0m        \e[38;5;25m     ^^^^^^^^                             
@@ -50,7 +51,7 @@ defmodule Xcribe.CLI.OutputTest do
       \e[34m┃\e[0m
       \e[34m┃\e[0m [P] → \e[33m invalid Router or invalid Conn
       \e[34m┃\e[0m        \e[34m> conn test
-      \e[34m┃\e[0m        \e[38;5;240m/test/lib/cli/output_test.exs:26
+      \e[34m┃\e[0m        \e[38;5;240m/test/lib/cli/output_test.exs:27
       \e[38;5;25m┃\e[0m
       \e[38;5;25m┃\e[0m        \e[38;5;37m# |> document(as: \"awesome route\")
       \e[38;5;25m┃\e[0m        \e[38;5;25m     ^^^^^^^^                     
@@ -132,7 +133,7 @@ defmodule Xcribe.CLI.OutputTest do
             call: %{
               description: "conn test",
               file: File.cwd!() <> "/test/lib/cli/output_test.exs",
-              line: 26
+              line: 27
             }
           },
           type: :exception,
@@ -145,7 +146,7 @@ defmodule Xcribe.CLI.OutputTest do
       \e[31m┃\e[0m
       \e[31m┃\e[0m [E] → \e[31m An exception was raised. Elixir.FunctionClauseError
       \e[31m┃\e[0m        \e[34m> conn test
-      \e[31m┃\e[0m        \e[38;5;240m/test/lib/cli/output_test.exs:26
+      \e[31m┃\e[0m        \e[38;5;240m/test/lib/cli/output_test.exs:27
       \e[38;5;88m┃\e[0m
       \e[38;5;88m┃\e[0m        \e[38;5;37m# |> document(as: \"awesome route\")
       \e[38;5;88m┃\e[0m        \e[38;5;88m     ^^^^^^^^                     
