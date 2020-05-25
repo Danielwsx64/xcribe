@@ -1,4 +1,6 @@
 defmodule Xcribe.ApiBlueprint.Templates do
+  @moduledoc false
+
   defmacro __using__(_opts \\ []) do
     quote do
       @metadata_template """

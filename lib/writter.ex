@@ -1,7 +1,5 @@
 defmodule Xcribe.Writter do
-  @moduledoc """
-  Writes the documentation to an file on the project.
-  """
+  @moduledoc false
 
   alias Xcribe.Config
 

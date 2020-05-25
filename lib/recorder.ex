@@ -1,4 +1,6 @@
 defmodule Xcribe.Recorder do
+  @moduledoc false
+
   use GenServer
 
   alias Xcribe.Request

@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   Use success requests to build Swagger parameter and request body examples
 
+## Enhancements
+
+-   Xcribe documentation
+
 ## [0.5.0] - 2020-05-12
 
 ## Added

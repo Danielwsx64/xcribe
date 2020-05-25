@@ -1,9 +1,5 @@
 defmodule Xcribe.Swagger.Formatter do
-  @moduledoc ~S"""
-  Format a given `Xcribe.Request` according to OpenAPI Specification.
-
-  To know more about the specifications [OpenAPI 3.0.3](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md)
-  """
+  @moduledoc false
 
   alias Xcribe.{ContentDecoder, Request}
   alias Xcribe.Swagger.Types

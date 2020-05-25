@@ -1,8 +1,5 @@
 defmodule Xcribe.ContentDecoder.UnknownType do
-  @moduledoc """
-  Raised at runtime when can't decode an unknown content type.
-  """
-
+  @moduledoc false
   defexception [:message]
 
   def exception(type) do
@@ -11,9 +8,7 @@ defmodule Xcribe.ContentDecoder.UnknownType do
 end
 
 defmodule Xcribe.UnknownFormat do
-  @moduledoc """
-  Raised at runtime when configured format is unknown.
-  """
+  @moduledoc false
 
   @help_information ~S"""
   Current supported formats are :api_blueprint and :swagger.
@@ -31,9 +26,7 @@ defmodule Xcribe.UnknownFormat do
 end
 
 defmodule Xcribe.MissingInformationSource do
-  @moduledoc """
-  Raised at runtime when not configured an implementation of `Xcribe.Information`.
-  """
+  @moduledoc false
 
   @help_information ~S"""
   You must create a module to implement `Xcribe.Information` and configure it:
