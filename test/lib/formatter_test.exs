@@ -129,7 +129,7 @@ defmodule XcribeFormatterTest do
           assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
         end)
 
-      assert output =~ "An exception was raised. Elixir.FunctionClauseError"
+      assert output =~ "An exception was raised"
     end
   end
 end

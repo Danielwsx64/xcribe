@@ -102,20 +102,20 @@ defmodule Xcribe.SwaggerTest do
     end
 
     test "handle excptions into Request Error structs" do
-      requests = [
-        %Request{
-          __meta__: %{
-            call: %{
-              description: "conn test",
-              file: File.cwd!() <> "/test/lib/cli/output_test.exs",
-              line: 25
-            }
+      request =
+        [:basic_auth]
+        |> RequestsGenerator.users_index()
+        |> Map.put(:path_params, nil)
+        |> Map.put(:__meta__, %{
+          call: %{
+            description: "conn test",
+            file: File.cwd!() <> "/test/lib/cli/output_test.exs",
+            line: 25
           }
-        }
-      ]
+        })
 
-      assert_raise DocException, "An exception was raised. Elixir.FunctionClauseError", fn ->
-        Swagger.generate_doc(requests)
+      assert_raise DocException, "An exception was raised. Elixir.Protocol.UndefinedError", fn ->
+        Swagger.generate_doc([request])
       end
     end
   end
