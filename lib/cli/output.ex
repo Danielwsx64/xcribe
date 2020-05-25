@@ -2,18 +2,23 @@ defmodule Xcribe.CLI.Output do
   @moduledoc false
 
   @blue IO.ANSI.blue()
+  @bg_blue IO.ANSI.blue_background()
+  @bg_green IO.ANSI.green_background()
+  @bg_red IO.ANSI.red_background()
   @dark_blue IO.ANSI.color(25)
   @dark_green IO.ANSI.color(100)
+  @dark_red IO.ANSI.color(88)
   @gray IO.ANSI.color(240)
   @green IO.ANSI.green()
   @light_green IO.ANSI.color(37)
+  @red IO.ANSI.red()
   @white IO.ANSI.white()
   @yellow IO.ANSI.yellow()
-  @bg_blue IO.ANSI.blue_background()
-  @bg_green IO.ANSI.green_background()
   @reset IO.ANSI.reset()
 
   @bar_size 95
+
+  alias Xcribe.DocException
 
   def print_request_errors(errors) do
     print_header_error("[ Xcribe ] Parsing Errors", @bg_blue)
@@ -25,6 +30,31 @@ defmodule Xcribe.CLI.Output do
     print_header_error("[ Xcribe ] Configuration Errors", @bg_green)
 
     Enum.each(errors, &print_error/1)
+  end
+
+  def print_doc_exception(%DocException{
+        request_error: %{__meta__: %{call: call}},
+        message: msg,
+        stacktrace: stack
+      }) do
+    line_call = get_line(call.file, call.line)
+
+    print_header_error("[ Xcribe ] Exception", @bg_red)
+
+    IO.puts("""
+    #{tab(@red)}
+    #{tab(@red)} [E] → #{@red} #{msg}
+    #{tab(@red)} #{space(6)} #{@blue}> #{call.description}
+    #{tab(@red)} #{space(6)} #{@gray}#{format_file_path(call.file)}:#{call.line}
+    #{tab(@dark_red)}
+    #{tab(@dark_red)} #{space(6)} #{@light_green}#{line_call}
+    #{tab(@dark_red)} #{space(6)} #{@dark_red}#{pointer_for(line_call)}
+    #{tab(@dark_red)}
+      
+     - Exception stacktrace:
+
+    #{stack}
+    """)
   end
 
   defp print_error(%{type: :parsing, message: msg, __meta__: %{call: call}}) do

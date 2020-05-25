@@ -110,5 +110,26 @@ defmodule XcribeFormatterTest do
       assert output =~ "Config key: format"
       assert output =~ "Config key: information_source"
     end
+
+    test "handle document exceptions" do
+      Recorder.save(%Request{
+        __meta__: %{
+          call: %{
+            description: "conn test",
+            file: File.cwd!() <> "/test/lib/cli/output_test.exs",
+            line: 25
+          }
+        }
+      })
+
+      Application.put_env(:xcribe, :format, :swagger)
+
+      # output =
+      #   capture_io(fn ->
+      assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
+      # end)
+
+      # assert output =~ "Config key: json_library"
+    end
   end
 end
