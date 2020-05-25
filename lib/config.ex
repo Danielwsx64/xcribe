@@ -55,7 +55,7 @@ defmodule Xcribe.Config do
   def active?, do: !is_nil(System.get_env(env_var_name()))
 
   @doc """
-  Return the iformation module with API information
+  Return the information module with API information
 
   To configure the source:
 
