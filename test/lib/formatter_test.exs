@@ -124,12 +124,12 @@ defmodule XcribeFormatterTest do
 
       Application.put_env(:xcribe, :format, :swagger)
 
-      # output =
-      #   capture_io(fn ->
-      assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
-      # end)
+      output =
+        capture_io(fn ->
+          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
+        end)
 
-      # assert output =~ "Config key: json_library"
+      assert output =~ "An exception was raised. Elixir.FunctionClauseError"
     end
   end
 end

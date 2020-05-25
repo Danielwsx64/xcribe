@@ -28,6 +28,7 @@ defmodule Xcribe.Formatter do
     ApiBlueprint,
     CLI.Output,
     Config,
+    DocException,
     Recorder,
     Request,
     Request.Error,
@@ -50,6 +51,11 @@ defmodule Xcribe.Formatter do
     end
 
     {:noreply, nil}
+  rescue
+    e in DocException ->
+      Output.print_doc_exception(e)
+
+      {:noreply, nil}
   end
 
   @doc false
