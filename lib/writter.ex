@@ -16,6 +16,7 @@ defmodule Xcribe.Writter do
     {:ok, file} = File.open(output_file, [:write])
 
     IO.binwrite(file, text)
+    IO.puts("#{IO.ANSI.cyan()}> Xcribe documentation written in #{output_file}#{IO.ANSI.reset()}")
 
     File.close(file)
   end

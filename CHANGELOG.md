@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.6.0] - 2020-05-23
 
+## Added
+
+-   Validate configuration before generate documentation
+-   Handle parsing errors and exceptions and print it friendly
+-   Requests are ordered by path to avoid big diffs btw docs
+-   Write a message with output file path
+
 ## Enhancements
 
 -   Xcribe documentation
