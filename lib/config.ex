@@ -66,7 +66,7 @@ defmodule Xcribe.Config do
   def xcribe_information_source, do: get_xcribe_config(:information_source)
 
   @doc """
-  Return the iformation module with API information
+  Return the information module with API information
 
   If information source is not given an `Xcribe.MissingInformationSource` exception will raise.
   """
