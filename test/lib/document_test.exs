@@ -76,7 +76,7 @@ defmodule Xcribe.DocumentTest do
       file_name = File.cwd!() <> "/test/lib/document_test.exs"
 
       parsed_request_with_meta =
-        %Error{message: "a Plug.Conn is needed", type: :parsing}
+        %Error{message: "A Plug.Conn must be given", type: :parsing}
         |> Map.put(:__meta__, %{
           call: %{
             description: test_name,

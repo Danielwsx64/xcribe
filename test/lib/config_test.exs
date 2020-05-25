@@ -196,12 +196,12 @@ defmodule Xcribe.ConfigTest do
                {:error,
                 [
                   {:json_library, FakeJson,
-                   "Given json library doesn't implement needed functions",
+                   "The configured json library doesn't implement the needed functions",
                    "Try configure Xcribe with Jason or Poison `config :xcribe, [json_library: Jason]`"},
                   {:information_source, FakeInfo,
-                   "Sees like the given module is not using Xcribe as :information",
+                   "The configured module as information source is not using Xcribe macros",
                    "Add `use Xcribe, :information` on top of your module"},
-                  {:format, :invalid, "An not supported format was configured",
+                  {:format, :invalid, "Xcribe doe't support the configured documentaion format",
                    "Xcribe supports Swagger and Blueprint, configure as: `config :xcribe, [format: :swagger]`"}
                 ]}
     end

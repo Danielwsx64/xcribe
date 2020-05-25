@@ -409,7 +409,7 @@ defmodule Xcribe.ConnParserTest do
 
       assert ConnParser.execute(conn) == %Error{
                type: :parsing,
-               message: "route not found"
+               message: "A route wasn't found for given Conn"
              }
     end
 
@@ -418,17 +418,20 @@ defmodule Xcribe.ConnParserTest do
 
       assert ConnParser.execute(conn) == %Error{
                type: :parsing,
-               message: "invalid Router or invalid Conn"
+               message: "An invalid Plug.Conn was given or maybe an invalid Router"
              }
 
       assert ConnParser.execute(%Conn{}) == %Error{
                type: :parsing,
-               message: "invalid Router or invalid Conn"
+               message: "An invalid Plug.Conn was given or maybe an invalid Router"
              }
     end
 
     test "invalid conn" do
-      assert ConnParser.execute(%{}) == %Error{type: :parsing, message: "a Plug.Conn is needed"}
+      assert ConnParser.execute(%{}) == %Error{
+               type: :parsing,
+               message: "A Plug.Conn must be given"
+             }
     end
   end
 end
