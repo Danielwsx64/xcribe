@@ -164,3 +164,7 @@ config :xcribe, [
   json_library: Jason
 ]
 ```
+
+## License
+
+[Apache License, Version 2.0](LICENSE) © [brainn.co](https://github.com/brainn-co)
