@@ -1,9 +1,7 @@
 defmodule Xcribe.Swagger do
-  @moduledoc """
-  Treats list of Requests and generates OpenAPI Document with json format
-  """
+  @moduledoc false
 
-  alias Xcribe.{Config, JSON, Request}
+  alias Xcribe.{Config, DocException, JSON, Request}
   alias Xcribe.Swagger.{Formatter}
 
   import Xcribe.Swagger.Formatter, only: [raw_openapi_object: 0]
@@ -30,12 +28,13 @@ defmodule Xcribe.Swagger do
   end
 
   defp build_security_schemes(requests) do
-    Enum.reduce(requests, %{}, fn request, schemas ->
-      Map.merge(
-        schemas,
-        Formatter.security_scheme_object_from_request(request)
-      )
-    end)
+    Enum.reduce(requests, %{}, &merge_security_schemas/2)
+  end
+
+  defp merge_security_schemas(request, schemas) do
+    Map.merge(schemas, Formatter.security_scheme_object_from_request(request))
+  rescue
+    exception -> raise DocException, {request, exception, __STACKTRACE__}
   end
 
   defp build_paths_object(requests),
@@ -50,8 +49,10 @@ defmodule Xcribe.Swagger do
       item,
       &Formatter.merge_path_item_objects(&1, item, verb)
     )
+  rescue
+    exception -> raise DocException, {request, exception, __STACKTRACE__}
   end
 
-  defp xcribe_info, do: apply(Config.xcribe_information_source(), :api_info, [])
+  defp xcribe_info, do: apply(Config.xcribe_information_source!(), :api_info, [])
   defp json_encode!(openapi), do: JSON.encode!(openapi)
 end

@@ -8,6 +8,7 @@ defmodule Xcribe.RequestTest do
       struct = Map.from_struct(%Request{})
 
       expected_struct = %{
+        __meta__: nil,
         action: nil,
         controller: nil,
         description: nil,

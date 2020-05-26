@@ -1,11 +1,6 @@
 defmodule Xcribe.JSON do
-  @moduledoc """
-  Wrapper for a JSON library.
+  @moduledoc false
 
-  Poison and Jason are the most popular json libraries common used in Elixir
-  projects. Xcribe works with both. By default Xcribe use the same library as
-  Phoenix. But you can change it by config, see `Xcribe.Config`.
-  """
   alias Xcribe.Config
 
   @doc """

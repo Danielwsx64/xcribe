@@ -1,6 +1,8 @@
 defmodule Xcribe.ApiBlueprint do
+  @moduledoc false
+
   alias Xcribe.ApiBlueprint.Formatter
-  alias Xcribe.Config
+  alias Xcribe.{Config, DocException}
 
   def generate_doc(requests) do
     requests
@@ -31,13 +33,18 @@ defmodule Xcribe.ApiBlueprint do
     request_example = resource_request_example(reqs)
     description = resource_description(request_example)
 
-    parameters =
-      Formatter.resource_parameters(request_example, resource_parameters(request_example))
+    parameters = formatter_resource_parameters(request_example)
 
     resource_string =
       if(is_nil(description), do: resource, else: "#{resource <> description}\n\n")
 
     doc <> resource_string <> parameters <> actions_to_string(reqs)
+  end
+
+  defp formatter_resource_parameters(request) do
+    Formatter.resource_parameters(request, resource_parameters(request))
+  rescue
+    exception -> raise DocException, {request, exception, __STACKTRACE__}
   end
 
   defp resource_request_example([{_, [request | _]} | _]), do: request
@@ -50,32 +57,50 @@ defmodule Xcribe.ApiBlueprint do
   defp action_reducer({action, reqs}, doc) do
     request_example = action_request_example(reqs)
     description = request_example |> action_description()
-    parameters = Formatter.action_parameters(request_example)
-
+    parameters = formatter_action_parameters(request_example)
     action_string = if(is_nil(description), do: action, else: "#{action <> description}\n\n")
 
     doc <> action_string <> parameters <> action_requests_to_string(reqs)
   end
 
+  defp formatter_action_parameters(request) do
+    Formatter.action_parameters(request)
+  rescue
+    exception -> raise DocException, {request, exception, __STACKTRACE__}
+  end
+
   defp action_request_example([request | _]), do: request
 
-  defp action_requests_to_string(requests) do
-    requests
-    |> Enum.reduce("", fn req, acc ->
-      attributes = resource_attributes(req)
+  defp action_requests_to_string(requests), do: Enum.reduce(requests, "", &reduce_full_requests/2)
 
-      acc <> Formatter.full_request(req, attributes)
-    end)
+  defp reduce_full_requests(request, requests) do
+    attributes = resource_attributes(request)
+
+    requests <> Formatter.full_request(request, attributes)
+  rescue
+    exception -> raise DocException, {request, exception, __STACKTRACE__}
   end
 
   defp group_by_resource_group(requests),
-    do: requests |> Enum.group_by(&Formatter.resource_group(&1)) |> Enum.sort()
+    do: requests |> Enum.group_by(&func_group_resouce_group/1) |> Enum.sort()
+
+  defp func_group_resouce_group(request) do
+    Formatter.resource_group(request)
+  rescue
+    exception -> raise DocException, {request, exception, __STACKTRACE__}
+  end
 
   defp group_by_resource_name(requests) do
     requests
     |> Enum.map(fn {resource_group, reqs} ->
-      {resource_group, reqs |> Enum.group_by(&Formatter.resource_section(&1)) |> Enum.sort()}
+      {resource_group, reqs |> Enum.group_by(&func_group_resouce_name/1) |> Enum.sort()}
     end)
+  end
+
+  defp func_group_resouce_name(request) do
+    Formatter.resource_section(request)
+  rescue
+    exception -> raise DocException, {request, exception, __STACKTRACE__}
   end
 
   defp group_by_action(requests) do
@@ -86,24 +111,30 @@ defmodule Xcribe.ApiBlueprint do
   defp group_the_actions(resource_requests) do
     resource_requests
     |> Enum.map(fn {resource_name, reqs} ->
-      {resource_name, reqs |> Enum.group_by(&Formatter.action_section(&1)) |> Enum.sort()}
+      {resource_name, reqs |> Enum.group_by(&func_group_action/1) |> Enum.sort()}
     end)
+  end
+
+  defp func_group_action(request) do
+    Formatter.action_section(request)
+  rescue
+    exception -> raise DocException, {request, exception, __STACKTRACE__}
   end
 
   defp api_metadata, do: Formatter.metadata_section(xcribe_info())
 
   defp resource_description(%{controller: controller}),
-    do: apply(Config.xcribe_information_source(), :resource_description, [controller])
+    do: apply(Config.xcribe_information_source!(), :resource_description, [controller])
 
   defp resource_parameters(%{controller: controller}),
-    do: apply(Config.xcribe_information_source(), :resource_parameters, [controller])
+    do: apply(Config.xcribe_information_source!(), :resource_parameters, [controller])
 
   defp resource_attributes(%{controller: controller}),
-    do: apply(Config.xcribe_information_source(), :resource_attributes, [controller])
+    do: apply(Config.xcribe_information_source!(), :resource_attributes, [controller])
 
   defp action_description(%{controller: controller, action: action}),
-    do: apply(Config.xcribe_information_source(), :action_description, [controller, action])
+    do: apply(Config.xcribe_information_source!(), :action_description, [controller, action])
 
   defp xcribe_info,
-    do: apply(Config.xcribe_information_source(), :api_info, [])
+    do: apply(Config.xcribe_information_source!(), :api_info, [])
 end

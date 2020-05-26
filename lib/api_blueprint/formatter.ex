@@ -1,4 +1,6 @@
 defmodule Xcribe.ApiBlueprint.Formatter do
+  @moduledoc false
+
   alias Xcribe.Request
 
   import Xcribe.Helpers.Formatter

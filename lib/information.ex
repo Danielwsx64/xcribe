@@ -1,4 +1,24 @@
 defmodule Xcribe.Information do
+  @moduledoc """
+  Add custom information for your API documentation.
+
+  You must create a module to handle custom information about your API. That
+  module must use `Xcribe.Information`.
+
+      defmodule YourModuleInformation do
+        use Xcribe.Information
+      end
+
+  The basic information is required and must be given inside `xcribe_info` block.
+
+        xcribe_info do
+          name "Your awesome API"
+          description "The best API in the world"
+          host "http://your-api.us"
+        end
+  """
+
+  @doc false
   defmacro __using__(_opts \\ []) do
     quote do
       import Xcribe.Information
@@ -20,6 +40,29 @@ defmodule Xcribe.Information do
     end
   end
 
+  @doc """
+  Defines the API custom information.
+
+  This information will be used to build the final documentation.
+
+  The required info are:
+
+  - `name` - a name for your API.
+  - `description` - a description about your API.
+  - `host` - your API host url
+
+  Example:
+
+      defmodule YourModuleInformation do
+        use Xcribe.Information
+
+        xcribe_info do
+          name "Your awesome API"
+          description "The best API in the world"
+          host "http://your-api.us"
+        end
+      end  
+  """
   defmacro xcribe_info(do: information) do
     name = fetch_information(information, :name, default_name())
     description = fetch_information(information, :description, default_description())
@@ -39,6 +82,7 @@ defmodule Xcribe.Information do
     end
   end
 
+  @doc false
   defmacro xcribe_info(controller, do: information) do
     resource_desc = fetch_information(information, :description)
     actions = fetch_information(information, :actions, [])
@@ -77,6 +121,7 @@ defmodule Xcribe.Information do
     end
   end
 
+  @doc false
   defmacro __before_compile__(_env) do
     quote do
       def resource_description(_), do: nil
@@ -96,9 +141,11 @@ defmodule Xcribe.Information do
     end
   end
 
+  @doc false
   def stringfy_keys(keyword),
     do: Enum.map(keyword, fn {key, value} -> {to_string(key), value} end)
 
+  @doc false
   def fetch_key(keyword, key, default) do
     case Keyword.fetch(keyword, key) do
       {:ok, value} -> value
@@ -106,7 +153,10 @@ defmodule Xcribe.Information do
     end
   end
 
+  @doc false
   def default_host, do: "http://example.com"
+  @doc false
   def default_name, do: "API"
+  @doc false
   def default_description, do: ""
 end

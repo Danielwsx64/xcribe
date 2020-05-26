@@ -1,39 +1,29 @@
 defmodule Xcribe.ConnParser do
-  @moduledoc ~S"""
-  Used to convert a `Plug.Conn` to a `Xcribe.Request`.
+  @moduledoc false
 
-  Each connection sent to documenting in your tests is given to `ConnParser`.
-  Is expected that connection has been passed through the app `Endpoint` as a
-  finished request. The parser will extract all needed info from `Conn` and uses
-  app `Router` for additional information about the request.
+  alias Plug.Conn
+  alias Xcribe.{Config, Request, Request.Error}
 
-  The atribute `description` must be given at `document` macro call with the
-  option `:as`:
-
-      test "test name", %{conn: conn} do
-        ...
-
-        Xcribe.Helpers.Document.document(conn, as: "description here")
-
-        ...
-      end
-
-  If no description is given the current test description will be used.
-  """
-
-  alias Xcribe.{Config, Request}
+  @error_struct %Error{type: :parsing}
 
   @doc """
   Parse the given `Plug.Conn` and transform it to a `Xcribe.Request`. A
   description can be provided.
+
+  If any error occurs a `Xcribe.Request.Error` is returned
   """
-  def execute(conn, description \\ "") do
+  def execute(conn, description \\ "")
+
+  def execute(%Conn{} = conn, description) do
     conn
     |> identify_route()
     |> parse_conn(conn, description)
   end
 
-  defp parse_conn({:error, _} = error, _conn, _description), do: error
+  def execute(_conn, _description),
+    do: %{@error_struct | message: "A Plug.Conn must be given"}
+
+  defp parse_conn(%Error{} = error, _conn, _description), do: error
 
   defp parse_conn(route, conn, description) do
     path = format_path(route.route, conn.path_params)
@@ -62,6 +52,8 @@ defmodule Xcribe.ConnParser do
     |> router_module()
     |> apply(:__match_route__, [method, decode_uri(path), host])
     |> extract_route_info()
+  rescue
+    _ -> %{@error_struct | message: "An invalid Plug.Conn was given or maybe an invalid Router"}
   end
 
   defp router_module(%{private: %{phoenix_router: router}}), do: router
@@ -71,7 +63,8 @@ defmodule Xcribe.ConnParser do
   defp extract_route_info({%{} = route_info, _callback_one, _callback_two, _plug_info}),
     do: route_info
 
-  defp extract_route_info(_), do: {:error, "route not found"}
+  defp extract_route_info(_),
+    do: Map.put(@error_struct, :message, "A route wasn't found for given Conn")
 
   defp router_options(%{plug_opts: opts}), do: opts
   defp router_options(%{opts: opts}), do: opts
@@ -95,5 +88,5 @@ defmodule Xcribe.ConnParser do
 
   defp transform_param(param, path), do: String.replace(path, ":#{param}", "{#{param}}")
 
-  defp fetch_namespaces, do: apply(Config.xcribe_information_source(), :namespaces, [])
+  defp fetch_namespaces, do: apply(Config.xcribe_information_source!(), :namespaces, [])
 end
