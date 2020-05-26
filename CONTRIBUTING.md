@@ -10,7 +10,7 @@ Please note we have a code of conduct, please follow it in all your interactions
 
 1.  Run `make release` and follow the instructions (It will bump Xcribe version
     in all needed files. The versioning scheme we use is [SemVer](http://semver.org/)).
-    After that, update `CHANGELOG.md` with a description of what is been changed in the release.
+    After that, update `CHANGELOG.md` with a description of what is being changed in the release.
 
 2.  Update the library documentation accordingly new changes.
 
