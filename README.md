@@ -165,6 +165,10 @@ config :xcribe, [
 ]
 ```
 
+## Contributing
+
+[Contributing Guide](CONTRIBUTING.md)
+
 ## License
 
 [Apache License, Version 2.0](LICENSE) © [brainn.co](https://github.com/brainn-co)
