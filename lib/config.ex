@@ -164,19 +164,6 @@ defmodule Xcribe.Config do
     end
   end
 
-  defp get_xcribe_config(key, default \\ nil) do
-    cond do
-      value = new_config(key) -> value
-      value = old_config(key) -> value
-      true -> default
-    end
-  end
-
-  defp new_config(key), do: Application.get_env(:xcribe, key)
-
-  defp old_config(key), do: Application.get_env(:xcribe, rename_key(key))
-
-  defp rename_key(:output), do: :output_file
-  defp rename_key(:format), do: :doc_format
-  defp rename_key(key), do: key
+  defp get_xcribe_config(key, default \\ nil),
+    do: Application.get_env(:xcribe, key, default)
 end
