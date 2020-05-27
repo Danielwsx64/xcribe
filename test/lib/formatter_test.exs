@@ -93,10 +93,6 @@ defmodule XcribeFormatterTest do
     end
 
     test "handle invalid configuration" do
-      # Deprecated config keys
-      Application.delete_env(:xcribe, :output_file)
-      Application.delete_env(:xcribe, :doc_format)
-
       Application.put_env(:xcribe, :format, :invalid)
       Application.put_env(:xcribe, :json_library, Fake)
       Application.put_env(:xcribe, :information_source, Fake)

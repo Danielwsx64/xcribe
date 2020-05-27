@@ -6,16 +6,11 @@ defmodule Xcribe.ConfigTest do
 
   setup do
     on_exit(fn ->
-      # Current config keys
       Application.delete_env(:xcribe, :output)
       Application.delete_env(:xcribe, :env_var)
       Application.delete_env(:xcribe, :format)
       Application.delete_env(:xcribe, :json_library)
       Application.delete_env(:xcribe, :information_source)
-
-      # Deprecated config keys
-      Application.delete_env(:xcribe, :output_file)
-      Application.delete_env(:xcribe, :doc_format)
     end)
 
     :ok
@@ -24,7 +19,6 @@ defmodule Xcribe.ConfigTest do
   describe "output_file/0" do
     test "return configured output name" do
       Application.put_env(:xcribe, :output, "example.md")
-      Application.delete_env(:xcribe, :output_file)
       assert Config.output_file() == "example.md"
     end
 
@@ -35,23 +29,6 @@ defmodule Xcribe.ConfigTest do
 
     test "return default file name for Swagger" do
       Application.put_env(:xcribe, :format, :swagger)
-      assert Config.output_file() == "openapi.json"
-    end
-
-    test "deprecated configuration" do
-      # return the output file setted at config
-      Application.put_env(:xcribe, :output_file, "example.md")
-      assert Config.output_file() == "example.md"
-      Application.delete_env(:xcribe, :output_file)
-
-      # return default file name for ApiBlueprint
-      Application.delete_env(:xcribe, :format)
-      Application.put_env(:xcribe, :doc_format, :api_blueprint)
-      assert Config.output_file() == "api_doc.apib"
-      Application.delete_env(:xcribe, :doc_format)
-
-      # return default file name for Swagger
-      Application.put_env(:xcribe, :doc_format, :swagger)
       assert Config.output_file() == "openapi.json"
     end
   end
@@ -75,17 +52,6 @@ defmodule Xcribe.ConfigTest do
 
       assert Config.active?() == true
     end
-
-    test "deprecated configuration" do
-      # return true when xcribe env var is defined
-      Application.put_env(:xcribe, :env_var, "EXISTING_ENV_VAR")
-      System.put_env("EXISTING_ENV_VAR", "1")
-      assert Config.active?() == true
-
-      # return false when xcribe env var is undefined
-      Application.put_env(:xcribe, :env_var, "UNDEFINED_XCRIBE_ENV_VAR_!@#")
-      assert Config.active?() == false
-    end
   end
 
   describe "doc_format!/0" do
@@ -97,16 +63,6 @@ defmodule Xcribe.ConfigTest do
 
     test "when an invalid format is specified" do
       Application.put_env(:xcribe, :format, :invalid)
-
-      assert_raise UnknownFormat, fn ->
-        Config.doc_format!()
-      end
-    end
-
-    test "depecated config invalid" do
-      # when an invalid format is specified
-      Application.delete_env(:xcribe, :format)
-      Application.put_env(:xcribe, :doc_format, :invalid)
 
       assert_raise UnknownFormat, fn ->
         Config.doc_format!()
@@ -124,16 +80,6 @@ defmodule Xcribe.ConfigTest do
     test "when Swagger format is specified" do
       Application.put_env(:xcribe, :format, :swagger)
 
-      assert Config.doc_format() == :swagger
-    end
-
-    test "deprecated configuration" do
-      # when ApiBlueprint format is specified
-      Application.put_env(:xcribe, :doc_format, :api_blueprint)
-      assert Config.doc_format() == :api_blueprint
-
-      # when Swagger format is specified
-      Application.put_env(:xcribe, :doc_format, :swagger)
       assert Config.doc_format() == :swagger
     end
   end
@@ -155,12 +101,6 @@ defmodule Xcribe.ConfigTest do
 
   describe "xcribe_information_source/0" do
     test "return information source" do
-      Application.put_env(:xcribe, :information_source, FakeOne)
-      assert Config.xcribe_information_source() == FakeOne
-    end
-
-    test "deprecated configuration" do
-      # return information source
       Application.put_env(:xcribe, :information_source, FakeOne)
       assert Config.xcribe_information_source() == FakeOne
     end
