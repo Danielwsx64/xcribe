@@ -1,3 +1,4 @@
+![CI](https://github.com/brainn-co/xcribe/workflows/CI/badge.svg?branch=master)
 ![Hex.pm](https://img.shields.io/hexpm/v/xcribe?style=flat-square)
 ![Hex.pm](https://img.shields.io/hexpm/l/xcribe?style=flat-square)
 ![Hex.pm](https://img.shields.io/hexpm/dt/xcribe?style=flat-square)
@@ -164,3 +165,11 @@ config :xcribe, [
   json_library: Jason
 ]
 ```
+
+## Contributing
+
+[Contributing Guide](CONTRIBUTING.md)
+
+## License
+
+[Apache License, Version 2.0](LICENSE) © [brainn.co](https://github.com/brainn-co)
