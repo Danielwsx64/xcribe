@@ -50,7 +50,10 @@ defmodule XcribeFormatterTest do
 
       expected_content = String.replace(@sample_swagger_output, ~r/\s/, "")
 
-      assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
+      assert capture_io(fn ->
+               assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
+             end) =~ "Xcribe documentation written in"
+
       assert @output_path |> File.read!() |> String.replace(~r/\s/, "") == expected_content
     end
 
@@ -61,7 +64,10 @@ defmodule XcribeFormatterTest do
 
       expected_content = @sample_requests_as_string
 
-      assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
+      assert capture_io(fn ->
+               assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
+             end) =~ "Xcribe documentation written in"
+
       assert File.read!(@output_path) == expected_content
     end
   end
@@ -93,10 +99,6 @@ defmodule XcribeFormatterTest do
     end
 
     test "handle invalid configuration" do
-      # Deprecated config keys
-      Application.delete_env(:xcribe, :output_file)
-      Application.delete_env(:xcribe, :doc_format)
-
       Application.put_env(:xcribe, :format, :invalid)
       Application.put_env(:xcribe, :json_library, Fake)
       Application.put_env(:xcribe, :information_source, Fake)
