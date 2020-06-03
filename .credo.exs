@@ -43,6 +43,10 @@
       #
       parse_timeout: 5000,
       #
+      # To modify the timeout for parsing files, change this value:
+      #
+      parse_timeout: 5000,
+      #
       # If you want to use uncolored output by default, you can change `color`
       # to `false` below:
       #
@@ -126,7 +130,7 @@
         {Credo.Check.Warning.ExpensiveEmptyEnumCheck, []},
         {Credo.Check.Warning.IExPry, []},
         {Credo.Check.Warning.IoInspect, []},
-        {Credo.Check.Warning.LazyLogging, false},
+        {Credo.Check.Warning.LazyLogging, []},
         {Credo.Check.Warning.MixEnv, false},
         {Credo.Check.Warning.OperationOnSameValues, []},
         {Credo.Check.Warning.OperationWithConstantResult, []},
