@@ -1,8 +1,7 @@
 defmodule Xcribe.Swagger.Formatter do
   @moduledoc false
 
-  alias Xcribe.{ContentDecoder, Request}
-  alias Xcribe.Swagger.Types
+  alias Xcribe.{ContentDecoder, JsonSchema, Request}
 
   import Xcribe.Helpers.Formatter, only: [content_type: 1, authorization: 1]
 
@@ -94,37 +93,6 @@ defmodule Xcribe.Swagger.Formatter do
       nil -> %{}
       auth -> auth |> security_type() |> security_scheme_by_type()
     end
-  end
-
-  @opt_no_title {:title, false}
-  @opt_example {:example, true}
-
-  @doc ~S"""
-  Return an schema object for given attribute/parameter.
-
-  ### Options:
-    * `:title` - Include the schema title, default is `true`.
-    * `:example` - Include the schema example, default is `false`.
-  """
-  def schema_object_for(param, opts \\ [])
-
-  def schema_object_for({title, value}, opts) when is_map(value) do
-    %{type: "object"}
-    |> schema_add_title(title, @opt_no_title in opts)
-    |> schema_add_properties(value, opts)
-  end
-
-  def schema_object_for({title, value}, opts) when is_list(value) do
-    %{type: "array"}
-    |> schema_add_title(title, @opt_no_title in opts)
-    |> schema_add_items(value, opts)
-  end
-
-  def schema_object_for({title, value}, opts) do
-    %{type: Types.type_for(value)}
-    |> schema_add_title(title, @opt_no_title in opts)
-    |> schema_add_format(Types.format_for(value))
-    |> schema_add_example(value, @opt_example in opts)
   end
 
   @doc """
@@ -234,9 +202,8 @@ defmodule Xcribe.Swagger.Formatter do
     |> build_schema_for_media(content_type)
   end
 
-  defp build_schema_for_media(content, _) do
-    schema_object_for({:build_schema_for_media, content}, title: false, example: true)
-  end
+  defp build_schema_for_media(content, _),
+    do: JsonSchema.schema_for(content, title: false, example: true)
 
   defp response_object_add_headers(response_object, headers) do
     Map.put(
@@ -252,10 +219,7 @@ defmodule Xcribe.Swagger.Formatter do
     Map.put(
       headers,
       title,
-      %{
-        description: "",
-        schema: schema_object_for({title, value}, title: false)
-      }
+      %{description: "", schema: JsonSchema.schema_for({title, value}, title: false)}
     )
   end
 
@@ -274,52 +238,13 @@ defmodule Xcribe.Swagger.Formatter do
     parameter_object_add_required(%{
       name: name,
       in: inn,
-      schema: schema_object_for({:parameter_object, value}, title: false),
+      schema: JsonSchema.schema_for({name, value}, title: false),
       example: value
     })
   end
 
   defp parameter_object_add_required(%{in: "path"} = param), do: Map.put(param, :required, true)
   defp parameter_object_add_required(param), do: param
-
-  defp schema_add_title(schema, _title, true), do: schema
-  defp schema_add_title(schema, title, false), do: Map.put(schema, :title, title)
-
-  defp schema_add_format(schema, ""), do: schema
-  defp schema_add_format(schema, format), do: Map.put(schema, :format, format)
-
-  defp schema_add_example(schema, value, true), do: Map.put(schema, :example, value)
-  defp schema_add_example(schema, _value, false), do: schema
-
-  defp schema_add_items(schema, [], _opts) do
-    Map.put(schema, :items, %{type: "string"})
-  end
-
-  defp schema_add_items(schema, [value | _], opts) do
-    item_opts = Keyword.merge(opts, title: false)
-
-    Map.put(
-      schema,
-      :items,
-      schema_object_for({:schema_add_items, value}, item_opts)
-    )
-  end
-
-  defp schema_add_properties(schema, value, opts) do
-    Map.put(schema, :properties, reduce_properties(value, opts))
-  end
-
-  defp reduce_properties(properties, opts) do
-    property_opts = Keyword.merge(opts, title: false)
-
-    Enum.reduce(properties, %{}, fn {title, value}, schema ->
-      Map.put(
-        schema,
-        title,
-        schema_object_for({:schema_add_properties, value}, property_opts)
-      )
-    end)
-  end
 
   defp security_type("Bearer" <> _tail), do: "bearer"
   defp security_type("Basic" <> _tail), do: "basic"
