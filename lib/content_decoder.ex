@@ -5,6 +5,7 @@ defmodule Xcribe.ContentDecoder do
   alias Xcribe.JSON
 
   @json_format_regex ~r{application\/json|application\/vnd\..*json}
+  @text_plain_format_regex ~r{text\/plain}
 
   @doc """
   Decode value by the given content_type.
@@ -21,14 +22,16 @@ defmodule Xcribe.ContentDecoder do
   end
 
   defp decode_for(:json, value), do: JSON.decode!(value)
+  defp decode_for(:string, value), do: to_string(value)
 
   defp define_format(content_type) do
-    if is_json?(content_type) do
-      :json
-    else
-      raise UnknownType, content_type
+    cond do
+      is_json?(content_type) -> :json
+      is_text_plain?(content_type) -> :string
+      true -> raise UnknownType, content_type
     end
   end
 
-  defp is_json?(content_type), do: Regex.match?(@json_format_regex, content_type)
+  defp is_json?(type), do: Regex.match?(@json_format_regex, type)
+  defp is_text_plain?(type), do: Regex.match?(@text_plain_format_regex, type)
 end

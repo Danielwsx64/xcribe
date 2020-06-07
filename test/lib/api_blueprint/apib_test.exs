@@ -125,11 +125,20 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
       assert APIB.request("show an user", "application/json") ==
                "+ Request show an user (application/json)\n"
     end
+
+    test "whitout content type" do
+      assert APIB.request("show an user", nil) ==
+               "+ Request show an user (text/plain)\n"
+    end
   end
 
   describe "response/2" do
     test "return response" do
       assert APIB.response(200, "application/json") == "+ Response 200 (application/json)\n"
+    end
+
+    test "without content type" do
+      assert APIB.response(200, nil) == "+ Response 200 (text/plain)\n"
     end
   end
 
