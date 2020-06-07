@@ -4,67 +4,28 @@ HOST: http://my-api.com
 # Basic API
 The description of the API
 
-## Group API
-## Users Posts [/users/{usersId}/posts/]
+## Group Api
+## Users [/users]
+### Users delete [DELETE /users/{id}]
 + Parameters
 
-    + usersId: `1` (required, string) - The users id
+    + id: `1` (string)
 
-### Users Posts show [GET /users/{usersId}/posts/{id}/]
-+ Parameters
-
-    + id: `2` (required, string) - The id
-
-+ Request get all user posts (text/plain)
++ Request delete user (application/json)
     + Headers
 
-            authorization: token
+            authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIn0.rTCH8cLoGxAm_xw68z-zXVKi9ie6xJn9tnVWjd_9ftE
 
-+ Response 200 (application/json)
++ Response 204 (text/plain)
     + Headers
 
             cache-control: max-age=0, private, must-revalidate
 
-    + Body
-
-            {
-              "id": 1,
-              "title": "user 1"
-            }
-## Users [/users/]
-### Users create [POST /users/]
-+ Request create an user (application/json)
+### Users index [GET /users]
++ Request show users (application/json)
     + Headers
 
-            authorization: token
-
-    + Attributes
-
-        + age: `5` (number) - The age
-        + name: `teste` (string) - The name
-
-    + Body
-
-            {
-              "age": 5,
-              "name": "teste"
-            }
-+ Response 201 (application/json)
-    + Headers
-
-            cache-control: max-age=0, private, must-revalidate
-
-    + Body
-
-            {
-              "age": 5,
-              "name": "teste"
-            }
-### Users index [GET /users/]
-+ Request get all users (text/plain)
-    + Headers
-
-            authorization: token
+            authorization: Basic dXNlcm5hbWU6cGFzcw==
 
 + Response 200 (application/json)
     + Headers
@@ -83,19 +44,371 @@ The description of the API
                 "name": "user 2"
               }
             ]
-## Group MONITORING
-## Monitoring [/monitoring/]
-### Monitoring index [GET /monitoring/]
-+ Request get monitoring info (text/plain)
+
+    + Schema
+
+            {
+              "items": {
+                "properties": {
+                  "id": {
+                    "example": 1,
+                    "format": "int32",
+                    "type": "number"
+                  },
+                  "name": {
+                    "example": "user 1",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+
+### Users show [GET /users/{id}]
++ Parameters
+
+    + id: `1` (string)
+
++ Request show user info (application/json)
     + Headers
 
-            authorization: token
+            authorization: Basic dXNlcm5hbWU6cGFzcw==
 
 + Response 200 (application/json)
+    + Headers
+
+            cache-control: max-age=0, private, must-revalidate
+
+    + Body
+
+            {
+              "id": 1,
+              "name": "user 1"
+            }
+
+    + Schema
+
+            {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "format": "int32",
+                  "type": "number"
+                },
+                "name": {
+                  "example": "user 1",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+
+### Users create [POST /users]
++ Request create user (application/json)
+    + Headers
+
+            authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIn0.rTCH8cLoGxAm_xw68z-zXVKi9ie6xJn9tnVWjd_9ftE
+
+    + Body
+
+            {
+              "age": 5,
+              "name": "teste"
+            }
+
+    + Schema
+
+            {
+              "properties": {
+                "age": {
+                  "example": 5,
+                  "format": "int32",
+                  "type": "number"
+                },
+                "name": {
+                  "example": "teste",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+
++ Response 201 (application/json)
+    + Headers
+
+            cache-control: max-age=0, private, must-revalidate
+
+    + Body
+
+            {
+              "age": 5,
+              "name": "teste"
+            }
+
+    + Schema
+
+            {
+              "properties": {
+                "age": {
+                  "example": 5,
+                  "format": "int32",
+                  "type": "number"
+                },
+                "name": {
+                  "example": "teste",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+
+### Users update [PUT /users/{id}]
++ Parameters
+
+    + id: `1` (string)
+
++ Request update user (application/json)
+    + Headers
+
+            authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIn0.rTCH8cLoGxAm_xw68z-zXVKi9ie6xJn9tnVWjd_9ftE
+
+    + Body
+
+            {
+              "age": 5,
+              "name": "teste"
+            }
+
+    + Schema
+
+            {
+              "properties": {
+                "age": {
+                  "example": 5,
+                  "format": "int32",
+                  "type": "number"
+                },
+                "name": {
+                  "example": "teste",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+
++ Response 200 (application/json)
+    + Headers
+
+            cache-control: max-age=0, private, must-revalidate
+
+    + Body
+
+            {
+              "age": 5,
+              "name": "teste"
+            }
+
+    + Schema
+
+            {
+              "properties": {
+                "age": {
+                  "example": 5,
+                  "format": "int32",
+                  "type": "number"
+                },
+                "name": {
+                  "example": "teste",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+
+## Users Cancel [/users/{usersId}/cancel]
++ Parameters
+
+    + usersId: `1` (string)
+
+### Users Cancel cancel [POST /users/{usersId}/cancel]
++ Parameters
+
+    + usersId: `1` (string)
+
++ Request custom action with user (application/json)
+    + Headers
+
+            authorization: BE28C1C33B979E6650F67E7800DC0662
+
++ Response 204 (text/plain)
+    + Headers
+
+            cache-control: max-age=0, private, must-revalidate
+
+## Users Posts [/users/{usersId}/posts]
++ Parameters
+
+    + usersId: `1` (string)
+
+### Users Posts index [GET /users/{usersId}/posts]
++ Parameters
+
+    + usersId: `1` (string)
+
++ Request show all user posts (application/json)
+    + Headers
+
+            authorization: BE28C1C33B979E6650F67E7800DC0662
+
++ Response 200 (application/json)
+    + Headers
+
+            cache-control: max-age=0, private, must-revalidate
+
     + Body
 
             [
               {
-                "status": "ok"
+                "id": 1,
+                "title": "user 1"
+              },
+              {
+                "id": 2,
+                "title": "user 2"
               }
             ]
+
+    + Schema
+
+            {
+              "items": {
+                "properties": {
+                  "id": {
+                    "example": 1,
+                    "format": "int32",
+                    "type": "number"
+                  },
+                  "title": {
+                    "example": "user 1",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+
+### Users Posts update [PATCH /users/{usersId}/posts/{id}]
++ Parameters
+
+    + id: `2` (string)
+    + usersId: `1` (string)
+
++ Request update user post (application/json)
+    + Headers
+
+            authorization: BE28C1C33B979E6650F67E7800DC0662
+
+    + Body
+
+            {
+              "title": "test"
+            }
+
+    + Schema
+
+            {
+              "properties": {
+                "title": {
+                  "example": "test",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+
++ Response 200 (application/json)
+    + Headers
+
+            cache-control: max-age=0, private, must-revalidate
+
+    + Body
+
+            {
+              "title": "test",
+              "users_id": "1"
+            }
+
+    + Schema
+
+            {
+              "properties": {
+                "title": {
+                  "example": "test",
+                  "type": "string"
+                },
+                "users_id": {
+                  "example": "1",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+
+### Users Posts create [POST /users/{usersId}/posts]
++ Parameters
+
+    + usersId: `1` (string)
+
++ Request show user post (application/json)
+    + Headers
+
+            authorization: BE28C1C33B979E6650F67E7800DC0662
+
+    + Body
+
+            {
+              "title": "test"
+            }
+
+    + Schema
+
+            {
+              "properties": {
+                "title": {
+                  "example": "test",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+
++ Response 201 (application/json)
+    + Headers
+
+            cache-control: max-age=0, private, must-revalidate
+
+    + Body
+
+            {
+              "title": "test",
+              "users_id": "1"
+            }
+
+    + Schema
+
+            {
+              "properties": {
+                "title": {
+                  "example": "test",
+                  "type": "string"
+                },
+                "users_id": {
+                  "example": "1",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+

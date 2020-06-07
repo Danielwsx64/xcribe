@@ -1,5 +1,5 @@
 defmodule Xcribe.ConnParserTest do
-  use Xcribe.ConnCase, async: true
+  use Xcribe.ConnCase, async: false
 
   alias Plug.Conn
   alias Xcribe.{ConnParser, Request, Request.Error}

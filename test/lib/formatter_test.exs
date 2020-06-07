@@ -1,8 +1,5 @@
 defmodule XcribeFormatterTest do
   use ExUnit.Case, async: false
-  use Xcribe.SwaggerExamples
-  use Xcribe.RequestsExamples
-  use Xcribe.ApiBlueprintExamples
 
   import ExUnit.CaptureIO
 
@@ -10,6 +7,8 @@ defmodule XcribeFormatterTest do
 
   alias Xcribe.Support.RequestsGenerator
 
+  @sample_swagger_output File.read!("test/support/swagger_example.json")
+  @sample_apib_output File.read!("test/support/api_blueprint_example.apib")
   @output_path "/tmp/test"
 
   setup do
@@ -58,17 +57,27 @@ defmodule XcribeFormatterTest do
     end
 
     test "api_blueprint format" do
-      Enum.each(@sample_requests, &Recorder.save(&1))
+      requests = [
+        RequestsGenerator.users_index([:basic_auth]),
+        RequestsGenerator.users_show([:basic_auth]),
+        RequestsGenerator.users_create([:bearer_auth]),
+        RequestsGenerator.users_update([:bearer_auth]),
+        RequestsGenerator.users_delete([:bearer_auth]),
+        RequestsGenerator.users_custom_action([:api_key_auth]),
+        RequestsGenerator.users_posts_index([:api_key_auth]),
+        RequestsGenerator.users_posts_create([:api_key_auth]),
+        RequestsGenerator.users_posts_update([:api_key_auth])
+      ]
+
+      Enum.each(requests, &Recorder.save(&1))
 
       Application.put_env(:xcribe, :format, :api_blueprint)
-
-      expected_content = @sample_requests_as_string
 
       assert capture_io(fn ->
                assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
              end) =~ "Xcribe documentation written in"
 
-      assert File.read!(@output_path) == expected_content
+      assert File.read!(@output_path) == @sample_apib_output
     end
   end
 
