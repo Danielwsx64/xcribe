@@ -3,50 +3,365 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
   alias Xcribe.ApiBlueprint.Formatter
   alias Xcribe.Request
+  alias Xcribe.Support.RequestsGenerator
 
-  describe "resource_group/1" do
-    test "return formatted resource group" do
-      struct = %Request{resource_group: :api}
+  describe "merge_request/2" do
+    setup do
+      Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
 
-      assert Formatter.resource_group(struct) == "## Group API\n"
+      on_exit(fn -> Application.delete_env(:xcribe, :information_source) end)
     end
 
-    test "remove underlines" do
-      struct = %Request{resource_group: :awesome_api}
+    test "merge two request objects" do
+      base_request = RequestsGenerator.users_index()
+      request_one = %{base_request | description: "Cool description"}
+      request_two = %{base_request | description: "Other description"}
 
-      assert Formatter.resource_group(struct) == "## Group AWESOME API\n"
+      full_request_one = Formatter.full_request_object(request_one)
+      full_request_two = Formatter.full_request_object(request_two)
+
+      assert Formatter.merge_request(full_request_one, full_request_two) == %{
+               "Api " => %{
+                 summary: "",
+                 description: "",
+                 resources: %{
+                   "/users" => %{
+                     name: "Users",
+                     description: "",
+                     summary: "",
+                     parameters: %{},
+                     actions: %{
+                       "GET /users" => %{
+                         name: "Users index",
+                         description: "",
+                         summary: "",
+                         parameters: %{},
+                         requests: %{
+                           "Cool description" => %{
+                             content_type: "application/json",
+                             headers: %{},
+                             body: %{},
+                             schema: %{},
+                             response: %{
+                               status: 200,
+                               content_type: "application/json",
+                               headers: %{
+                                 "cache-control" => "max-age=0, private, must-revalidate"
+                               },
+                               body: [
+                                 %{"id" => 1, "name" => "user 1"},
+                                 %{"id" => 2, "name" => "user 2"}
+                               ],
+                               schema: %{
+                                 type: "array",
+                                 items: %{
+                                   type: "object",
+                                   properties: %{
+                                     "id" => %{example: 1, format: "int32", type: "number"},
+                                     "name" => %{example: "user 1", type: "string"}
+                                   }
+                                 }
+                               }
+                             }
+                           },
+                           "Other description" => %{
+                             body: %{},
+                             schema: %{},
+                             content_type: "application/json",
+                             headers: %{},
+                             response: %{
+                               status: 200,
+                               content_type: "application/json",
+                               headers: %{
+                                 "cache-control" => "max-age=0, private, must-revalidate"
+                               },
+                               body: [
+                                 %{"id" => 1, "name" => "user 1"},
+                                 %{"id" => 2, "name" => "user 2"}
+                               ],
+                               schema: %{
+                                 type: "array",
+                                 items: %{
+                                   type: "object",
+                                   properties: %{
+                                     "id" => %{example: 1, format: "int32", type: "number"},
+                                     "name" => %{example: "user 1", type: "string"}
+                                   }
+                                 }
+                               }
+                             }
+                           }
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
+             }
     end
   end
 
-  describe "resource_section/1" do
-    test "return formatted resource" do
-      struct = %Request{resource: "users", path: "/users"}
+  describe "full_request_object/1" do
+    test "return group object" do
+      struct = %Request{
+        action: "show",
+        controller: Elixir.Xcribe.PostsController,
+        description: "get all user posts",
+        header_params: [{"content-type", "application/json"}],
+        params: %{},
+        path: "/users",
+        path_params: %{},
+        query_params: %{},
+        request_body: %{},
+        resource: "users",
+        resource_group: :api,
+        resp_body: "{\"id\":1,\"title\":\"user 1\"}",
+        resp_headers: [{"content-type", "application/json"}],
+        status_code: 200,
+        verb: "get"
+      }
 
-      assert Formatter.resource_section(struct) == "## Users [/users/]\n"
+      assert Formatter.full_request_object(struct) == %{
+               "Api " => %{
+                 description: "",
+                 summary: "",
+                 resources: %{
+                   "/users" => %{
+                     name: "Users",
+                     description: "",
+                     summary: "",
+                     parameters: %{},
+                     actions: %{
+                       "GET /users" => %{
+                         name: "Users show",
+                         description: "",
+                         summary: "",
+                         parameters: %{},
+                         requests: %{
+                           "get all user posts" => %{
+                             content_type: "application/json",
+                             headers: %{},
+                             body: %{},
+                             schema: %{},
+                             response: %{
+                               status: 200,
+                               content_type: "application/json",
+                               headers: %{},
+                               body: %{"id" => 1, "title" => "user 1"},
+                               schema: %{
+                                 type: "object",
+                                 properties: %{
+                                   "id" => %{example: 1, format: "int32", type: "number"},
+                                   "title" => %{example: "user 1", type: "string"}
+                                 }
+                               }
+                             }
+                           }
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
+             }
     end
+  end
 
-    test "when path ends with forward slash" do
-      struct = %Request{resource: "users", path: "/users/"}
+  describe "resource_object/1" do
+    test "return resource object" do
+      struct = %Request{
+        action: "show",
+        controller: Elixir.Xcribe.PostsController,
+        description: "get all user posts",
+        header_params: [
+          {"authorization", "token"},
+          {"content-type", "application/json; charset=utf-8"}
+        ],
+        params: %{"users_id" => "1"},
+        path: "/users/{users_id}/posts/{id}",
+        path_params: %{"users_id" => "1", "id" => "2"},
+        query_params: %{},
+        request_body: %{},
+        resource: "users_posts",
+        resource_group: :api,
+        resp_body: "{\"id\":1,\"title\":\"user 1\"}",
+        resp_headers: [
+          {"content-type", "application/json; charset=utf-8"},
+          {"cache-control", "max-age=0, private, must-revalidate"}
+        ],
+        status_code: 200,
+        verb: "get"
+      }
 
-      assert Formatter.resource_section(struct) == "## Users [/users/]\n"
+      assert Formatter.resource_object(struct) == %{
+               "/users/{usersId}/posts" => %{
+                 name: "Users Posts",
+                 description: "",
+                 summary: "",
+                 parameters: %{"usersId" => %{example: "1", required: true, type: "string"}},
+                 actions: %{
+                   "GET /users/{usersId}/posts/{id}" => %{
+                     name: "Users Posts show",
+                     description: "",
+                     summary: "",
+                     parameters: %{
+                       "id" => %{example: "2", required: true, type: "string"},
+                       "usersId" => %{example: "1", required: true, type: "string"}
+                     },
+                     requests: %{
+                       "get all user posts" => %{
+                         content_type: "application/json",
+                         headers: %{"authorization" => "token"},
+                         body: %{},
+                         schema: %{},
+                         response: %{
+                           status: 200,
+                           content_type: "application/json",
+                           headers: %{"cache-control" => "max-age=0, private, must-revalidate"},
+                           body: %{"id" => 1, "title" => "user 1"},
+                           schema: %{
+                             type: "object",
+                             properties: %{
+                               "id" => %{example: 1, format: "int32", type: "number"},
+                               "title" => %{example: "user 1", type: "string"}
+                             }
+                           }
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
+             }
     end
+  end
 
-    test "when there is an arg in the path's end" do
-      struct = %Request{resource: "users posts", path: "/users/{id}/posts/{post_id}"}
+  describe "action_object/1" do
+    test "return full action object" do
+      struct = %Request{
+        action: "show",
+        controller: Elixir.Xcribe.PostsController,
+        description: "get all user posts",
+        header_params: [
+          {"authorization", "token"},
+          {"content-type", "application/json; charset=utf-8"}
+        ],
+        params: %{"users_id" => "1"},
+        path: "/users/{users_id}/posts/{id}",
+        path_params: %{"users_id" => "1", "id" => "2"},
+        query_params: %{},
+        request_body: %{},
+        resource: "users_posts",
+        resource_group: :api,
+        resp_body: "{\"id\":1,\"title\":\"user 1\"}",
+        resp_headers: [
+          {"content-type", "application/json; charset=utf-8"},
+          {"cache-control", "max-age=0, private, must-revalidate"}
+        ],
+        status_code: 200,
+        verb: "get"
+      }
 
-      assert Formatter.resource_section(struct) == "## Users Posts [/users/{id}/posts/]\n"
+      assert Formatter.action_object(struct) == %{
+               "GET /users/{usersId}/posts/{id}" => %{
+                 name: "Users Posts show",
+                 description: "",
+                 summary: "",
+                 parameters: %{
+                   "id" => %{example: "2", required: true, type: "string"},
+                   "usersId" => %{example: "1", required: true, type: "string"}
+                 },
+                 requests: %{
+                   "get all user posts" => %{
+                     content_type: "application/json",
+                     headers: %{"authorization" => "token"},
+                     body: %{},
+                     schema: %{},
+                     response: %{
+                       content_type: "application/json",
+                       status: 200,
+                       headers: %{"cache-control" => "max-age=0, private, must-revalidate"},
+                       body: %{"id" => 1, "title" => "user 1"},
+                       schema: %{
+                         type: "object",
+                         properties: %{
+                           "id" => %{example: 1, format: "int32", type: "number"},
+                           "title" => %{example: "user 1", type: "string"}
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
+             }
     end
+  end
 
-    test "resource with underline" do
-      struct = %Request{resource: "users_posts", path: "/users/{id}/posts/{post_id}"}
+  describe "request_object/1" do
+    test "return full request object" do
+      struct = %Request{
+        description: "create an user",
+        header_params: [
+          {"authorization", "token"},
+          {"content-type", "application/json; charset=utf-8"}
+        ],
+        request_body: %{"age" => 5, "name" => "teste"},
+        resp_body: "{\"age\":5,\"name\":\"teste\"}",
+        resp_headers: [{"content-type", "application/json; charset=utf-8"}],
+        status_code: 201
+      }
 
-      assert Formatter.resource_section(struct) == "## Users Posts [/users/{id}/posts/]\n"
+      assert Formatter.request_object(struct) == %{
+               "create an user" => %{
+                 content_type: "application/json",
+                 headers: %{"authorization" => "token"},
+                 body: %{"age" => 5, "name" => "teste"},
+                 schema: %{
+                   type: "object",
+                   properties: %{
+                     "age" => %{example: 5, format: "int32", type: "number"},
+                     "name" => %{example: "teste", type: "string"}
+                   }
+                 },
+                 response: %{
+                   content_type: "application/json",
+                   headers: %{},
+                   body: %{"age" => 5, "name" => "teste"},
+                   schema: %{
+                     properties: %{
+                       "age" => %{example: 5, format: "int32", type: "number"},
+                       "name" => %{example: "teste", type: "string"}
+                     },
+                     type: "object"
+                   },
+                   status: 201
+                 }
+               }
+             }
     end
+  end
 
-    test "camelize params" do
-      struct = %Request{resource: "users", path: "/users/{user_id}/posts/{post_id}"}
+  describe "response_object/1" do
+    test "return full response object" do
+      struct = %Request{
+        resp_body: "{\"age\":5,\"name\":\"teste\"}",
+        resp_headers: [{"content-type", "application/json; charset=utf-8"}],
+        status_code: 201
+      }
 
-      assert Formatter.resource_section(struct) == "## Users [/users/{userId}/posts/]\n"
+      assert Formatter.response_object(struct) == %{
+               status: 201,
+               content_type: "application/json",
+               headers: %{},
+               body: %{"age" => 5, "name" => "teste"},
+               schema: %{
+                 type: "object",
+                 properties: %{
+                   "age" => %{example: 5, format: "int32", type: "number"},
+                   "name" => %{example: "teste", type: "string"}
+                 }
+               }
+             }
     end
   end
 
@@ -57,38 +372,22 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         path: "/users/{users_id}/posts/{id}"
       }
 
-      assert Formatter.resource_parameters(struct) == """
-             + Parameters
-
-                 + usersId: `1` (required, string) - The users id
-
-             """
-    end
-
-    test "format resource URI parameters with custom description" do
-      struct = %Request{
-        path_params: %{"users_id" => "1", "id" => 5},
-        path: "/users/{users_id}/posts/{id}"
-      }
-
-      descripitions = %{
-        "users_id" => "The user identificator"
-      }
-
-      assert Formatter.resource_parameters(struct, descripitions) == """
-             + Parameters
-
-                 + usersId: `1` (required, string) - The user identificator
-
-             """
+      assert Formatter.resource_parameters(struct) == %{
+               "usersId" => %{
+                 example: "1",
+                 type: "string",
+                 required: true
+               }
+             }
     end
 
     test "no path paramters" do
       struct = %Request{
-        path_params: %{}
+        path_params: %{},
+        path: "/users/{id}"
       }
 
-      assert Formatter.resource_parameters(struct) == ""
+      assert Formatter.resource_parameters(struct) == %{}
     end
 
     test "with endind param" do
@@ -97,45 +396,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         path: "/posts/{id}"
       }
 
-      assert Formatter.resource_parameters(struct) == ""
-    end
-  end
-
-  describe "action_section/1" do
-    test "return formatted resource action" do
-      struct = %Request{resource: "users", path: "/users", action: "index", verb: "get"}
-
-      assert Formatter.action_section(struct) == "### Users index [GET /users/]\n"
-    end
-
-    test "when there is an arg in the path's end" do
-      struct = %Request{
-        resource: "users posts",
-        path: "/users/{id}/posts/{post_id}",
-        action: "update",
-        verb: "put"
-      }
-
-      assert Formatter.action_section(struct) ==
-               "### Users Posts update [PUT /users/{id}/posts/{post_id}/]\n"
-    end
-
-    test "when there is underline" do
-      struct = %Request{resource: "users_posts", path: "/users", action: "new_index", verb: "get"}
-
-      assert Formatter.action_section(struct) == "### Users Posts new index [GET /users/]\n"
-    end
-
-    test "camelize params" do
-      struct = %Request{
-        resource: "users_posts",
-        path: "/users/{user_id}/user",
-        action: "new_index",
-        verb: "get"
-      }
-
-      assert Formatter.action_section(struct) ==
-               "### Users Posts new index [GET /users/{userId}/user/]\n"
+      assert Formatter.resource_parameters(struct) == %{}
     end
   end
 
@@ -146,456 +407,136 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         path: "/users/{users_id}/posts/{id}"
       }
 
-      assert Formatter.action_parameters(struct) == """
-             + Parameters
-
-                 + id: `5` (required, number) - The id
-
-             """
-    end
-
-    test "format action URI parameters with custom descriptions" do
-      struct = %Request{
-        path_params: %{"users_id" => "1", "id" => 5},
-        path: "/users/{users_id}/posts/{id}"
-      }
-
-      descriptions = %{"id" => "the identificator"}
-
-      assert Formatter.action_parameters(struct, descriptions) == """
-             + Parameters
-
-                 + id: `5` (required, number) - the identificator
-
-             """
-    end
-
-    test "camelize param" do
-      struct = %Request{
-        path_params: %{"users_id" => "1", "user_id" => 5},
-        path: "/users/{users_id}/posts/{user_id}"
-      }
-
-      assert Formatter.action_parameters(struct) == """
-             + Parameters
-
-                 + userId: `5` (required, number) - The user id
-
-             """
-    end
-
-    test "just resource params" do
-      struct = %Request{
-        path_params: %{"users_id" => "1"},
-        path: "/users/{users_id}/posts"
-      }
-
-      assert Formatter.action_parameters(struct) == ""
+      assert Formatter.action_parameters(struct) == %{
+               "id" => %{example: 5, required: true, type: "number", format: "int32"},
+               "usersId" => %{example: "1", required: true, type: "string"}
+             }
     end
 
     test "with no parameters" do
       struct = %Request{path_params: %{}}
 
-      assert Formatter.action_parameters(struct) == ""
+      assert Formatter.action_parameters(struct) == %{}
     end
   end
 
-  describe "request_section/1" do
-    test "return formatted request description" do
-      struct = %Request{description: "create user with token"}
-
-      assert Formatter.request_section(struct) ==
-               "+ Request create user with token (text/plain)\n"
-    end
-
-    test "clean description" do
-      struct = %Request{description: "POST /api/boletos [ create  ] add a boleto"}
-
-      assert Formatter.request_section(struct) ==
-               "+ Request POST api boletos create add a boleto (text/plain)\n"
-    end
-
-    test "when content type is set" do
+  describe "response_schema/1" do
+    test "return response schema for json content" do
       struct = %Request{
-        description: "create user with token",
-        header_params: [
-          {"content-type", "application/json; charset=utf-8"},
-          {"cache-control", "max-age=0, private, must-revalidate"}
-        ]
+        resp_body: "{\"age\":5,\"name\":\"teste\"}",
+        resp_headers: [{"content-type", "application/json; charset=utf-8"}]
       }
 
-      assert Formatter.request_section(struct) ==
-               "+ Request create user with token (application/json)\n"
+      assert Formatter.response_schema(struct) == %{
+               type: "object",
+               properties: %{
+                 "age" => %{example: 5, format: "int32", type: "number"},
+                 "name" => %{example: "teste", type: "string"}
+               }
+             }
+    end
+
+    test "return schema for text/plain" do
+      struct = %Request{
+        resp_body: "success",
+        resp_headers: [{"content-type", "text/plain; charset=utf-8"}]
+      }
+
+      assert Formatter.response_schema(struct) == %{}
     end
   end
 
-  describe "request_headers/1" do
-    test "return formatted request headers" do
+  describe "request_schema/1" do
+    test "return request schema for json content" do
       struct = %Request{
         header_params: [
           {"authorization", "token"},
-          {"content-type", "multipart/mixed; boundary=plug_conn_test"}
-        ]
-      }
-
-      assert Formatter.request_headers(struct) == """
-                 + Headers
-
-                         authorization: token
-
-             """
-    end
-
-    test "just content type" do
-      struct = %Request{
-        header_params: [
-          {"content-type", "multipart/mixed; boundary=plug_conn_test"}
-        ]
-      }
-
-      assert Formatter.request_headers(struct) == ""
-    end
-
-    test "return empty string when no headers" do
-      struct = %Request{
-        header_params: []
-      }
-
-      assert Formatter.request_headers(struct) == ""
-    end
-  end
-
-  describe "request_body/1" do
-    test "return formatted json request body" do
-      struct = %Request{
-        request_body: %{"age" => 5, "name" => "teste"},
-        header_params: [
-          {"content-type", "application/json; charset=utf8"}
-        ]
-      }
-
-      assert Formatter.request_body(struct) == """
-                 + Body
-
-                         {
-                           "age": 5,
-                           "name": "teste"
-                         }
-             """
-    end
-
-    test "return empty string when no body" do
-      struct = %Request{
-        request_body: %{}
-      }
-
-      assert Formatter.request_body(struct) == ""
-    end
-  end
-
-  describe "request_attributes" do
-    test "return formatted request attributes" do
-      struct = %Request{
+          {"content-type", "application/json; boundary=plug_conn_test"}
+        ],
         request_body: %{"age" => 5, "name" => "teste"}
       }
 
-      assert Formatter.request_attributes(struct) == """
-                 + Attributes
-
-                     + age: `5` (number) - The age
-                     + name: `teste` (string) - The name
-
-             """
+      assert Formatter.request_schema(struct) == %{
+               type: "object",
+               properties: %{
+                 "age" => %{example: 5, format: "int32", type: "number"},
+                 "name" => %{example: "teste", type: "string"}
+               }
+             }
     end
 
-    test "return formatted request attributes with custom descriptions" do
+    test "for empty body" do
       struct = %Request{
-        request_body: %{"age" => 5, "name" => "teste"}
-      }
-
-      descriptions = %{"age" => "the user age", "name" => "is the full name of the user"}
-
-      assert Formatter.request_attributes(struct, descriptions) == """
-                 + Attributes
-
-                     + age: `5` (number) - the user age
-                     + name: `teste` (string) - is the full name of the user
-
-             """
-    end
-
-    test "remove underline from example and description" do
-      struct = %Request{
-        request_body: %{"age" => 5, "name" => "teste_of_name"}
-      }
-
-      descriptions = %{"age" => "the user age", "name" => "is the full_name of the user"}
-
-      assert Formatter.request_attributes(struct, descriptions) == """
-                 + Attributes
-
-                     + age: `5` (number) - the user age
-                     + name: `teste of name` (string) - is the full name of the user
-
-             """
-    end
-
-    test "attribute object and array" do
-      struct = %Request{
-        request_body: %{"age" => ["item one", "item two"], "name" => %{"key" => "value"}}
-      }
-
-      descriptions = %{"age" => "the user age", "name" => "is the full_name of the user"}
-
-      assert Formatter.request_attributes(struct, descriptions) == """
-                 + Attributes
-
-                     + age: `array` (array) - the user age
-                     + name: `object` (object) - is the full name of the user
-
-             """
-    end
-
-    test "return empty string when no body" do
-      struct = %Request{
+        header_params: [{"content-type", "application/json; boundary=plug_conn_test"}],
         request_body: %{}
       }
 
-      assert Formatter.request_attributes(struct) == ""
+      assert Formatter.request_schema(struct) == %{}
+    end
+
+    test "return schema for text/plain" do
+      struct = %Request{request_body: %{}}
+
+      assert Formatter.request_schema(struct) == %{}
     end
   end
 
-  describe "response_section/1" do
-    test "return formatted response description" do
-      struct = %Request{
-        status_code: 201
-      }
+  describe "action_key/1" do
+    test "return formatted action key" do
+      struct = %Request{path: "/users/{users_id}/posts/{id}", verb: "post"}
 
-      assert Formatter.response_section(struct) == "+ Response 201 (text/plain)\n"
-    end
-
-    test "when has content type header" do
-      struct = %Request{
-        status_code: 201,
-        resp_headers: [
-          {"content-type", "multipart/mixed"}
-        ]
-      }
-
-      assert Formatter.response_section(struct) == "+ Response 201 (multipart/mixed)\n"
+      assert Formatter.action_key(struct) == "POST /users/{usersId}/posts/{id}"
     end
   end
 
-  describe "response_headers/1" do
-    test "return formatted request headers" do
+  describe "action_name/1" do
+    test "return formatted action name" do
       struct = %Request{
-        resp_headers: [
-          {"authorization", "token"},
-          {"content-type", "multipart/mixed; boundary=plug_conn_test"}
-        ]
+        resource: "users_posts",
+        action: "show"
       }
 
-      assert Formatter.response_headers(struct) == """
-                 + Headers
-
-                         authorization: token
-
-             """
+      assert Formatter.action_name(struct) == "Users Posts show"
     end
+  end
 
-    test "just content header" do
-      struct = %Request{
-        resp_headers: [
-          {"content-type", "multipart/mixed; boundary=plug_conn_test"}
-        ]
-      }
+  describe "resource_key/1" do
+    test "return formatted resource key" do
+      struct_one = %Request{path: "/users/{users_id}/posts/{id}"}
+      struct_two = %Request{path: "/users/{users_id}/posts"}
 
-      assert Formatter.response_headers(struct) == ""
+      assert Formatter.resource_key(struct_one) == "/users/{usersId}/posts"
+      assert Formatter.resource_key(struct_two) == "/users/{usersId}/posts"
     end
+  end
 
-    test "return empty string when no headers" do
-      struct = %Request{
-        resp_headers: []
-      }
+  describe "resource_name/1" do
+    test "return formatted resource name" do
+      struct_one = %Request{resource: "users_posts"}
+      struct_two = %Request{resource: "users"}
 
-      assert Formatter.response_headers(struct) == ""
+      assert Formatter.resource_name(struct_one) == "Users Posts"
+      assert Formatter.resource_name(struct_two) == "Users"
     end
   end
 
   describe "response_body/1" do
-    test "return formatted json request body" do
+    test "return response body" do
       struct = %Request{
-        resp_body: "{\"age\":5,\"name\":\"teste\"}",
-        resp_headers: [
-          {"content-type", "application/json; charset=utf8"}
-        ]
+        resp_body: "{\"id\":1,\"title\":\"user 1\"}",
+        resp_headers: [{"content-type", "application/json"}]
       }
 
-      assert Formatter.response_body(struct) == """
-                 + Body
-
-                         {
-                           "age": 5,
-                           "name": "teste"
-                         }
-             """
+      assert Formatter.response_body(struct) == %{"id" => 1, "title" => "user 1"}
     end
 
-    test "return empty string when no body" do
+    test "response without content type" do
       struct = %Request{
         resp_body: "",
-        resp_headers: [
-          {"content-type", "application/json; charset=utf8"}
-        ]
+        resp_headers: [{"cache-control", "max-age=0, private, must-revalidate"}]
       }
 
-      assert Formatter.response_body(struct) == ""
-    end
-
-    test "return empty string when status 204" do
-      struct = %Request{
-        resp_body: "{\"age\":5,\"name\":\"teste\"}",
-        status_code: 204,
-        resp_headers: [
-          {"content-type", "application/json; charset=utf8"}
-        ]
-      }
-
-      assert Formatter.response_body(struct) == ""
-    end
-
-    test "when content type is text/plain" do
-      struct = %Request{
-        resp_body: "no json response",
-        resp_headers: [
-          {"content-type", "text/plain"}
-        ]
-      }
-
-      assert Formatter.response_body(struct) == """
-                 + Body
-
-                         no json response
-             """
-    end
-  end
-
-  describe "metadata_section/1" do
-    test "return API overview" do
-      api_info = %{
-        description: "some cool description",
-        host: "http://my-host.com",
-        name: "The Cool API"
-      }
-
-      assert Formatter.metadata_section(api_info) == """
-             FORMAT: 1A
-             HOST: http://my-host.com
-
-             # The Cool API
-             some cool description
-
-             """
-    end
-  end
-
-  describe "full_request/1" do
-    test "return full request" do
-      struct = %Request{
-        description: "create an user",
-        header_params: [
-          {"authorization", "token"},
-          {"content-type", "application/json"}
-        ],
-        params: %{"age" => 5, "name" => "teste"},
-        request_body: %{"age" => 5, "name" => "teste"},
-        resp_body: "{\"age\":5,\"name\":\"teste\"}",
-        resp_headers: [
-          {"content-type", "application/json; charset=utf-8"},
-          {"cache-control", "max-age=0, private, must-revalidate"}
-        ],
-        status_code: 201
-      }
-
-      assert Formatter.full_request(struct) == """
-             + Request create an user (application/json)
-                 + Headers
-
-                         authorization: token
-
-                 + Attributes
-
-                     + age: `5` (number) - The age
-                     + name: `teste` (string) - The name
-
-                 + Body
-
-                         {
-                           "age": 5,
-                           "name": "teste"
-                         }
-             + Response 201 (application/json)
-                 + Headers
-
-                         cache-control: max-age=0, private, must-revalidate
-
-                 + Body
-
-                         {
-                           "age": 5,
-                           "name": "teste"
-                         }
-             """
-    end
-
-    test "return full request with descriptions" do
-      struct = %Request{
-        description: "create an user",
-        header_params: [
-          {"authorization", "token"},
-          {"content-type", "application/json"}
-        ],
-        params: %{"age" => 5, "name" => "teste"},
-        request_body: %{"age" => 5, "name" => "teste"},
-        resp_body: "{\"age\":5,\"name\":\"teste\"}",
-        resp_headers: [
-          {"content-type", "application/json; charset=utf-8"},
-          {"cache-control", "max-age=0, private, must-revalidate"}
-        ],
-        status_code: 201
-      }
-
-      descriptions = %{"age" => "the user age", "name" => "is the full name of the user"}
-
-      assert Formatter.full_request(struct, descriptions) == """
-             + Request create an user (application/json)
-                 + Headers
-
-                         authorization: token
-
-                 + Attributes
-
-                     + age: `5` (number) - the user age
-                     + name: `teste` (string) - is the full name of the user
-
-                 + Body
-
-                         {
-                           "age": 5,
-                           "name": "teste"
-                         }
-             + Response 201 (application/json)
-                 + Headers
-
-                         cache-control: max-age=0, private, must-revalidate
-
-                 + Body
-
-                         {
-                           "age": 5,
-                           "name": "teste"
-                         }
-             """
+      assert Formatter.response_body(struct) == %{}
     end
   end
 end

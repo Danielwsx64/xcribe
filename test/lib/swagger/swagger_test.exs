@@ -1,10 +1,10 @@
 defmodule Xcribe.SwaggerTest do
   use ExUnit.Case, async: true
-  use Xcribe.RequestsExamples
-  use Xcribe.SwaggerExamples
 
   alias Xcribe.Support.RequestsGenerator
-  alias Xcribe.{DocException, Swagger}
+  alias Xcribe.{DocException, Request, Swagger}
+
+  @sample_swagger_output File.read!("test/support/swagger_example.json")
 
   setup do
     Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)

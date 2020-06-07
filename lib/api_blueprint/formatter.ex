@@ -1,180 +1,208 @@
 defmodule Xcribe.ApiBlueprint.Formatter do
   @moduledoc false
 
-  alias Xcribe.Request
+  alias Xcribe.{ContentDecoder, JsonSchema, Request}
 
   import Xcribe.Helpers.Formatter
 
-  use Xcribe.ApiBlueprint.Templates
+  def merge_request(requests, new_request) do
+    group_key = object_key(new_request)
 
-  @content_type_opts [default: "text/plain"]
-
-  def metadata_section(api_info) do
-    apply_template(
-      @metadata_template,
-      host: fetch_key(api_info, :host, ""),
-      name: fetch_key(api_info, :name, ""),
-      description: fetch_key(api_info, :description, "")
+    Map.update(
+      requests,
+      group_key,
+      new_request[group_key],
+      &merge_group(&1, new_request[group_key])
     )
   end
 
-  def resource_group(%Request{} = request) do
-    apply_template(
-      @group_template,
-      identifier: prepare_and_upcase(request.resource_group)
-    )
+  def full_request_object(%Request{resource_group: group} = request) do
+    %{
+      capitalize_all_words(to_string(group)) => %{
+        summary: "",
+        description: "",
+        resources: resource_object(request)
+      }
+    }
   end
 
-  def resource_section(%Request{resource: resource, path: path}) do
-    apply_template(
-      @resource_template,
-      identifier: prepare_and_captalize(resource),
-      uri_template: build_uri_template(path, :resource)
-    )
+  def resource_object(%Request{} = request) do
+    %{
+      resource_key(request) => %{
+        name: resource_name(request),
+        summary: "",
+        description: "",
+        parameters: resource_parameters(request),
+        actions: action_object(request)
+      }
+    }
   end
 
-  def action_section(%Request{resource: resource, path: path, action: action, verb: verb}) do
-    apply_template(
-      @action_template,
-      identifier_resource: prepare_and_captalize(resource),
-      identifier_action: remove_underline(action),
-      request_method: String.upcase(verb),
-      uri_template: build_uri_template(path, :action)
-    )
+  def action_object(%Request{} = request) do
+    %{
+      action_key(request) => %{
+        name: action_name(request),
+        summary: "",
+        description: "",
+        parameters: action_parameters(request),
+        requests: request_object(request)
+      }
+    }
   end
 
-  def request_section(%Request{description: description, header_params: headers}) do
-    apply_template(
-      @request_template,
-      identifier: purge_string(description),
-      media_type: content_type(headers, @content_type_opts)
-    )
+  def request_object(%Request{description: desc, header_params: headers} = request) do
+    %{
+      desc => %{
+        content_type: content_type(headers),
+        headers: headers(headers),
+        body: request.request_body,
+        schema: request_schema(request),
+        response: response_object(request)
+      }
+    }
   end
 
-  def response_section(%Request{status_code: code, resp_headers: headers}) do
-    apply_template(@response_template,
-      code: to_string(code),
-      media_type: content_type(headers, @content_type_opts)
-    )
+  def response_object(%Request{resp_headers: headers, status_code: code} = request) do
+    %{
+      status: code,
+      content_type: content_type(headers),
+      headers: headers(headers),
+      body: response_body(request),
+      schema: response_schema(request)
+    }
   end
 
-  def request_headers(%Request{header_params: headers}), do: headers_section(headers)
-
-  def response_headers(%Request{resp_headers: headers}), do: headers_section(headers)
-
-  def request_body(%Request{request_body: body, header_params: headers}),
-    do: body_section(body, headers)
-
-  def response_body(%Request{status_code: 204}), do: ""
-
-  def response_body(%Request{resp_body: body, resp_headers: headers}),
-    do: body_section(body, headers)
-
-  def request_attributes(%Request{request_body: body}, desc \\ %{}),
-    do: attributes_section(body, desc)
-
-  def resource_parameters(%Request{path_params: params, path: path}, desc \\ %{}) do
-    params
-    |> remove_path_ending_arg(path)
-    |> parameters_section(desc)
+  def action_parameters(%Request{path_params: path_params}) do
+    Enum.reduce(path_params, %{}, &reduce_path_params/2)
   end
 
-  def action_parameters(%Request{path_params: params, path: path}, desc \\ %{}) do
-    resourse_params = params |> remove_path_ending_arg(path) |> Map.keys()
-
-    params
-    |> Map.drop(resourse_params)
-    |> parameters_section(desc)
+  def resource_parameters(%Request{path: path, path_params: path_params}) do
+    path_params
+    |> Map.take(url_params(path))
+    |> Enum.reduce(%{}, &reduce_path_params/2)
   end
 
-  def full_request(%Request{} = struct, desc \\ %{}) do
-    Enum.join([
-      request_section(struct),
-      request_headers(struct),
-      request_attributes(struct, desc),
-      request_body(struct),
-      response_section(struct),
-      response_headers(struct),
-      response_body(struct)
-    ])
-  end
-
-  defp parameters_section(params, _desc) when params == %{}, do: ""
-
-  defp parameters_section(params, desc) do
-    apply_template(
-      @parameters_template,
-      parameters_list: format_items_list(params, desc, tab(1), "required, ")
-    )
-  end
-
-  defp attributes_section(attrs, _desc) when attrs == %{}, do: ""
-
-  defp attributes_section(attrs, desc) do
-    apply_template(
-      @attributes_template,
-      attributes_list: format_items_list(attrs, desc, tab(2))
-    )
-  end
-
-  defp body_section(body, _headers) when body == "" or body == %{}, do: ""
-
-  defp body_section(body, headers) do
-    apply_template(@body_template,
-      body: body |> format_body(content_type(headers, @content_type_opts)) |> ident_lines(3)
-    )
-  end
-
-  defp headers_section(headers) do
+  def response_schema(%Request{resp_body: body, resp_headers: headers}) do
     headers
-    |> format_headers()
-    |> template_for_headers()
+    |> content_type()
+    |> json_schema_for(body)
   end
 
-  defp template_for_headers(""), do: ""
+  def response_body(%Request{resp_body: body, resp_headers: headers}) do
+    case content_type(headers) do
+      nil -> %{}
+      content_type -> ContentDecoder.decode!(body, content_type)
+    end
+  end
 
-  defp template_for_headers(headers) do
-    apply_template(@headers_template,
-      headers: headers
+  def request_schema(%Request{request_body: body}) when body == %{}, do: %{}
+
+  def request_schema(%Request{request_body: body, header_params: headers}) do
+    headers
+    |> content_type()
+    |> json_schema_for(body)
+  end
+
+  def action_name(%Request{action: action, resource: resource}),
+    do: "#{capitalize_all_words(resource)}#{action}"
+
+  def action_key(%Request{path: path, verb: verb}) do
+    Enum.reduce(
+      url_params(path),
+      "#{String.upcase(verb)} #{path}",
+      &String.replace(&2, &1, format_path_parameter(&1))
     )
   end
 
-  defp format_items_list(params, desc, tab, type \\ "") do
-    Enum.reduce(params, "", fn {key, value}, acc ->
-      acc <>
-        apply_template(
-          @item_template,
-          description: get_description(key, desc),
-          param: camelize(" #{key}"),
-          prefix: tab <> "+",
-          type: type <> "#{type_of(value)}",
-          value: "#{item_value(value)}"
-        )
-    end)
+  def resource_name(%Request{resource: resource}),
+    do: resource |> capitalize_all_words() |> String.trim()
+
+  def resource_key(%Request{path: path}) do
+    Enum.reduce(
+      url_params(path),
+      resource_path(path),
+      &String.replace(&2, &1, format_path_parameter(&1))
+    )
   end
 
-  defp item_value(item) when is_list(item) or is_map(item), do: type_of(item)
-  defp item_value(item), do: remove_underline(item)
+  defp merge_group(group, new_request),
+    do: %{group | resources: merge_group_resources(group.resources, new_request.resources)}
 
-  defp get_description(param, desc),
-    do: desc |> fetch_key(param, "The #{param}") |> remove_underline()
+  defp merge_group_resources(resources, new_request) do
+    resource_key = object_key(new_request)
 
-  defp remove_path_ending_arg(params, path), do: Map.delete(params, path_ending_arg(path))
-
-  defp format_headers(headers), do: Enum.reduce(headers, "", &add_header/2)
-
-  defp add_header({"content-type", _}, acc), do: acc
-
-  defp add_header({header, value}, acc),
-    do: apply_template(@header_item_template, header: header, value: value) <> acc
-
-  defp build_uri_template(path, typ) do
-    path
-    |> camelize_params()
-    |> add_forward_slash()
-    |> remove_ending_argument_for(typ)
+    Map.update(
+      resources,
+      resource_key,
+      new_request[resource_key],
+      &merge_resource(&1, new_request[resource_key])
+    )
   end
 
-  defp remove_ending_argument_for(uri, :resource), do: remove_ending_argument(uri)
-  defp remove_ending_argument_for(uri, _), do: uri
+  defp merge_resource(resource, new_request) do
+    %{resource | actions: merge_resource_actions(resource.actions, new_request.actions)}
+  end
+
+  defp merge_resource_actions(actions, new_request) do
+    action_key = object_key(new_request)
+
+    Map.update(
+      actions,
+      action_key,
+      new_request[action_key],
+      &merge_action(&1, new_request[action_key])
+    )
+  end
+
+  defp merge_action(action, new_request) do
+    %{action | requests: Map.merge(action.requests, new_request.requests)}
+  end
+
+  defp object_key(%{} = request) do
+    request
+    |> Map.keys()
+    |> List.first()
+  end
+
+  defp resource_path(path) do
+    ~r/(.*)(?=\/{.*}$)|(.*)/
+    |> Regex.run(path, capture: :all_but_first)
+    |> List.last()
+  end
+
+  defp capitalize_all_words(string),
+    do: Enum.reduce(String.split(string, "_"), "", &"#{&2}#{String.capitalize(&1)} ")
+
+  defp json_schema_for("application/json" = type, body) when is_binary(body),
+    do: json_schema_for(type, ContentDecoder.decode!(body, type))
+
+  defp json_schema_for("application/json", body) when is_map(body) or is_list(body),
+    do: JsonSchema.schema_for(body)
+
+  defp json_schema_for(_content_type, _body), do: %{}
+
+  defp reduce_path_params({param, value}, parameters) do
+    Map.put(
+      parameters,
+      format_path_parameter(param),
+      schema_for(value, true)
+    )
+  end
+
+  defp schema_for(value, required) do
+    {nil, value}
+    |> JsonSchema.schema_for()
+    |> add_required(required)
+  end
+
+  defp headers(headers), do: headers |> Enum.into(%{}) |> Map.delete("content-type")
+
+  defp add_required(map, true), do: Map.put(map, :required, true)
+
+  defp url_params(path) do
+    case Regex.run(~r/\{(.*?)\}.+/, path, capture: :all_but_first) do
+      nil -> []
+      result -> result
+    end
+  end
 end
