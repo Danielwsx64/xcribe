@@ -75,8 +75,9 @@ defmodule Xcribe.ApiBlueprint.APIB do
   def parameters(parameters),
     do: apply_template(@parameters_template, parameters: reduce_parameters_items(parameters))
 
-  def request(name, media_type),
-    do: apply_template(@request_template, identifier: name, media_type: media_type)
+  def request(name, media_type) do
+    apply_template(@request_template, identifier: name, media_type: media_type || "text/plain")
+  end
 
   def response(code, media_type),
     do:
