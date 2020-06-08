@@ -5,7 +5,7 @@ on:
       - master
   pull_request:
     branches:
-      - master
+      - '*'
 jobs:
   mix_format:
     name: mix format (Elixir 1.10.2 OTP 22.3)
@@ -63,6 +63,10 @@ jobs:
     if: github.ref != 'refs/heads/master'
     steps:
       - uses: actions/checkout@v1
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       - uses: actions/setup-elixir@v1.0.0
         with:
           otp-version: "22.3"
