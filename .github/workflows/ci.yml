@@ -1,6 +1,32 @@
 name: CI
 on: push
 jobs:
+  mix_format:
+    name: mix format (Elixir 1.10.2 OTP 22.3)
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-elixir@v1.0.0
+        with:
+          otp-version: "22.3"
+          elixir-version: "1.10.2"
+      - name: Install Dependencies
+        run: mix deps.get
+      - name: Run Formatter
+        run: mix format --check-formatted
+  mix_credo:
+    name: mix credo (Elixir 1.10.2 OTP 22.3)
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-elixir@v1.0.0
+        with:
+          otp-version: "22.3"
+          elixir-version: "1.10.2"
+      - name: Install Dependencies
+        run: mix deps.get
+      - name: Run Credo
+        run: mix credo
   mix_test:
     name: mix test (Elixir ${{ matrix.elixir }} OTP ${{ matrix.otp }})
     strategy:
@@ -24,19 +50,6 @@ jobs:
         run: mix deps.get
       - name: Run Tests
         run: mix test
-  mix_format:
-    name: mix format (Elixir 1.10.2 OTP 22.3)
-    runs-on: ubuntu-16.04
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-elixir@v1.0.0
-        with:
-          otp-version: "22.3"
-          elixir-version: "1.10.2"
-      - name: Install Dependencies
-        run: mix deps.get
-      - name: Run Formatter
-        run: mix format --check-formatted
   mix_check_version:
     name: Check version (Elixir 1.10.2 OTP 22.3)
     runs-on: ubuntu-16.04

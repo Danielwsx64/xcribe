@@ -52,7 +52,7 @@ defmodule Xcribe.MixProject do
       {:jason, "~> 1.1", only: [:dev, :test]},
       {:phoenix, "~> 1.4.10", only: [:test]},
       {:excoveralls, "~> 0.10", only: :test},
-      {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 
