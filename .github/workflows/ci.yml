@@ -90,13 +90,13 @@ jobs:
       #     HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
       #   run: mix hex.publish --yes
       - name: Output version
-        run: echo "::set-output name=version::v$(mix run -e 'IO.puts(Application.spec(:xcribe, :vsn))')"
+        run: echo "##[::set-output name=version;]v$(mix run -e 'IO.puts(Application.spec(:xcribe, :vsn))')"
   github_release:
     name: Create release
     runs-on: ubuntu-16.04
     needs: [mix_publish]
+    # if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
       - name: Create Release
-        id: create_release
-        run: echo ${{needs.mix_publish.version}}
+        run: echo ${{steps.mix_publish.outputs.version}}
