@@ -55,30 +55,30 @@ jobs:
         run: mix deps.get
       - name: Run Tests
         run: mix test
-  # mix_check_version:
-  #   name: Check version (Elixir 1.10.2 OTP 22.3)
-  #   runs-on: ubuntu-16.04
-  #   needs: [mix_format, mix_credo, mix_test]
-  #   if: github.ref != 'refs/heads/master'
-  #   steps:
-  #     - uses: actions/checkout@v1
-  #     - uses: actions/setup-elixir@v1.0.0
-  #       with:
-  #         otp-version: "22.3"
-  #         elixir-version: "1.10.2"
-  #     - name: Install Dependencies
-  #       run: mix deps.get
-  #     - name: Check version
-  #       env:
-  #         HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
-  #       run: mix run bin/check_version.exs
+  mix_check_version:
+    name: Check version (Elixir 1.10.2 OTP 22.3)
+    runs-on: ubuntu-16.04
+    needs: [mix_format, mix_credo, mix_test]
+    if: github.ref != 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-elixir@v1.0.0
+        with:
+          otp-version: "22.3"
+          elixir-version: "1.10.2"
+      - name: Install Dependencies
+        run: mix deps.get
+      - name: Check version
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
+        run: mix run bin/check_version.exs
   mix_publish:
     name: Publish (Elixir 1.10.2 OTP 22.3)
     runs-on: ubuntu-16.04
     needs: [mix_format, mix_credo, mix_test]
     outputs:
       version: ${{ steps.output_version.outputs.version }}
-    # if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-elixir@v1.0.0
@@ -87,10 +87,10 @@ jobs:
           elixir-version: "1.10.2"
       - name: Install Dependencies
         run: mix do deps.get, deps.compile, compile
-      # - name: Publish
-      #   env:
-      #     HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
-      #   run: mix hex.publish --yes
+      - name: Publish
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
+        run: mix hex.publish --yes
       - name: Output version
         run: echo "::set-output name=version::v$(mix run -e 'IO.puts(Application.spec(:xcribe, :vsn))')"
         id: output_version
@@ -98,8 +98,16 @@ jobs:
     name: Create release
     runs-on: ubuntu-16.04
     needs: [mix_publish]
-    # if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
       - name: Create Release
-        run: echo ${{ needs.mix_publish.outputs.version }}
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.mix_publish.outputs.version }}
+          release_name: Release ${{ needs.mix_publish.outputs.version }}
+          body: Checkout the [changelog](https://github.com/brainn-co/xcribe/blob/master/CHANGELOG.md)
+          draft: false
+          prerelease: false
