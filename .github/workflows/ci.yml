@@ -2,9 +2,10 @@ name: CI
 on:
   push:
     branches:
-      - '*'
-    tags-ignore:
-      - '*'
+      - master
+  pull_request:
+    branches:
+      - master
 jobs:
   mix_format:
     name: mix format (Elixir 1.10.2 OTP 22.3)
