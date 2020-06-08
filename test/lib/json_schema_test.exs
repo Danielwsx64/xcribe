@@ -85,7 +85,7 @@ defmodule Xcribe.JsonSchemaTest do
              }
     end
 
-    test "return a schema for single iten as tuple" do
+    test "return a schema for single item as tuple" do
       opts = [title: true, example: false]
 
       assert JsonSchema.schema_for({"alias", "Jon"}, opts) == %{
