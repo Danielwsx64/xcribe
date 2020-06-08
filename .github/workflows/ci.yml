@@ -63,10 +63,6 @@ jobs:
     if: github.ref != 'refs/heads/master' && github.event_name == 'pull_request' && github.base_ref == 'master'
     steps:
       - uses: actions/checkout@v1
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
       - uses: actions/setup-elixir@v1.0.0
         with:
           otp-version: "22.3"
