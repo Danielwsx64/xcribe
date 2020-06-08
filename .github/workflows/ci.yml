@@ -53,6 +53,7 @@ jobs:
   mix_check_version:
     name: Check version (Elixir 1.10.2 OTP 22.3)
     runs-on: ubuntu-16.04
+    needs: [mix_format, mix_credo, mix_test]
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-elixir@v1.0.0
