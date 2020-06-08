@@ -61,6 +61,10 @@ jobs:
     needs: [mix_format, mix_credo, mix_test]
     if: github.ref != 'refs/heads/master'
     steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       - uses: actions/checkout@v1
       - uses: actions/setup-elixir@v1.0.0
         with:
