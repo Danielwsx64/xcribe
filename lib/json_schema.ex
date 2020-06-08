@@ -19,7 +19,7 @@ defmodule Xcribe.JsonSchema do
   def format_for(_), do: ""
 
   @doc """
-  Basic implementatio of JSON Schema specification (http://json-schema.org/)
+  Basic implementation of JSON Schema specification (http://json-schema.org/)
 
   ### Options:
     * `:title` - Include the schema title, default is `true`.
