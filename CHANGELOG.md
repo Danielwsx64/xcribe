@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2020-06-08
+
+## Enhancements
+
+Improve CI/CD flow:
+- Run credo
+- Publish after tests completed
+- Create github release + git tag
+
 ## [0.6.0] - 2020-05-23
 
 ## Added

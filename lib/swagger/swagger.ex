@@ -2,7 +2,7 @@ defmodule Xcribe.Swagger do
   @moduledoc false
 
   alias Xcribe.{Config, DocException, JSON, Request}
-  alias Xcribe.Swagger.{Formatter}
+  alias Xcribe.Swagger.Formatter
 
   import Xcribe.Swagger.Formatter, only: [raw_openapi_object: 0]
 
