@@ -133,7 +133,7 @@ defmodule Xcribe.ApiBlueprint.APIB do
   defp reduce_keys({key, value}, template),
     do: String.replace(template, "--#{key}--", value)
 
-  def apply_tab(text, count) do
+  defp apply_tab(text, count) do
     text
     |> String.split("\n")
     |> Enum.map(&pad_string(&1, @tab_size * count))
