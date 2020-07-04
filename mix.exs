@@ -68,7 +68,8 @@ defmodule Xcribe.MixProject do
       source_ref: "v#{@version}",
       main: "readme",
       extras: [
-        "README.md": [title: "Get starting"]
+        "README.md": [title: "Get starting"],
+        "documentation/serving_doc.md": [title: "Serving doc"]
       ],
       groups_for_modules: doc_groups_for_modules()
     ]
