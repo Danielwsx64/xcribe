@@ -49,6 +49,7 @@ defmodule Xcribe.MixProject do
       {:plug, "~> 1.0"},
 
       # Test environment
+      {:floki, "~> 0.26", only: [:test]},
       {:jason, "~> 1.1", only: [:dev, :test]},
       {:phoenix, "~> 1.4.10", only: [:test]},
       {:excoveralls, "~> 0.10", only: :test},
