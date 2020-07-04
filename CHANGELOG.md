@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.7.0] - 2020-05-27
 
+### Added
+
+- Serve Swagger documentation
+
 ### Deprecations
 
 - Configuration key `:output_file` in favor of `:output`
@@ -17,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Enhancements
 
 - Xcribe contributing documentation
+- ApiBlueprint formatter modules
 
 ## [0.6.1] - 2020-06-08
 
@@ -60,6 +65,7 @@ Improve CI/CD flow:
 
 [unreleased]: https://github.com/brainn-co/xcribe/compa...master
 [0.7.0]: https://github.com/brainn-co/xcribe/compare/0.6.0...0.7.0
+[0.6.0]: https://github.com/brainn-co/xcribe/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/brainn-co/xcribe/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/brainn-co/xcribe/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/brainn-co/xcribe/compare/0.3.0...0.4.0
