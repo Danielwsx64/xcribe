@@ -13,21 +13,34 @@ defmodule Xcribe.Web.Plug do
   @template [Path.dirname(__ENV__.file), "template.eex"] |> Path.join() |> File.read!()
 
   get "/" do
-    if Config.serving?(), do: send_resp(conn, 200, conn.assigns.body), else: not_found(conn)
+    if Config.serving?() do
+      uri =
+        URI.to_string(%URI{
+          host: conn.host,
+          path: conn.request_path,
+          port: conn.port,
+          scheme: to_string(conn.scheme)
+        })
+
+      body = EEx.eval_string(@template, file: conn.assigns.file, uri: uri)
+
+      send_resp(conn, 200, body)
+    else
+      not_found(conn)
+    end
   end
 
   match(_, do: not_found(conn))
 
   def init(_opts) do
-    doc_file = String.replace_prefix(Config.output_file(), "priv/static", "")
-    body = EEx.eval_string(@template, doc_file: doc_file)
+    file = String.replace_prefix(Config.output_file(), "priv/static", "")
 
-    [body: body]
+    [file: file]
   end
 
-  def call(conn, body: body) do
+  def call(conn, file: file) do
     conn
-    |> Conn.assign(:body, body)
+    |> Conn.assign(:file, file)
     |> super([])
   end
 

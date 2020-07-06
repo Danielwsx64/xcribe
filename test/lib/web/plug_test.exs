@@ -15,13 +15,9 @@ defmodule Xcribe.Web.PlugTest do
   end
 
   describe "init/1" do
-    test "assgin body" do
+    test "return file name" do
       Application.put_env(:xcribe, :output, "specificy_name_file.json")
-      assert [{:body, body}] = Plug.init([])
-      assert {:ok, html} = Floki.parse_document(body)
-
-      assert Floki.find(html, "#swagger-ui") != []
-      assert body =~ "specificy_name_file.json"
+      assert [{:file, "specificy_name_file.json"}] = Plug.init([])
     end
   end
 
@@ -30,26 +26,51 @@ defmodule Xcribe.Web.PlugTest do
       Application.put_env(:xcribe, :serve, true)
       conn = Test.conn(:get, "/")
 
-      response = Plug.call(conn, body: "doc_body")
+      response = Plug.call(conn, file: "file.json")
 
-      assert {200, _, "doc_body"} = Test.sent_resp(response)
+      assert {200, _headers, body} = Test.sent_resp(response)
+
+      assert {:ok, html} = Floki.parse_document(body)
+
+      assert Floki.find(html, "#swagger-ui") != []
+
+      assert html |> Floki.find("link[type='text/css']") |> Floki.attribute("href") == [
+               "http://www.example.com//swagger-ui.css"
+             ]
+
+      assert html |> Floki.find("link[rel='icon'][sizes='32x32']") |> Floki.attribute("href") == [
+               "http://www.example.com//favicon-32x32.png"
+             ]
+
+      assert html |> Floki.find("link[rel='icon'][sizes='16x16']") |> Floki.attribute("href") == [
+               "http://www.example.com//favicon-16x16.png"
+             ]
+
+      assert [
+               {"script", [{"src", "http://www.example.com//swagger-ui-bundle.js"}], [" "]},
+               {"script", [{"src", "http://www.example.com//swagger-ui-standalone-preset.js"}],
+                [" "]},
+               script
+             ] = Floki.find(html, "script")
+
+      assert Floki.text(script, js: true) =~ "file.json"
     end
 
     test "not found route" do
       Application.put_env(:xcribe, :serve, true)
       conn = Test.conn(:get, "/invalid_route")
-      response = Plug.call(conn, body: "")
+      response = Plug.call(conn, file: "")
 
-      assert {404, _, "not found"} = Test.sent_resp(response)
+      assert {404, _headers, "not found"} = Test.sent_resp(response)
     end
 
     test "return not found when serving is disabled" do
       Application.put_env(:xcribe, :serve, false)
       conn = Test.conn(:get, "/")
 
-      response = Plug.call(conn, body: "")
+      response = Plug.call(conn, file: "")
 
-      assert {404, _, "not found"} = Test.sent_resp(response)
+      assert {404, _headers, "not found"} = Test.sent_resp(response)
     end
   end
 end
