@@ -167,13 +167,15 @@ defmodule Xcribe.Config do
   @serve_format_message "When serve config is true you must use swagger format"
   @serve_format_instructions "You must use Swagger format: `config :xcribe, format: :swagger`"
   defp validate_serve_format(results) do
-    if doc_format() == :swagger do
+    format = doc_format()
+
+    if format == :swagger do
       results
     else
       add_error(
         results,
-        nil,
-        nil,
+        :format,
+        format,
         @serve_format_message,
         @serve_format_instructions
       )
@@ -183,13 +185,15 @@ defmodule Xcribe.Config do
   @serve_output_message "When serve config is true you must confiture output to \"priv/static\" folder"
   @serve_output_instructions "You must configure output as: `config :xcribe, output: \"priv/static/doc.json\"`"
   defp validate_serve_output(results) do
-    if Regex.match?(~r/^priv\/static\/.*/, output_file()) do
+    output = output_file()
+
+    if Regex.match?(~r/^priv\/static\/.*/, output) do
       results
     else
       add_error(
         results,
-        nil,
-        nil,
+        :output,
+        output,
         @serve_output_message,
         @serve_output_instructions
       )

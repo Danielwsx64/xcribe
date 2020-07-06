@@ -158,10 +158,10 @@ defmodule Xcribe.ConfigTest do
       assert Config.check_configurations() ==
                {:error,
                 [
-                  {nil, nil,
+                  {:output, "",
                    "When serve config is true you must confiture output to \"priv/static\" folder",
                    "You must configure output as: `config :xcribe, output: \"priv/static/doc.json\"`"},
-                  {nil, nil, "When serve config is true you must use swagger format",
+                  {:format, :invalid, "When serve config is true you must use swagger format",
                    "You must use Swagger format: `config :xcribe, format: :swagger`"},
                   {:json_library, FakeJson,
                    "The configured json library doesn't implement the needed functions",

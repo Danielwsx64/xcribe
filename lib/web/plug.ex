@@ -26,7 +26,7 @@ defmodule Xcribe.Web.Plug do
   EEx.function_from_file(
     :defp,
     :swagger_ui,
-    Path.join([Path.dirname(__ENV__.file), "template.eex"]),
+    Path.join([File.cwd!(), "priv", "templates", "swagger_ui.eex"]),
     [:file, :uri]
   )
 
