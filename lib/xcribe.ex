@@ -82,9 +82,18 @@ defmodule Xcribe do
   """
   use Application
 
+  alias Xcribe.Config
+  alias Xcribe.CLI.Output
+
   @doc false
   def start(_type, _opts) do
     opts = [strategy: :one_for_one, name: Xcribe.Supervisor]
+
+    case Config.check_configurations([:serve]) |> IO.inspect() do
+      {:error, errors} -> Output.print_configuration_errors(errors)
+      :ok -> :ok
+    end
+
     Supervisor.start_link(children(), opts)
   end
 

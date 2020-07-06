@@ -109,6 +109,28 @@ defmodule Xcribe.CLI.OutputTest do
                assert Output.print_configuration_errors(errors) == :ok
              end) == expected_output
     end
+
+    test "with a nil key and value" do
+      errors = [
+        {nil, nil,
+         "When serve config is true you must confiture output to \"priv/static\" folder",
+         "You must configure output as: `config :xcribe, output: \"priv/static/doc.json\"`"}
+      ]
+
+      expected_output = """
+      \e[42m\e[37m  [ Xcribe ] Configuration Errors                                                                \e[0m
+      \e[32m┃\e[0m
+      \e[32m┃\e[0m [C] → \e[34m When serve config is true you must confiture output to \"priv/static\" folder
+      \e[38;5;100m┃\e[0m
+      \e[38;5;100m┃\e[0m        \e[38;5;100mYou must configure output as: `config :xcribe, output: \"priv/static/doc.json\"`
+      \e[38;5;100m┃\e[0m
+
+      """
+
+      assert capture_io(fn ->
+               assert Output.print_configuration_errors(errors) == :ok
+             end) == expected_output
+    end
   end
 
   describe "print_doc_exception/1" do
