@@ -64,7 +64,7 @@ Improve CI/CD flow:
 - Add changelog and Makefile.
 
 [unreleased]: https://github.com/brainn-co/xcribe/compa...master
-[0.7.0]: https://github.com/brainn-co/xcribe/compare/0.6.0...0.7.0
+[0.7.0]: https://github.com/brainn-co/xcribe/compare/0.6.1...0.7.0
 [0.6.1]: https://github.com/brainn-co/xcribe/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/brainn-co/xcribe/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/brainn-co/xcribe/compare/0.4.0...0.5.0
