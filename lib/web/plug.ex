@@ -1,5 +1,16 @@
 defmodule Xcribe.Web.Plug do
-  @moduledoc false
+  @moduledoc """
+  Server generated API documentation.
+
+  Add a doc scope to your router, and forward all requests to `Xcribe.Web.Plug`
+
+  ```
+        scope "doc/swagger" do
+          forward "/", Xcribe.Web.Plug
+        end
+
+  ```
+  """
 
   use Plug.Router
 
@@ -32,12 +43,14 @@ defmodule Xcribe.Web.Plug do
 
   match(_, do: not_found(conn))
 
+  @doc false
   def init(_opts) do
     file = String.replace_prefix(Config.output_file(), "priv/static", "")
 
     [file: file]
   end
 
+  @doc false
   def call(conn, file: file) do
     conn
     |> Conn.assign(:file, file)

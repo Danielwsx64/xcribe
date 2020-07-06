@@ -57,8 +57,7 @@ defmodule Xcribe do
 
   ## Configuration
 
-  The `config/test.exs` file is used for Xcribe configuration. You must configure
-  at least the `information_source` and `format` for basic use.
+  You must configure at least the `information_source` and `format` for basic use.
 
   eg
 
@@ -79,6 +78,7 @@ defmodule Xcribe do
     generator. Default is `XCRIBE_ENV`.
     * `:json_library` - The library to be used for json decode/encode (Jason
     and Poison are supported). The default is the same as `Phoenix` configuration.
+    * `:serve` - Enable Xcribe serve mode. Default `false`. See more `Serving doc`
   """
   use Application
 

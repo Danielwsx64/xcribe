@@ -152,7 +152,8 @@ You can add this configurations to your `config/test.ex`
 - output: a custom name to the output file
 - format: ApiBlueprint or Swagger formats
 - env_var: a custom name to the env to active Xcribe.Formatter
-- json_library: The library to be used for json decode/encode. See `Xcribe.JSON`
+- json_library: The library to be used for json decode/encode.
+- serve: Enables Xcribe serve mode. See more in `Serving doc` session.
 
 Example
 
