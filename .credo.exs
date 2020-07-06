@@ -43,10 +43,6 @@
       #
       parse_timeout: 5000,
       #
-      # To modify the timeout for parsing files, change this value:
-      #
-      parse_timeout: 5000,
-      #
       # If you want to use uncolored output by default, you can change `color`
       # to `false` below:
       #
@@ -115,7 +111,7 @@
         {Credo.Check.Refactor.CyclomaticComplexity, []},
         {Credo.Check.Refactor.FunctionArity, []},
         {Credo.Check.Refactor.LongQuoteBlocks, []},
-        {Credo.Check.Refactor.MapInto, false},
+        {Credo.Check.Refactor.MapInto, []},
         {Credo.Check.Refactor.MatchInCondition, []},
         {Credo.Check.Refactor.NegatedConditionsInUnless, []},
         {Credo.Check.Refactor.NegatedConditionsWithElse, []},
