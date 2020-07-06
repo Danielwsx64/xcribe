@@ -14,6 +14,8 @@ defmodule Xcribe.Web.Plug do
 
   use Plug.Router
 
+  require EEx
+
   alias Plug.Conn
   alias Xcribe.Config
 
@@ -21,7 +23,12 @@ defmodule Xcribe.Web.Plug do
   plug(:match)
   plug(:dispatch)
 
-  @template [Path.dirname(__ENV__.file), "template.eex"] |> Path.join() |> File.read!()
+  EEx.function_from_file(
+    :defp,
+    :swagger_ui,
+    Path.join([Path.dirname(__ENV__.file), "template.eex"]),
+    [:file, :uri]
+  )
 
   get "/" do
     if Config.serving?() do
@@ -33,9 +40,7 @@ defmodule Xcribe.Web.Plug do
           scheme: to_string(conn.scheme)
         })
 
-      body = EEx.eval_string(@template, file: conn.assigns.file, uri: uri)
-
-      send_resp(conn, 200, body)
+      send_resp(conn, 200, swagger_ui(conn.assigns.file, uri))
     else
       not_found(conn)
     end

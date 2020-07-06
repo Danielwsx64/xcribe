@@ -167,6 +167,10 @@ config :xcribe, [
 ]
 ```
 
+### Serve documentation
+
+[Serve doc](documentation/serving_doc.md)
+
 ## Contributing
 
 [Contributing Guide](CONTRIBUTING.md)
