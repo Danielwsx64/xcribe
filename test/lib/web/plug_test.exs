@@ -47,9 +47,9 @@ defmodule Xcribe.Web.PlugTest do
              ]
 
       assert [
-               {"script", [{"src", "http://www.example.com//swagger-ui-bundle.js"}], [" "]},
+               {"script", [{"src", "http://www.example.com//swagger-ui-bundle.js"}], [""]},
                {"script", [{"src", "http://www.example.com//swagger-ui-standalone-preset.js"}],
-                [" "]},
+                [""]},
                script
              ] = Floki.find(html, "script")
 
