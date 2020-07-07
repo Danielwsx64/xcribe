@@ -11,9 +11,26 @@ defmodule Xcribe.ConfigTest do
       Application.delete_env(:xcribe, :format)
       Application.delete_env(:xcribe, :json_library)
       Application.delete_env(:xcribe, :information_source)
+      Application.delete_env(:xcribe, :serve)
     end)
 
     :ok
+  end
+
+  describe "serving?/0" do
+    test "return true when serve mode is enable" do
+      Application.put_env(:xcribe, :serve, true)
+      assert Config.serving?() == true
+    end
+
+    test "return false when config was not given" do
+      assert Config.serving?() == false
+    end
+
+    test "return false for invalid configuration" do
+      Application.put_env(:xcribe, :serve, "true")
+      assert Config.serving?() == false
+    end
   end
 
   describe "output_file/0" do
@@ -30,6 +47,11 @@ defmodule Xcribe.ConfigTest do
     test "return default file name for Swagger" do
       Application.put_env(:xcribe, :format, :swagger)
       assert Config.output_file() == "openapi.json"
+    end
+
+    test "return empty string for invalid format" do
+      Application.put_env(:xcribe, :format, :invalid)
+      assert Config.output_file() == ""
     end
   end
 
@@ -131,13 +153,39 @@ defmodule Xcribe.ConfigTest do
       Application.put_env(:xcribe, :json_library, FakeJson)
       Application.put_env(:xcribe, :information_source, FakeInfo)
       Application.put_env(:xcribe, :format, :invalid)
+      Application.put_env(:xcribe, :serve, true)
 
       assert Config.check_configurations() ==
                {:error,
                 [
+                  {:output, "",
+                   "When serve config is true you must confiture output to \"priv/static\" folder",
+                   "You must configure output as: `config :xcribe, output: \"priv/static/doc.json\"`"},
+                  {:format, :invalid, "When serve config is true you must use swagger format",
+                   "You must use Swagger format: `config :xcribe, format: :swagger`"},
                   {:json_library, FakeJson,
                    "The configured json library doesn't implement the needed functions",
                    "Try configure Xcribe with Jason or Poison `config :xcribe, json_library: Jason`"},
+                  {:information_source, FakeInfo,
+                   "The configured module as information source is not using Xcribe macros",
+                   "Add `use Xcribe, :information` on top of your module"},
+                  {:format, :invalid,
+                   "Xcribe doesn't support the configured documentation format",
+                   "Xcribe supports Swagger and Blueprint, configure as: `config :xcribe, format: :swagger`"}
+                ]}
+    end
+  end
+
+  describe "check_configurations/1" do
+    test "check just requested configs" do
+      Application.put_env(:xcribe, :json_library, FakeJson)
+      Application.put_env(:xcribe, :information_source, FakeInfo)
+      Application.put_env(:xcribe, :format, :invalid)
+      Application.put_env(:xcribe, :serve, true)
+
+      assert Config.check_configurations([:format, :information_source]) ==
+               {:error,
+                [
                   {:information_source, FakeInfo,
                    "The configured module as information source is not using Xcribe macros",
                    "Add `use Xcribe, :information` on top of your module"},

@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.7.0] - 2020-05-27
+## [0.7.0] - 2020-06-06
+
+### Added
+
+- Serve Swagger documentation
 
 ### Deprecations
 
@@ -17,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Enhancements
 
 - Xcribe contributing documentation
+- ApiBlueprint formatter modules
 
 ## [0.6.1] - 2020-06-08
 
@@ -59,7 +64,8 @@ Improve CI/CD flow:
 - Add changelog and Makefile.
 
 [unreleased]: https://github.com/brainn-co/xcribe/compa...master
-[0.7.0]: https://github.com/brainn-co/xcribe/compare/0.6.0...0.7.0
+[0.7.0]: https://github.com/brainn-co/xcribe/compare/0.6.1...0.7.0
+[0.6.1]: https://github.com/brainn-co/xcribe/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/brainn-co/xcribe/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/brainn-co/xcribe/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/brainn-co/xcribe/compare/0.3.0...0.4.0

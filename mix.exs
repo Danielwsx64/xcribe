@@ -49,6 +49,7 @@ defmodule Xcribe.MixProject do
       {:plug, "~> 1.0"},
 
       # Test environment
+      {:floki, "~> 0.26", only: [:test]},
       {:jason, "~> 1.1", only: [:dev, :test]},
       {:phoenix, "~> 1.4.10", only: [:test]},
       {:excoveralls, "~> 0.10", only: :test},
@@ -68,7 +69,8 @@ defmodule Xcribe.MixProject do
       source_ref: "v#{@version}",
       main: "readme",
       extras: [
-        "README.md": [title: "Get starting"]
+        "README.md": [title: "Get starting"],
+        "documentation/serving_doc.md": [title: "Serving doc"]
       ],
       groups_for_modules: doc_groups_for_modules()
     ]
