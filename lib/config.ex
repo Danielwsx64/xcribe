@@ -6,7 +6,7 @@ defmodule Xcribe.Config do
   @valid_formats [:api_blueprint, :swagger]
 
   @doc """
-  Return true if serve mode is enable.
+  Return true if serve mode is enabled.
 
   If no config was given the default is false.
 
