@@ -72,6 +72,16 @@ defmodule Xcribe.CLI.Output do
     """)
   end
 
+  defp print_error({nil, nil, msg, info}) do
+    IO.puts("""
+    #{tab(@green)}
+    #{tab(@green)} [C] → #{@blue} #{msg}
+    #{tab(@dark_green)}
+    #{tab(@dark_green)} #{space(6)} #{@dark_green}#{info}
+    #{tab(@dark_green)}
+    """)
+  end
+
   defp print_error({config, value, msg, info}) do
     IO.puts("""
     #{tab(@green)}

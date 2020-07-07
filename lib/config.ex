@@ -6,6 +6,19 @@ defmodule Xcribe.Config do
   @valid_formats [:api_blueprint, :swagger]
 
   @doc """
+  Return true if serve mode is enabled.
+
+  If no config was given the default is false.
+
+  To configure server mode:
+
+      config :xcribe, [
+        serve: true
+      ]
+  """
+  def serving?, do: get_xcribe_config(:serve, false) == true
+
+  @doc """
   Return the file name to output generated documentation.
 
   If no config was given the default names are `api_doc.apib` for Blueprint
@@ -96,8 +109,8 @@ defmodule Xcribe.Config do
 
   If same invalid config was set an tuple with a list of erros will be returned.
   """
-  def check_configurations,
-    do: Enum.reduce([:format, :information_source, :json_library], :ok, &validate_config/2)
+  def check_configurations(configs \\ [:format, :information_source, :json_library, :serve]),
+    do: Enum.reduce(configs, :ok, &validate_config/2)
 
   @format_message "Xcribe doesn't support the configured documentation format"
   @format_instructions "Xcribe supports Swagger and Blueprint, configure as: `config :xcribe, format: :swagger`"
@@ -141,6 +154,52 @@ defmodule Xcribe.Config do
     end
   end
 
+  defp validate_config(:serve, results) do
+    if serving?() do
+      results
+      |> validate_serve_format()
+      |> validate_serve_output()
+    else
+      results
+    end
+  end
+
+  @serve_format_message "When serve config is true you must use swagger format"
+  @serve_format_instructions "You must use Swagger format: `config :xcribe, format: :swagger`"
+  defp validate_serve_format(results) do
+    format = doc_format()
+
+    if format == :swagger do
+      results
+    else
+      add_error(
+        results,
+        :format,
+        format,
+        @serve_format_message,
+        @serve_format_instructions
+      )
+    end
+  end
+
+  @serve_output_message "When serve config is true you must confiture output to \"priv/static\" folder"
+  @serve_output_instructions "You must configure output as: `config :xcribe, output: \"priv/static/doc.json\"`"
+  defp validate_serve_output(results) do
+    output = output_file()
+
+    if Regex.match?(~r/^priv\/static\/.*/, output) do
+      results
+    else
+      add_error(
+        results,
+        :output,
+        output,
+        @serve_output_message,
+        @serve_output_instructions
+      )
+    end
+  end
+
   defp module_functions(module) do
     apply(module, :__info__, [:functions])
   rescue
@@ -161,22 +220,10 @@ defmodule Xcribe.Config do
     case doc_format() do
       :api_blueprint -> "api_doc.apib"
       :swagger -> "openapi.json"
+      _ -> ""
     end
   end
 
-  defp get_xcribe_config(key, default \\ nil) do
-    cond do
-      value = new_config(key) -> value
-      value = old_config(key) -> value
-      true -> default
-    end
-  end
-
-  defp new_config(key), do: Application.get_env(:xcribe, key)
-
-  defp old_config(key), do: Application.get_env(:xcribe, rename_key(key))
-
-  defp rename_key(:output), do: :output_file
-  defp rename_key(:format), do: :doc_format
-  defp rename_key(key), do: key
+  defp get_xcribe_config(key, default \\ nil),
+    do: Application.get_env(:xcribe, key, default)
 end

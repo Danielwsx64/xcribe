@@ -7,49 +7,65 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2020-06-06
+
+### Added
+
+- Serve Swagger documentation
+
+### Deprecations
+
+- Configuration key `:output_file` in favor of `:output`
+- Configuration key `:doc_format` in favor of `:format`
+
+### Enhancements
+
+- Xcribe contributing documentation
+- ApiBlueprint formatter modules
+
 ## [0.6.1] - 2020-06-08
 
 ## Enhancements
 
 Improve CI/CD flow:
+
 - Run credo
 - Publish after tests completed
 - Create github release + git tag
 
 ## [0.6.0] - 2020-05-23
 
-## Added
+### Added
 
--   Validate configuration before generate documentation
--   Handle parsing errors and exceptions and print it friendly
--   Requests are ordered by path to avoid big diffs btw docs
--   Write a message with output file path
+- Validate configuration before generate documentation
+- Handle parsing errors and exceptions and print it friendly
+- Requests are ordered by path to avoid big diffs btw docs
+- Write a message with output file path
 
-## Fixed
+### Fixed
 
--   Use success requests to build Swagger parameter and request body examples
+- Use success requests to build Swagger parameter and request body examples
 
-## Enhancements
+### Enhancements
 
--   Xcribe documentation
+- Xcribe documentation
 
 ## [0.5.0] - 2020-05-12
 
-## Added
+### Added
 
--   Automatic publish to hex.pm.
+- Automatic publish to hex.pm.
 
 ## [0.4.0] - 2020-05-11
 
 ### Added
 
--   New "tags" parameter to operations object in Swagger format.
--   Add changelog and Makefile.
+- New "tags" parameter to operations object in Swagger format.
+- Add changelog and Makefile.
 
-[Unreleased]: https://github.com/brainn-co/xcribe/compa...master
-
+[unreleased]: https://github.com/brainn-co/xcribe/compa...master
+[0.7.0]: https://github.com/brainn-co/xcribe/compare/0.6.1...0.7.0
+[0.6.1]: https://github.com/brainn-co/xcribe/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/brainn-co/xcribe/compare/0.5.0...0.6.0
-
 [0.5.0]: https://github.com/brainn-co/xcribe/compare/0.4.0...0.5.0
-
 [0.4.0]: https://github.com/brainn-co/xcribe/compare/0.3.0...0.4.0

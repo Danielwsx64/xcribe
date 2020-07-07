@@ -14,7 +14,7 @@ defmodule Xcribe.UnknownFormat do
   Current supported formats are :api_blueprint and :swagger.
 
   You should configure it in your `test/config` as:
-  config: :xcribe, :configuration, format: :swagger
+  config: :xcribe, :format, :swagger
 
   """
 
@@ -53,7 +53,7 @@ defmodule Xcribe.MissingInformationSource do
   @help_information ~S"""
   You must create a module to implement `Xcribe.Information` and configure it:
 
-  config: :xcribe, :configuration, information_source: YourInformationModule
+  config: :xcribe, :information_source, YourInformationModule
 
   """
 

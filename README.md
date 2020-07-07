@@ -1,3 +1,4 @@
+![CI](https://github.com/brainn-co/xcribe/workflows/CI/badge.svg?branch=master)
 ![Hex.pm](https://img.shields.io/hexpm/v/xcribe?style=flat-square)
 ![Hex.pm](https://img.shields.io/hexpm/l/xcribe?style=flat-square)
 ![Hex.pm](https://img.shields.io/hexpm/dt/xcribe?style=flat-square)
@@ -19,7 +20,7 @@ mix.exs
 ```elixir
 def deps do
   [
-    {:xcribe, "~> 0.6.1"}
+    {:xcribe, "~> 0.7.0"}
   ]
 end
 ```
@@ -147,11 +148,12 @@ If Swagger format is configured, [Swagger UI](https://swagger.io/tools/swagger-u
 
 You can add this configurations to your `config/test.ex`
 
--   information_source: the module with doc information
--   output: a custom name to the output file
--   format: ApiBlueprint or Swagger formats
--   env_var: a custom name to the env to active Xcribe.Formatter
--   json_library: The library to be used for json decode/encode. See `Xcribe.JSON`
+- information_source: the module with doc information
+- output: a custom name to the output file
+- format: ApiBlueprint or Swagger formats
+- env_var: a custom name to the env to active Xcribe.Formatter
+- json_library: The library to be used for json decode/encode.
+- serve: Enables Xcribe serve mode. See more in `Serving doc` session.
 
 Example
 
@@ -164,3 +166,15 @@ config :xcribe, [
   json_library: Jason
 ]
 ```
+
+### Serve documentation
+
+[Serve doc](documentation/serving_doc.md)
+
+## Contributing
+
+[Contributing Guide](CONTRIBUTING.md)
+
+## License
+
+[Apache License, Version 2.0](LICENSE) © [brainn.co](https://github.com/brainn-co)

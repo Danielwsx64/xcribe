@@ -12,6 +12,12 @@ defmodule Xcribe.ContentDecoderTest do
       assert ContentDecoder.decode!(value, "application/vnd.api+json") == %{"key" => "value"}
     end
 
+    test "decode content when type is know text plain" do
+      value = "successfuly created!"
+
+      assert ContentDecoder.decode!(value, "text/plain") == value
+    end
+
     test "raise UnknownType when content_type is unknown" do
       assert_raise UnknownType, "Couldn't decode value. Type application/xml is unknown.", fn ->
         assert ContentDecoder.decode!("", "application/xml")
