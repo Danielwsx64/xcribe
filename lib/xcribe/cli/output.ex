@@ -94,7 +94,7 @@ defmodule Xcribe.CLI.Output do
     """)
   end
 
-  defp format_file_path(path), do: String.replace(path, File.cwd!(), "")
+  defp format_file_path(path), do: Path.relative_to_cwd(path)
 
   defp tab(color), do: "#{color}┃#{@reset}"
 
