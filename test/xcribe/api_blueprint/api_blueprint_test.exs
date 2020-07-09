@@ -35,7 +35,7 @@ defmodule Xcribe.ApiBlueprintTest do
           __meta__: %{
             call: %{
               description: "conn test",
-              file: File.cwd!() <> "/test/lib/cli/output_test.exs",
+              file: File.cwd!() <> "/test/xcribe/cli/output_test.exs",
               line: 25
             }
           }
