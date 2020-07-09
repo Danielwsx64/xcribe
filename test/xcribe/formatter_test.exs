@@ -1,4 +1,4 @@
-defmodule XcribeFormatterTest do
+defmodule Xcribe.FormatterTest do
   use ExUnit.Case, async: false
 
   import ExUnit.CaptureIO
@@ -89,7 +89,7 @@ defmodule XcribeFormatterTest do
         __meta__: %{
           call: %{
             description: "test name",
-            file: File.cwd!() <> "/test/lib/formatter_test.exs",
+            file: File.cwd!() <> "/test/xcribe/formatter_test.exs",
             line: 1
           }
         }
@@ -127,7 +127,7 @@ defmodule XcribeFormatterTest do
         __meta__: %{
           call: %{
             description: "conn test",
-            file: File.cwd!() <> "/test/lib/cli/output_test.exs",
+            file: File.cwd!() <> "/test/xcribe/cli/output_test.exs",
             line: 25
           }
         }

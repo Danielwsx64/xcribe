@@ -23,7 +23,7 @@ defmodule Xcribe.DocumentTest do
         |> document()
 
       test_name = "document/1 parse conn and save it"
-      file_name = File.cwd!() <> "/test/lib/document_test.exs"
+      file_name = File.cwd!() <> "/test/xcribe/document_test.exs"
 
       parsed_request_with_meta =
         conn
@@ -51,7 +51,7 @@ defmodule Xcribe.DocumentTest do
         |> document(as: request_description)
 
       test_name = "test document/1 parse conn and save it whith custom description"
-      file_name = File.cwd!() <> "/test/lib/document_test.exs"
+      file_name = File.cwd!() <> "/test/xcribe/document_test.exs"
 
       parsed_request_with_meta =
         conn
@@ -73,7 +73,7 @@ defmodule Xcribe.DocumentTest do
       document(%{})
 
       test_name = "test document/1 handle parse errors"
-      file_name = File.cwd!() <> "/test/lib/document_test.exs"
+      file_name = File.cwd!() <> "/test/xcribe/document_test.exs"
 
       parsed_request_with_meta =
         %Error{message: "A Plug.Conn must be given", type: :parsing}

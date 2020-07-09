@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2020-06-09
+
+- Improve internal modules naming and location.
+
 ## [0.7.0] - 2020-06-06
 
 ### Added
@@ -64,6 +68,7 @@ Improve CI/CD flow:
 - Add changelog and Makefile.
 
 [unreleased]: https://github.com/brainn-co/xcribe/compa...master
+[0.7.1]: https://github.com/brainn-co/xcribe/compare/0.7.0...0.7.1
 [0.7.0]: https://github.com/brainn-co/xcribe/compare/0.6.1...0.7.0
 [0.6.1]: https://github.com/brainn-co/xcribe/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/brainn-co/xcribe/compare/0.5.0...0.6.0
