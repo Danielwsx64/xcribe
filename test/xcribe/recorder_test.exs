@@ -1,4 +1,4 @@
-defmodule RecorderTest do
+defmodule Xcribe.RecorderTest do
   use ExUnit.Case, async: true
 
   alias Xcribe.{Recorder, Request, Request.Error}

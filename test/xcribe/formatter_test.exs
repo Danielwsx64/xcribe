@@ -1,4 +1,4 @@
-defmodule XcribeFormatterTest do
+defmodule Xcribe.FormatterTest do
   use ExUnit.Case, async: false
 
   import ExUnit.CaptureIO
