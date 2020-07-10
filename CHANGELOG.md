@@ -7,7 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] - 2020-06-09
+
+### Fixed
+
+- Relative path format on errors.
+- Changelog links.
+
 ## [0.7.1] - 2020-06-09
+
+### Enhancements
 
 - Improve internal modules naming and location.
 
@@ -67,10 +76,11 @@ Improve CI/CD flow:
 - New "tags" parameter to operations object in Swagger format.
 - Add changelog and Makefile.
 
-[unreleased]: https://github.com/brainn-co/xcribe/compa...master
-[0.7.1]: https://github.com/brainn-co/xcribe/compare/0.7.0...0.7.1
-[0.7.0]: https://github.com/brainn-co/xcribe/compare/0.6.1...0.7.0
-[0.6.1]: https://github.com/brainn-co/xcribe/compare/0.6.0...0.6.1
+[unreleased]: https://github.com/brainn-co/xcribe/compare/v0.7.2...master
+[0.7.2]: https://github.com/brainn-co/xcribe/compare/v0.7.1...v0.7.2
+[0.7.1]: https://github.com/brainn-co/xcribe/compare/v0.7.0...v0.7.1
+[0.7.0]: https://github.com/brainn-co/xcribe/compare/v0.6.1...v0.7.0
+[0.6.1]: https://github.com/brainn-co/xcribe/compare/0.6.0...v0.6.1
 [0.6.0]: https://github.com/brainn-co/xcribe/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/brainn-co/xcribe/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/brainn-co/xcribe/compare/0.3.0...0.4.0

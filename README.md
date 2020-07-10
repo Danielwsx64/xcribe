@@ -20,7 +20,7 @@ mix.exs
 ```elixir
 def deps do
   [
-    {:xcribe, "~> 0.7.1"}
+    {:xcribe, "~> 0.7.2"}
   ]
 end
 ```
