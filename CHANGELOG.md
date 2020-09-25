@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.4] - 2020-09-25
+
 ### Fixed
 
 - Parse DateTimes and other stringifiable structs as strings at request params.
@@ -91,6 +93,7 @@ Improve CI/CD flow:
 - Add changelog and Makefile.
 
 [unreleased]: https://github.com/brainn-co/xcribe/compare/v0.7.3...master
+[0.7.4]: https://github.com/brainn-co/xcribe/compare/0.7.3...0.7.4
 [0.7.3]: https://github.com/brainn-co/xcribe/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/brainn-co/xcribe/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/brainn-co/xcribe/compare/v0.7.0...v0.7.1
