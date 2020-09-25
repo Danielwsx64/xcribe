@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Parse DateTimes and other stringifiable structs as strings at request params.
+- Treat structs as maps at request params.
+
 ## [0.7.2] - 2020-06-11
 
 ### Enhancements
