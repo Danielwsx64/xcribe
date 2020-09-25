@@ -156,5 +156,60 @@ defmodule Xcribe.JsonSchemaTest do
                }
              }
     end
+
+    test "schema for stringifiable struct" do
+      value = ~D[2020-04-23]
+      map = %{"last_login" => value}
+
+      assert JsonSchema.schema_for(map) == %{
+               type: "object",
+               properties: %{
+                 "last_login" => %{type: "string", example: to_string(value)}
+               }
+             }
+    end
+
+    test "schema for map with nested struct that is stringifiable" do
+      value = ~D[2020-04-23]
+      map = %{"authentication" => %{"last_login" => value}, "name" => "some name"}
+
+      assert JsonSchema.schema_for(map) == %{
+               type: "object",
+               properties: %{
+                 "authentication" => %{
+                   type: "object",
+                   properties: %{"last_login" => %{type: "string", example: to_string(value)}}
+                 },
+                 "name" => %{type: "string", example: "some name"}
+               }
+             }
+    end
+
+    defmodule NonStringifiablePerson do
+      defstruct [:name, :age]
+    end
+
+    test "schema for a struct that is not stringifiable" do
+      value = %NonStringifiablePerson{name: "some name", age: 18}
+      map = %{"profile" => %{"person" => value}}
+
+      assert JsonSchema.schema_for(map) == %{
+               type: "object",
+               properties: %{
+                 "profile" => %{
+                   type: "object",
+                   properties: %{
+                     "person" => %{
+                       type: "object",
+                       properties: %{
+                         age: %{example: 18, format: "int32", type: "number"},
+                         name: %{example: "some name", type: "string"}
+                       }
+                     }
+                   }
+                 }
+               }
+             }
+    end
   end
 end

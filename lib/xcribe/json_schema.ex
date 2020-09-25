@@ -35,6 +35,17 @@ defmodule Xcribe.JsonSchema do
   @opt_no_title {:title, false}
   @opt_example {:example, true}
 
+  defp schema_object_for({title, %{__struct__: module} = struct}, opts) when is_atom(module) do
+    value =
+      if stringy?(struct) do
+        to_string(struct)
+      else
+        struct |> Map.from_struct() |> Map.drop([:__struct__])
+      end
+
+    schema_object_for({title, value}, opts)
+  end
+
   defp schema_object_for({title, value}, opts) when is_map(value) do
     %{type: "object"}
     |> schema_add_title(title, @opt_no_title in opts)
@@ -90,5 +101,15 @@ defmodule Xcribe.JsonSchema do
       :items,
       schema_object_for({:schema_add_items, value}, item_opts)
     )
+  end
+
+  defp stringy?(%{__struct__: module}) when is_atom(module) do
+    try do
+      Protocol.assert_impl!(String.Chars, module)
+      true
+    rescue
+      Protocol.UndefinedError -> false
+      ArgumentError -> false
+    end
   end
 end
