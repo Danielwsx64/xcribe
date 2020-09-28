@@ -103,13 +103,10 @@ defmodule Xcribe.JsonSchema do
     )
   end
 
-  defp stringy?(%{__struct__: module}) when is_atom(module) do
-    try do
-      Protocol.assert_impl!(String.Chars, module)
-      true
-    rescue
-      Protocol.UndefinedError -> false
-      ArgumentError -> false
+  defp stringy?(value) do
+    case String.Chars.impl_for(value) do
+      nil -> false
+      _ -> true
     end
   end
 end
