@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.7.4] - 2020-10-19
 
 - Remove usage of deprecated `Supervisor.Spec`
-- Add elixir 1.11 to CI
 
 ## [0.7.2] - 2020-06-11
 
