@@ -49,6 +49,6 @@ release: ## Bumps the version and creates the new tag
 	  perl -p -i -e "s/\"\~> ${VERSION}\"/\"\~> $$NEW_VERSION\"/g" ${README_FILE} && \
 	  printf "\t${DIM_COLOR}Updating ${CHANGELOG_FILE} version${DEFAULT_COLOR}\n" && \
 	  perl -p -i -e "s/## \[Unreleased\]/## \[Unreleased\]\\n\\n## \[$$NEW_VERSION\] - ${DATE}/g" ${CHANGELOG_FILE} && \
-	  perl -p -i -e "s/${REPO}\/${VERSION}...master/${REPO}\/$$NEW_VERSION...master/g" ${CHANGELOG_FILE} && \
-	  perl -p -i -e "s/...master/...master\\n\[$$NEW_VERSION\]: ${REPO}\/${VERSION}...$$NEW_VERSION/g" ${CHANGELOG_FILE} && \
+	  perl -p -i -e "s/${REPO}\/v${VERSION}...master/${REPO}\/v$$NEW_VERSION...master/g" ${CHANGELOG_FILE} && \
+	  perl -p -i -e "s/...master/...master\\n\[$$NEW_VERSION\]: ${REPO}\/v${VERSION}...v$$NEW_VERSION/g" ${CHANGELOG_FILE} && \
 	  printf "\t${DIM_COLOR}Recording changes to the repository${DEFAULT_COLOR}\n"

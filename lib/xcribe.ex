@@ -45,7 +45,7 @@ defmodule Xcribe do
           description "The best API in the world"
           host "http://your-api.us"
         end
-      end  
+      end
 
   See `Xcribe.Information` for more details about custom information.
 
@@ -61,7 +61,7 @@ defmodule Xcribe do
 
   eg
 
-      config :xcribe, 
+      config :xcribe,
         information_source: YourApp.YouModuleInformation,
         format: :swagger
 
@@ -105,8 +105,6 @@ defmodule Xcribe do
   end
 
   defp children do
-    import Supervisor.Spec
-
-    [worker(Xcribe.Recorder, [])]
+    [{Xcribe.Recorder, []}]
   end
 end
