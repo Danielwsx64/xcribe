@@ -5,7 +5,7 @@ defmodule Xcribe.Recorder do
 
   alias Xcribe.{Request, Request.Error}
 
-  def start_link do
+  def start_link(_opts \\ []) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
