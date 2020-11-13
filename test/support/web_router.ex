@@ -24,6 +24,10 @@ defmodule Xcribe.WebRouter do
     resources("/users", UsersController)
   end
 
+  scope "/nopipe", Xcribe, as: :no_pipe do
+    get("/users", UsersController, :index, as: :users)
+  end
+
   scope "/", Xcribe do
     pipe_through(:api)
 

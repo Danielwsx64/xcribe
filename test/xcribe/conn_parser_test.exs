@@ -397,6 +397,31 @@ defmodule Xcribe.ConnParserTest do
              }
     end
 
+    test "route without pipelines", %{conn: conn} do
+      conn = get(conn, no_pipe_users_path(conn, :index))
+
+      assert ConnParser.execute(conn) == %Request{
+               action: "index",
+               controller: Xcribe.UsersController,
+               description: "",
+               header_params: [],
+               params: %{},
+               path: "/nopipe/users",
+               path_params: %{},
+               query_params: %{},
+               request_body: %{},
+               resource: "nopipe_users",
+               resource_group: nil,
+               resp_body: "[{\"id\":1,\"name\":\"user 1\"},{\"id\":2,\"name\":\"user 2\"}]",
+               resp_headers: [
+                 {"content-type", "application/json; charset=utf-8"},
+                 {"cache-control", "max-age=0, private, must-revalidate"}
+               ],
+               status_code: 200,
+               verb: "get"
+             }
+    end
+
     test "not found route" do
       conn = %Conn{
         host: "www.example.com",
