@@ -89,7 +89,7 @@ defmodule Xcribe.DocumentTest do
     end
 
     test "dont document when env var is not defined", %{conn: conn} do
-      Application.put_env(:xcribe, :env_var, "NOT_DEFINIED_ENV_VAR_TEST")
+      Application.put_env(:xcribe, :env_var, "NOT_DEFINED_ENV_VAR_TEST")
 
       Recorder.start_link()
 
