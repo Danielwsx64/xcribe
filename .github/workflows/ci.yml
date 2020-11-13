@@ -60,7 +60,6 @@ jobs:
     name: Update coverave badge
     runs-on: ubuntu-16.04
     needs: [mix_format, mix_credo, mix_test]
-    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-elixir@v1.0.0
