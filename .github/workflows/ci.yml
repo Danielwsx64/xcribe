@@ -69,6 +69,10 @@ jobs:
           elixir-version: "1.10.2"
       - name: Install Dependencies
         run: mix deps.get
+      - name: Run Mix Coverage
+        run: mix coveralls.json
+        env:
+          MIX_ENV: test
       - name: Run codecov script
         run: bash <(curl -s https://codecov.io/bash)
   mix_check_version:
