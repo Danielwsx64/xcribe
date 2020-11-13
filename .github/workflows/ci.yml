@@ -56,11 +56,10 @@ jobs:
         run: mix deps.get
       - name: Run Tests
         run: mix test
-  update_coverage:
-    name: Update coverave badge
+  coverage:
+    name: Check coverage
     runs-on: ubuntu-16.04
     needs: [mix_format, mix_credo, mix_test]
-    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-elixir@v1.0.0
