@@ -61,7 +61,9 @@ defmodule Xcribe.ApiBlueprint.APIB do
       headers(response.headers) <> body(response.body) <> schema(response.schema)
   end
 
+  def group(""), do: ""
   def group(name), do: apply_template(@group_template, identifier: name)
+
   def resource(name, uri), do: apply_template(@resource_template, identifier: name, uri: uri)
   def action(name, uri), do: apply_template(@action_template, identifier: name, uri: uri)
 

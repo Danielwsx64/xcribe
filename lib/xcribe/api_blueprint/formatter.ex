@@ -170,6 +170,8 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     |> List.last()
   end
 
+  defp capitalize_all_words(""), do: ""
+
   defp capitalize_all_words(string),
     do: Enum.reduce(String.split(string, "_"), "", &"#{&2}#{String.capitalize(&1)} ")
 

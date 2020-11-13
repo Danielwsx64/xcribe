@@ -12,6 +12,14 @@ defmodule Xcribe.Support.RequestsGenerator do
   @base_auth Base.encode64("username:pass")
   @bearer_auth "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIn0.rTCH8cLoGxAm_xw68z-zXVKi9ie6xJn9tnVWjd_9ftE"
 
+  def no_pipe_users_index do
+    conn = conn()
+
+    conn
+    |> ConnTest.get(no_pipe_users_path(conn, :index))
+    |> ConnParser.execute("show users")
+  end
+
   def users_index(opts \\ []) do
     conn = conn()
 

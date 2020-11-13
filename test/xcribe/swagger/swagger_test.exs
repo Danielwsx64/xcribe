@@ -1,5 +1,5 @@
 defmodule Xcribe.SwaggerTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   alias Xcribe.Support.RequestsGenerator
   alias Xcribe.{DocException, Request, Swagger}
