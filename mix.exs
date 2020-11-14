@@ -1,7 +1,7 @@
 defmodule Xcribe.MixProject do
   use Mix.Project
 
-  @version "0.7.5"
+  @version "0.7.6"
   @description "A lib to generate API documentation from test specs"
   @links %{"GitHub" => "https://github.com/brainn-co/xcribe"}
 

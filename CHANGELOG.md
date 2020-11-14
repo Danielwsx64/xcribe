@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.6] - 2020-11-14
+
+### Fixed
+
+- Compilation warning about Phoenix module.
+
 ## [0.7.5] - 2020-11-13
 
 ### Fixed
@@ -95,7 +101,8 @@ Improve CI/CD flow:
 - New "tags" parameter to operations object in Swagger format.
 - Add changelog and Makefile.
 
-[unreleased]: https://github.com/brainn-co/xcribe/compare/v0.7.5...master
+[unreleased]: https://github.com/brainn-co/xcribe/compare/v0.7.6...master
+[0.7.6]: https://github.com/brainn-co/xcribe/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/brainn-co/xcribe/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/brainn-co/xcribe/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/brainn-co/xcribe/compare/v0.7.2...v0.7.3
