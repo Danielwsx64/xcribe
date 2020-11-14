@@ -85,6 +85,13 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
 
              """
     end
+
+    test "don't print group section when resource group has no name" do
+      request = RequestsGenerator.no_pipe_users_index()
+      struct = ApiBlueprint.apib_struct([request])
+
+      refute APIB.encode(struct) =~ "# Group"
+    end
   end
 
   describe "metadata/1" do
@@ -105,6 +112,10 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
   describe "group/1" do
     test "return group" do
       assert APIB.group("Private API") == "## Group Private API\n"
+    end
+
+    test "Empty string as name" do
+      assert APIB.group("") == ""
     end
   end
 

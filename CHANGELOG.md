@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.5] - 2020-11-13
+
+### Fixed
+
+- Exception on parsing route without pipeline ( routes without pipeline will be out of a group section in ApiBlueprint format ).
+
 ## [0.7.4] - 2020-10-19
 
 - Remove usage of deprecated `Supervisor.Spec`
@@ -89,7 +95,8 @@ Improve CI/CD flow:
 - New "tags" parameter to operations object in Swagger format.
 - Add changelog and Makefile.
 
-[unreleased]: https://github.com/brainn-co/xcribe/compare/v0.7.4...master
+[unreleased]: https://github.com/brainn-co/xcribe/compare/v0.7.5...master
+[0.7.5]: https://github.com/brainn-co/xcribe/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/brainn-co/xcribe/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/brainn-co/xcribe/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/brainn-co/xcribe/compare/v0.7.1...v0.7.2

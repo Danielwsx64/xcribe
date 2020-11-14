@@ -165,6 +165,28 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                }
              }
     end
+
+    test "return group with resource group nil" do
+      struct = %Request{
+        action: "show",
+        controller: Elixir.Xcribe.PostsController,
+        description: "get all user posts",
+        header_params: [{"content-type", "application/json"}],
+        params: %{},
+        path: "/users",
+        path_params: %{},
+        query_params: %{},
+        request_body: %{},
+        resource: "users",
+        resource_group: nil,
+        resp_body: "{\"id\":1,\"title\":\"user 1\"}",
+        resp_headers: [{"content-type", "application/json"}],
+        status_code: 200,
+        verb: "get"
+      }
+
+      assert %{"" => _group_struct} = Formatter.full_request_object(struct)
+    end
   end
 
   describe "resource_object/1" do

@@ -72,6 +72,7 @@ defmodule Xcribe.ConnParser do
   defp controller_module(%{plug: controller}), do: controller
 
   defp resource_group(%{pipe_through: [head | _rest]}), do: head
+  defp resource_group(%{}), do: nil
 
   defp resource_name(path, namespaces) do
     namespaces

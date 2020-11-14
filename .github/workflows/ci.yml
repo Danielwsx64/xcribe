@@ -56,6 +56,24 @@ jobs:
         run: mix deps.get
       - name: Run Tests
         run: mix test
+  coverage:
+    name: Check coverage
+    runs-on: ubuntu-16.04
+    needs: [mix_format, mix_credo, mix_test]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-elixir@v1.0.0
+        with:
+          otp-version: "22.3"
+          elixir-version: "1.10.2"
+      - name: Install Dependencies
+        run: mix deps.get
+      - name: Run Mix Coverage
+        run: mix coveralls.json
+        env:
+          MIX_ENV: test
+      - name: Run codecov script
+        run: bash <(curl -s https://codecov.io/bash)
   mix_check_version:
     name: Check version (Elixir 1.10.2 OTP 22.3)
     runs-on: ubuntu-16.04

@@ -1,7 +1,7 @@
 defmodule Xcribe.MixProject do
   use Mix.Project
 
-  @version "0.7.4"
+  @version "0.7.5"
   @description "A lib to generate API documentation from test specs"
   @links %{"GitHub" => "https://github.com/brainn-co/xcribe"}
 
@@ -52,7 +52,7 @@ defmodule Xcribe.MixProject do
       {:floki, "~> 0.26", only: [:test]},
       {:jason, "~> 1.1", only: [:dev, :test]},
       {:phoenix, "~> 1.4.10", only: [:test]},
-      {:excoveralls, "~> 0.10", only: :test},
+      {:excoveralls, "~> 0.13", only: :test},
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo_naming, "~> 0.5", only: [:dev, :test], runtime: false}
     ]
