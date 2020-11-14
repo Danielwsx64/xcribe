@@ -43,6 +43,8 @@ defmodule Xcribe.MixProject do
 
   defp deps do
     [
+      {:phoenix, "~> 1.4"},
+
       # Dev environment
       {:earmark, "~> 1.2", only: :dev},
       {:ex_doc, "~> 0.19", only: :dev},
@@ -51,7 +53,6 @@ defmodule Xcribe.MixProject do
       # Test environment
       {:floki, "~> 0.26", only: [:test]},
       {:jason, "~> 1.1", only: [:dev, :test]},
-      {:phoenix, "~> 1.4.10", only: [:test]},
       {:excoveralls, "~> 0.13", only: :test},
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo_naming, "~> 0.5", only: [:dev, :test], runtime: false}
