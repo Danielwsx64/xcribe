@@ -1,6 +1,7 @@
 defmodule Xcribe.Swagger.Formatter do
   @moduledoc false
 
+  alias Plug.Upload
   alias Xcribe.{ContentDecoder, JsonSchema, Request}
 
   import Xcribe.Helpers.Formatter, only: [content_type: 1, authorization: 1]
@@ -188,13 +189,31 @@ defmodule Xcribe.Swagger.Formatter do
   defp media_type_object(headers, content) do
     media_type = content_type(headers)
 
-    %{
-      description: "",
-      content: %{
-        media_type => %{schema: build_schema_for_media(content, media_type)}
-      }
-    }
+    media_type_schema =
+      %{}
+      |> Map.put(:schema, build_schema_for_media(content, media_type))
+      |> add_enconding_if_needed(content)
+
+    %{description: "", content: %{media_type => media_type_schema}}
   end
+
+  defp add_enconding_if_needed(schema, content) when is_map(content) do
+    content
+    |> Map.keys()
+    |> Enum.reduce(schema, &enconding_for(content[&1], &2, &1))
+  end
+
+  defp add_enconding_if_needed(schema, _content), do: schema
+
+  defp enconding_for(%Upload{} = upload, schema, property) do
+    schema_encoding = Map.get(schema, :encoding, %{})
+
+    new_encoding = Map.merge(schema_encoding, %{property => %{contentType: upload.content_type}})
+
+    Map.put(schema, :encoding, new_encoding)
+  end
+
+  defp enconding_for(_value, schema, _property), do: schema
 
   defp build_schema_for_media(content, content_type) when is_binary(content) do
     content

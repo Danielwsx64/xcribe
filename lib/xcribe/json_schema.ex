@@ -37,7 +37,7 @@ defmodule Xcribe.JsonSchema do
   @opt_no_title {:title, false}
   @opt_example {:example, true}
 
-  defp schema_object_for({title, %Upload{} = value}, opts) do
+  defp schema_object_for({title, %Upload{}}, opts) do
     schema_add_title(
       %{type: "string", format: "binary"},
       title,
