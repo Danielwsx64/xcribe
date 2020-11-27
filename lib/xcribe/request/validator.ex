@@ -1,4 +1,5 @@
 defmodule Xcribe.Request.Validator do
+  alias Plug.Upload
   alias Xcribe.Request
   alias Xcribe.Request.Error
 
@@ -19,6 +20,8 @@ defmodule Xcribe.Request.Validator do
     |> find_struct()
     |> handle_validate_params(request)
   end
+
+  defp find_struct(%Upload{}), do: :ok
 
   defp find_struct(%{__struct__: module}) do
     %Error{
