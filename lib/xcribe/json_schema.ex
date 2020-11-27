@@ -1,6 +1,8 @@
 defmodule Xcribe.JsonSchema do
   @moduledoc false
 
+  alias Plug.Upload
+
   @doc """
   Return the type of given data
   """
@@ -34,6 +36,14 @@ defmodule Xcribe.JsonSchema do
 
   @opt_no_title {:title, false}
   @opt_example {:example, true}
+
+  defp schema_object_for({title, %Upload{} = value}, opts) do
+    schema_add_title(
+      %{type: "string", format: "binary"},
+      title,
+      @opt_no_title in opts
+    )
+  end
 
   defp schema_object_for({title, value}, opts) when is_map(value) do
     %{type: "object"}
