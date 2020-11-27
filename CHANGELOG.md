@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.8] - 2020-11-27
+
+### Fixed
+
+- Add query strings to API Blueprint formatter
+
 ## [0.7.7] - 2020-11-27
 
 ### Fixed
@@ -107,7 +113,8 @@ Improve CI/CD flow:
 - New "tags" parameter to operations object in Swagger format.
 - Add changelog and Makefile.
 
-[unreleased]: https://github.com/brainn-co/xcribe/compare/v0.7.7...master
+[unreleased]: https://github.com/brainn-co/xcribe/compare/v0.7.8...master
+[0.7.8]: https://github.com/brainn-co/xcribe/compare/v0.7.7...v0.7.8
 [0.7.7]: https://github.com/brainn-co/xcribe/compare/v0.7.6...v0.7.7
 [0.7.6]: https://github.com/brainn-co/xcribe/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/brainn-co/xcribe/compare/v0.7.4...v0.7.5
