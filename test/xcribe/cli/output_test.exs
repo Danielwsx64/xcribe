@@ -39,7 +39,7 @@ defmodule Xcribe.CLI.OutputTest do
       }
 
       expected_output = """
-      \e[44m\e[37m  [ Xcribe ] Parsing Errors                                                                      \e[0m
+      \e[44m\e[37m  [ Xcribe ] Parsing and validation errors                                                       \e[0m
       \e[34m┃\e[0m
       \e[34m┃\e[0m [P] → \e[33m route not found
       \e[34m┃\e[0m        \e[34m> test name\n\e[34m┃\e[0m        \e[38;5;240mtest/xcribe/cli/output_test.exs:13
@@ -63,6 +63,39 @@ defmodule Xcribe.CLI.OutputTest do
                assert Output.print_request_errors([route_error, conn_error]) == :ok
              end) == expected_output
     end
+
+    test "printing request validation error" do
+      validation_error = %Error{
+        type: :validation,
+        message:
+          "The Plug.Conn params must be valid HTTP params. A struct Elixir.Date was found!",
+        __meta__: %{
+          call: %{
+            description: "test name",
+            file: File.cwd!() <> "/test/xcribe/cli/output_test.exs",
+            line: 13
+          }
+        }
+      }
+
+      expected_output = """
+      \e[44m\e[37m  [ Xcribe ] Parsing and validation errors                                                       \e[0m
+      \e[34m┃\e[0m
+      \e[34m┃\e[0m [V] → \e[33m The Plug.Conn params must be valid HTTP params. A struct Elixir.Date was found!
+      \e[34m┃\e[0m        \e[34m> test name
+      \e[34m┃\e[0m        \e[38;5;240mtest/xcribe/cli/output_test.exs:13
+      \e[38;5;25m┃\e[0m
+      \e[38;5;25m┃\e[0m        \e[38;5;37m# |> document(as: \"some cool description\")
+      \e[38;5;25m┃\e[0m        \e[38;5;25m     ^^^^^^^^                             
+      \e[38;5;25m┃\e[0m
+      \
+
+      """
+
+      assert capture_io(fn ->
+               assert Output.print_request_errors([validation_error]) == :ok
+             end) == expected_output
+    end
   end
 
   describe "print_configuration_errors/1" do
@@ -78,7 +111,7 @@ defmodule Xcribe.CLI.OutputTest do
       ]
 
       expected_output = """
-      \e[42m\e[37m  [ Xcribe ] Configuration Errors                                                                \e[0m
+      \e[42m\e[37m  [ Xcribe ] Configuration errors                                                                \e[0m
       \e[32m┃\e[0m
       \e[32m┃\e[0m [C] → \e[34m Given json library doesn't implement needed functions
       \e[32m┃\e[0m        \e[38;5;240m> Config key: json_library
@@ -118,7 +151,7 @@ defmodule Xcribe.CLI.OutputTest do
       ]
 
       expected_output = """
-      \e[42m\e[37m  [ Xcribe ] Configuration Errors                                                                \e[0m
+      \e[42m\e[37m  [ Xcribe ] Configuration errors                                                                \e[0m
       \e[32m┃\e[0m
       \e[32m┃\e[0m [C] → \e[34m When serve config is true you must confiture output to \"priv/static\" folder
       \e[38;5;100m┃\e[0m
