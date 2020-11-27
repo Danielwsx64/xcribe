@@ -39,7 +39,7 @@ defmodule Xcribe.Request.ValidatorTest do
                 %Error{
                   type: :validation,
                   message:
-                    "The Plug.Conn params must be valid HTTP params. A struct Elixir.Date was found!",
+                    "The Plug.Conn params must be valid HTTP params. A struct Date was found!",
                   __meta__: meta
                 }}
     end
@@ -53,7 +53,7 @@ defmodule Xcribe.Request.ValidatorTest do
                 %Error{
                   type: :validation,
                   message:
-                    "The Plug.Conn params must be valid HTTP params. A struct Elixir.Date was found!",
+                    "The Plug.Conn params must be valid HTTP params. A struct Date was found!",
                   __meta__: meta
                 }}
     end
@@ -67,7 +67,7 @@ defmodule Xcribe.Request.ValidatorTest do
                 %Error{
                   type: :validation,
                   message:
-                    "The Plug.Conn params must be valid HTTP params. A struct Elixir.Date was found!",
+                    "The Plug.Conn params must be valid HTTP params. A struct Date was found!",
                   __meta__: meta
                 }}
     end
@@ -81,7 +81,7 @@ defmodule Xcribe.Request.ValidatorTest do
                 %Error{
                   type: :validation,
                   message:
-                    "The Plug.Conn params must be valid HTTP params. A struct Elixir.Date was found!",
+                    "The Plug.Conn params must be valid HTTP params. A struct Date was found!",
                   __meta__: meta
                 }}
     end
@@ -97,7 +97,7 @@ defmodule Xcribe.Request.ValidatorTest do
                {:error,
                 %Xcribe.Request.Error{
                   message:
-                    "The Plug.Conn params must be valid HTTP params. A struct Elixir.Date was found!",
+                    "The Plug.Conn params must be valid HTTP params. A struct Date was found!",
                   type: :validation
                 }}
     end
@@ -118,7 +118,7 @@ defmodule Xcribe.Request.ValidatorTest do
                {:error,
                 %Xcribe.Request.Error{
                   message:
-                    "The Plug.Conn params must be valid HTTP params. A struct Elixir.Date was found!",
+                    "The Plug.Conn params must be valid HTTP params. A struct Date was found!",
                   type: :validation
                 }}
     end

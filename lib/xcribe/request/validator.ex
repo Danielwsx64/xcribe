@@ -23,7 +23,8 @@ defmodule Xcribe.Request.Validator do
   def find_struct(%{__struct__: module}) do
     %Error{
       type: :validation,
-      message: "The Plug.Conn params must be valid HTTP params. A struct #{module} was found!"
+      message:
+        "The Plug.Conn params must be valid HTTP params. A struct #{sanitize_module_name(module)} was found!"
     }
   end
 
@@ -41,6 +42,9 @@ defmodule Xcribe.Request.Validator do
       %Error{} = error -> {:halt, error}
     end
   end
+
+  defp sanitize_module_name(module),
+    do: module |> Atom.to_string() |> String.replace_prefix("Elixir.", "")
 
   defp handle_validate_params(:ok, request), do: {:ok, request}
   defp handle_validate_params(%Error{} = error, _request), do: {:error, error}
