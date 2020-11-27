@@ -211,6 +211,18 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
 
              """
     end
+
+    test "parameters with array" do
+      parameters = %{
+        "financialAccounts" => %{
+          items: %{example: "12", type: "string"},
+          type: "array"
+        }
+      }
+
+      assert APIB.parameters(parameters) ==
+               "+ Parameters\n\n    + financialAccounts: `12` (array(string))\n\n"
+    end
   end
 
   describe "body/1" do
@@ -399,6 +411,61 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                              }
                            },
                            "type": "object"
+                         }
+
+             """
+    end
+
+    test "action with query parameters" do
+      [{key, action}] =
+        RequestsGenerator.users_index()
+        |> Map.put(:query_params, %{"limit" => "6"})
+        |> Formatter.action_object()
+        |> Map.to_list()
+
+      assert APIB.full_action(key, action) == """
+             ### Users index [GET /users{?limit}]
+             + Parameters
+
+                 + limit: `6` (string)
+
+             + Request show users (application/json)
+             + Response 200 (application/json)
+                 + Headers
+
+                         cache-control: max-age=0, private, must-revalidate
+
+                 + Body
+
+                         [
+                           {
+                             "id": 1,
+                             "name": "user 1"
+                           },
+                           {
+                             "id": 2,
+                             "name": "user 2"
+                           }
+                         ]
+
+                 + Schema
+
+                         {
+                           "items": {
+                             "properties": {
+                               "id": {
+                                 "example": 1,
+                                 "format": "int32",
+                                 "type": "number"
+                               },
+                               "name": {
+                                 "example": "user 1",
+                                 "type": "string"
+                               }
+                             },
+                             "type": "object"
+                           },
+                           "type": "array"
                          }
 
              """
