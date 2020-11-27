@@ -107,6 +107,46 @@ defmodule Xcribe.FormatterTest do
       assert output =~ "formatter_test.exs"
     end
 
+    test "handle parsing and validation errors" do
+      parsing_error = %Error{
+        type: :parsing,
+        message: "route not found",
+        __meta__: %{
+          call: %{
+            description: "test name",
+            file: File.cwd!() <> "/test/xcribe/formatter_test.exs",
+            line: 1
+          }
+        }
+      }
+
+      validation_error = %Error{
+        type: :validation,
+        message:
+          "The Plug.Conn params must be valid HTTP params. A struct Elixir.Date was found!",
+        __meta__: %{
+          call: %{
+            description: "test name",
+            file: File.cwd!() <> "/test/xcribe/formatter_test.exs",
+            line: 1
+          }
+        }
+      }
+
+      Recorder.save(%Request{})
+      Recorder.save(parsing_error)
+      Recorder.save(validation_error)
+
+      output =
+        capture_io(fn ->
+          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
+        end)
+
+      assert output =~ "route not found"
+      assert output =~ "formatter_test.exs"
+      assert output =~ "The Plug.Conn params must be valid HTTP params"
+    end
+
     test "handle invalid configuration" do
       Application.put_env(:xcribe, :format, :invalid)
       Application.put_env(:xcribe, :json_library, Fake)

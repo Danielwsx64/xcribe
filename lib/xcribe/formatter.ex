@@ -32,6 +32,7 @@ defmodule Xcribe.Formatter do
     Recorder,
     Request,
     Request.Error,
+    Request.Validator,
     Swagger,
     Writter
   }
@@ -75,17 +76,23 @@ defmodule Xcribe.Formatter do
 
   defp validate_records(records) when is_list(records) do
     records
-    |> check_errors()
+    |> Enum.reduce({:ok, []}, &validate_request/2)
     |> handle_errors()
   end
 
-  defp check_errors(records), do: Enum.reduce(records, {:ok, []}, &reduce_records/2)
+  defp validate_request(%Request{} = request, acc) do
+    request
+    |> Validator.validate()
+    |> add_result(acc)
+  end
 
-  defp reduce_records(%Request{} = request, {:ok, requests}), do: {:ok, [request | requests]}
-  defp reduce_records(%Request{}, {:error, _errs} = err), do: err
+  defp validate_request(%Error{} = err, {:ok, _requests}), do: {:error, [err]}
+  defp validate_request(%Error{} = err, {:error, errs}), do: {:error, [err | errs]}
 
-  defp reduce_records(%Error{} = err, {:ok, _requests}), do: {:error, [err]}
-  defp reduce_records(%Error{} = err, {:error, errs}), do: {:error, [err | errs]}
+  defp add_result({:error, error}, {:error, errs}), do: {:error, [error | errs]}
+  defp add_result({:error, error}, {:ok, _requests}), do: {:error, [error]}
+  defp add_result({:ok, request}, {:ok, requests}), do: {:ok, [request | requests]}
+  defp add_result({:ok, _request}, {:error, _errs} = errs), do: errs
 
   defp handle_errors({:error, errs}), do: Output.print_request_errors(errs) && :error
   defp handle_errors({:ok, requests}), do: requests
