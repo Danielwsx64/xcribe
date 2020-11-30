@@ -1,6 +1,8 @@
 defmodule Xcribe.ApiBlueprint.Formatter do
   @moduledoc false
 
+  alias Plug.Upload
+  alias Xcribe.ApiBlueprint.Multipart
   alias Xcribe.{ContentDecoder, JsonSchema, Request}
 
   import Xcribe.Helpers.Formatter
@@ -56,7 +58,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
       desc => %{
         content_type: content_type(headers),
         headers: headers(headers),
-        body: request.request_body,
+        body: request_body(request),
         schema: request_schema(request),
         response: response_object(request)
       }
@@ -106,6 +108,14 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     headers
     |> content_type()
     |> json_schema_for(body)
+  end
+
+  def request_body(%Request{request_body: body}) when body == %{}, do: %{}
+
+  def request_body(%Request{request_body: body, header_params: headers}) do
+    headers
+    |> content_type()
+    |> body_data_for(headers, body)
   end
 
   def action_name(%Request{action: action, resource: resource}),
@@ -191,6 +201,30 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     do: JsonSchema.schema_for(body)
 
   defp json_schema_for(_content_type, _body), do: %{}
+
+  defp body_data_for("multipart/form-data", headers, body) when is_map(body) do
+    %Multipart{
+      parts: Enum.reduce(body, [], &data_schema/2),
+      boundary: content_type_boundary(headers)
+    }
+  end
+
+  defp body_data_for(_content_type, _headers, body), do: body
+
+  defp data_schema({key, %Upload{} = upload}, acc) do
+    [
+      %{
+        content_type: upload.content_type,
+        name: key,
+        value: "image-binary",
+        filename: upload.filename
+      }
+      | acc
+    ]
+  end
+
+  defp data_schema({key, value}, acc),
+    do: [%{content_type: "text/plain", name: key, value: value} | acc]
 
   defp reduce_path_params({param, value}, parameters) do
     Map.put(

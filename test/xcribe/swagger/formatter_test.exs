@@ -264,7 +264,7 @@ defmodule Xcribe.Swagger.FormatterTest do
       expected = %{
         description: "",
         content: %{
-          "multipart/form" => %{
+          "multipart/form-data" => %{
             schema: %{
               type: "object",
               properties: %{

@@ -1,7 +1,8 @@
 defmodule Xcribe.ApiBlueprint.FormatterTest do
   use ExUnit.Case, async: true
 
-  alias Xcribe.ApiBlueprint.Formatter
+  alias Plug.Upload
+  alias Xcribe.ApiBlueprint.{Formatter, Multipart}
   alias Xcribe.Request
   alias Xcribe.Support.RequestsGenerator
 
@@ -378,6 +379,41 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                }
              }
     end
+
+    test "with a Upload struct in body" do
+      request = %Request{
+        header_params: [{"content-type", "multipart/form-data; boundary=---boundary"}],
+        request_body: %{
+          "file" => %Upload{
+            content_type: "image/png",
+            filename: "screenshot.png",
+            path: "/tmp/multipart-id"
+          }
+        }
+      }
+
+      expected = %{
+        nil: %{
+          body: %Multipart{
+            boundary: "---boundary",
+            parts: [
+              %{
+                content_type: "image/png",
+                filename: "screenshot.png",
+                name: "file",
+                value: "image-binary"
+              }
+            ]
+          },
+          content_type: "multipart/form-data",
+          headers: %{},
+          response: %{body: %{}, content_type: nil, headers: %{}, schema: %{}, status: nil},
+          schema: %{}
+        }
+      }
+
+      assert Formatter.request_object(request) == expected
+    end
   end
 
   describe "response_object/1" do
@@ -529,10 +565,69 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       assert Formatter.request_schema(struct) == %{}
     end
 
+    test "with upload body" do
+      request = %Request{
+        header_params: [{"content-type", "multipart/form-data; boundary=---boundary"}],
+        request_body: %{
+          "user_id" => "123",
+          "file" => %Upload{
+            content_type: "image/png",
+            filename: "screenshot.png",
+            path: "/tmp/multipart-id"
+          }
+        }
+      }
+
+      assert Formatter.request_schema(request) == %{}
+    end
+
     test "return schema for text/plain" do
       struct = %Request{request_body: %{}}
 
       assert Formatter.request_schema(struct) == %{}
+    end
+  end
+
+  describe "test group subject" do
+    test "with upload body" do
+      request = %Request{
+        header_params: [{"content-type", "multipart/form-data; boundary=---boundary"}],
+        request_body: %{
+          "user_id" => "123",
+          "file" => %Upload{
+            content_type: "image/png",
+            filename: "screenshot.png",
+            path: "/tmp/multipart-id"
+          }
+        }
+      }
+
+      expected = %Multipart{
+        boundary: "---boundary",
+        parts: [
+          %{content_type: "text/plain", name: "user_id", value: "123"},
+          %{
+            content_type: "image/png",
+            filename: "screenshot.png",
+            name: "file",
+            value: "image-binary"
+          }
+        ]
+      }
+
+      assert Formatter.request_body(request) == expected
+    end
+
+    test "return request body for json content" do
+      struct = %Request{
+        header_params: [
+          {"authorization", "token"},
+          {"content-type", "application/json; boundary=plug_conn_test"}
+        ],
+        request_body: %{"age" => 5, "name" => "teste"}
+      }
+
+      assert Formatter.request_body(struct) == struct.request_body
     end
   end
 
