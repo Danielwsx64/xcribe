@@ -42,6 +42,14 @@ defmodule Xcribe.Helpers.FormatterTest do
     end
   end
 
+  describe "content_type_boundary/1" do
+    test "return content_type boundary" do
+      headers = [{"content-type", "multipart/form-data; boundary=---boundary123"}]
+
+      assert Formatter.content_type_boundary(headers) == "---boundary123"
+    end
+  end
+
   describe "authorization/1" do
     test "return the request authorization header" do
       headers_one = [
