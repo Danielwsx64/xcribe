@@ -1,7 +1,7 @@
 defmodule Xcribe.Helpers.Formatter do
   @moduledoc false
 
-  @content_type_regex ~r{^(\w*\/\w*(\.\w*\+\w*)?);?.*}
+  @content_type_regex ~r{^(\w*\/[\w-]*(\.\w*\+\w*)?);?.*}
 
   @doc """
   return the content type by a list of header params
