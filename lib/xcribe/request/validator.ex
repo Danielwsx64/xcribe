@@ -20,7 +20,7 @@ defmodule Xcribe.Request.Validator do
     |> handle_validate_params(request)
   end
 
-  def find_struct(%{__struct__: module}) do
+  defp find_struct(%{__struct__: module}) do
     %Error{
       type: :validation,
       message:
@@ -28,9 +28,9 @@ defmodule Xcribe.Request.Validator do
     }
   end
 
-  def find_struct(%{} = map), do: Enum.reduce_while(map, :ok, &reduce_map/2)
-  def find_struct(list) when is_list(list), do: Enum.reduce_while(list, :ok, &reduce_list/2)
-  def find_struct(_), do: :ok
+  defp find_struct(%{} = map), do: Enum.reduce_while(map, :ok, &reduce_map/2)
+  defp find_struct(list) when is_list(list), do: Enum.reduce_while(list, :ok, &reduce_list/2)
+  defp find_struct(_), do: :ok
 
   defp reduce_list(value, _acc), do: reduce_function(value)
 
