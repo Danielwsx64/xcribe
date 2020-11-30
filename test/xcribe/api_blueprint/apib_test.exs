@@ -2,7 +2,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
   use ExUnit.Case, async: false
 
   alias Xcribe.ApiBlueprint
-  alias Xcribe.ApiBlueprint.{APIB, Formatter}
+  alias Xcribe.ApiBlueprint.{APIB, Formatter, Multipart}
   alias Xcribe.Support.RequestsGenerator
 
   setup do
@@ -242,6 +242,42 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
 
     test "empty body" do
       assert APIB.body(%{}) == ""
+    end
+
+    test "multipart body" do
+      body = %Multipart{
+        boundary: "---boundary",
+        parts: [
+          %{content_type: "text/plain", name: "user_id", value: "123"},
+          %{
+            content_type: "image/png",
+            filename: "screenshot.png",
+            name: "file",
+            value: "image-binary"
+          }
+        ]
+      }
+
+      expected = """
+          + Body
+
+
+
+                  ---boundary
+                  Content-Disposition: form-data; name="user_id"
+                  Content-Type: text/plain
+
+                  123
+
+                  ---boundary
+                  Content-Disposition: form-data; name="file"
+                  Content-Type: image/png
+
+                  image-binary
+
+      """
+
+      assert APIB.body(body) == expected
     end
   end
 
