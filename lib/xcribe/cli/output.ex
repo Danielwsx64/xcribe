@@ -21,13 +21,13 @@ defmodule Xcribe.CLI.Output do
   alias Xcribe.DocException
 
   def print_request_errors(errors) do
-    print_header_error("[ Xcribe ] Parsing Errors", @bg_blue)
+    print_header_error("[ Xcribe ] Parsing and validation errors", @bg_blue)
 
     Enum.each(errors, &print_error/1)
   end
 
   def print_configuration_errors(errors) do
-    print_header_error("[ Xcribe ] Configuration Errors", @bg_green)
+    print_header_error("[ Xcribe ] Configuration errors", @bg_green)
 
     Enum.each(errors, &print_error/1)
   end
@@ -57,12 +57,13 @@ defmodule Xcribe.CLI.Output do
     """)
   end
 
-  defp print_error(%{type: :parsing, message: msg, __meta__: %{call: call}}) do
+  defp print_error(%{type: typ, message: msg, __meta__: %{call: call}})
+       when typ in [:parsing, :validation] do
     line_call = get_line(call.file, call.line)
 
     IO.puts("""
     #{tab(@blue)}
-    #{tab(@blue)} [P] → #{@yellow} #{msg}
+    #{tab(@blue)} [#{error_char(typ)}] → #{@yellow} #{msg}
     #{tab(@blue)} #{space(6)} #{@blue}> #{call.description}
     #{tab(@blue)} #{space(6)} #{@gray}#{format_file_path(call.file)}:#{call.line}
     #{tab(@dark_blue)}
@@ -109,6 +110,9 @@ defmodule Xcribe.CLI.Output do
 
   defp space_for(message), do: String.duplicate(" ", @bar_size - String.length(message))
   defp space(count), do: String.duplicate(" ", count)
+
+  defp error_char(:parsing), do: "P"
+  defp error_char(:validation), do: "V"
 
   def get_line(filename, line) do
     filename

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.7] - 2020-11-27
+
+### Fixed
+
+- Validate requests and report an error message when found structs in HTTP params
+
 ## [0.7.6] - 2020-11-14
 
 ### Fixed
@@ -101,7 +107,8 @@ Improve CI/CD flow:
 - New "tags" parameter to operations object in Swagger format.
 - Add changelog and Makefile.
 
-[unreleased]: https://github.com/brainn-co/xcribe/compare/v0.7.6...master
+[unreleased]: https://github.com/brainn-co/xcribe/compare/v0.7.7...master
+[0.7.7]: https://github.com/brainn-co/xcribe/compare/v0.7.6...v0.7.7
 [0.7.6]: https://github.com/brainn-co/xcribe/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/brainn-co/xcribe/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/brainn-co/xcribe/compare/v0.7.3...v0.7.4
