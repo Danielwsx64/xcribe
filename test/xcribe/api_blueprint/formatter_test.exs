@@ -14,8 +14,18 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
     test "merge two request objects" do
       base_request = RequestsGenerator.users_index()
-      request_one = %{base_request | description: "Cool description"}
-      request_two = %{base_request | description: "Other description"}
+
+      request_one = %{
+        base_request
+        | description: "Cool description",
+          query_params: %{"user_age" => "32"}
+      }
+
+      request_two = %{
+        base_request
+        | description: "Other description",
+          query_params: %{"limit" => "5"}
+      }
 
       full_request_one = Formatter.full_request_object(request_one)
       full_request_two = Formatter.full_request_object(request_two)
@@ -36,6 +46,10 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                          description: "",
                          summary: "",
                          parameters: %{},
+                         query_parameters: %{
+                           "limit" => %{example: "5", type: "string"},
+                           "user_age" => %{example: "32", type: "string"}
+                         },
                          requests: %{
                            "Cool description" => %{
                              content_type: "application/json",
@@ -137,6 +151,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                          description: "",
                          summary: "",
                          parameters: %{},
+                         query_parameters: %{},
                          requests: %{
                            "get all user posts" => %{
                              content_type: "application/json",
@@ -202,7 +217,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         params: %{"users_id" => "1"},
         path: "/users/{users_id}/posts/{id}",
         path_params: %{"users_id" => "1", "id" => "2"},
-        query_params: %{},
+        query_params: %{"user_age" => "34"},
         request_body: %{},
         resource: "users_posts",
         resource_group: :api,
@@ -230,6 +245,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                        "id" => %{example: "2", required: true, type: "string"},
                        "usersId" => %{example: "1", required: true, type: "string"}
                      },
+                     query_parameters: %{"user_age" => %{example: "34", type: "string"}},
                      requests: %{
                        "get all user posts" => %{
                          content_type: "application/json",
@@ -271,7 +287,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         params: %{"users_id" => "1"},
         path: "/users/{users_id}/posts/{id}",
         path_params: %{"users_id" => "1", "id" => "2"},
-        query_params: %{},
+        query_params: %{"user_age" => "16"},
         request_body: %{},
         resource: "users_posts",
         resource_group: :api,
@@ -293,6 +309,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                    "id" => %{example: "2", required: true, type: "string"},
                    "usersId" => %{example: "1", required: true, type: "string"}
                  },
+                 query_parameters: %{"user_age" => %{example: "16", type: "string"}},
                  requests: %{
                    "get all user posts" => %{
                      content_type: "application/json",
@@ -439,6 +456,22 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       struct = %Request{path_params: %{}}
 
       assert Formatter.action_parameters(struct) == %{}
+    end
+  end
+
+  describe "action_query_parameters/1" do
+    test "format action URI query parameters" do
+      struct = %Request{query_params: %{"user_age" => "15"}}
+
+      assert Formatter.action_query_parameters(struct) == %{
+               "user_age" => %{example: "15", type: "string"}
+             }
+    end
+
+    test "with no parameters" do
+      struct = %Request{query_params: %{}}
+
+      assert Formatter.action_query_parameters(struct) == %{}
     end
   end
 

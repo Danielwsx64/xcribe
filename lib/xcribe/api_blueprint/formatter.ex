@@ -45,6 +45,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
         summary: "",
         description: "",
         parameters: action_parameters(request),
+        query_parameters: action_query_parameters(request),
         requests: request_object(request)
       }
     }
@@ -74,6 +75,10 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   def action_parameters(%Request{path_params: path_params}) do
     Enum.reduce(path_params, %{}, &reduce_path_params/2)
+  end
+
+  def action_query_parameters(%Request{query_params: query_params}) do
+    Enum.reduce(query_params, %{}, &reduce_query_params/2)
   end
 
   def resource_parameters(%Request{path: path, path_params: path_params}) do
@@ -155,7 +160,11 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   end
 
   defp merge_action(action, new_request) do
-    %{action | requests: Map.merge(action.requests, new_request.requests)}
+    %{
+      action
+      | requests: Map.merge(action.requests, new_request.requests),
+        query_parameters: Map.merge(action.query_parameters, new_request.query_parameters)
+    }
   end
 
   defp object_key(%{} = request) do
@@ -191,6 +200,14 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     )
   end
 
+  defp reduce_query_params({param, value}, parameters) do
+    Map.put(
+      parameters,
+      param,
+      schema_for(value, false)
+    )
+  end
+
   defp schema_for(value, required) do
     {nil, value}
     |> JsonSchema.schema_for()
@@ -200,6 +217,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   defp headers(headers), do: headers |> Enum.into(%{}) |> Map.delete("content-type")
 
   defp add_required(map, true), do: Map.put(map, :required, true)
+  defp add_required(map, false), do: map
 
   defp url_params(path) do
     case Regex.run(~r/\{(.*?)\}.+/, path, capture: :all_but_first) do

@@ -41,8 +41,14 @@ defmodule Xcribe.ApiBlueprint.APIB do
     resource(name, uri) <> parameters(params) <> reduce_resource_actions(actions)
   end
 
-  def full_action(uri, %{name: name, parameters: params, requests: requests}) do
-    action(name, uri) <> parameters(params) <> reduce_action_requests(requests)
+  def full_action(uri, %{
+        name: name,
+        parameters: params,
+        query_parameters: query_parameters,
+        requests: requests
+      }) do
+    action(name, action_uri(uri, query_parameters)) <>
+      parameters(Map.merge(params, query_parameters)) <> reduce_action_requests(requests)
   end
 
   def full_request(name, request) do
@@ -106,6 +112,11 @@ defmodule Xcribe.ApiBlueprint.APIB do
     )
   end
 
+  defp action_uri(uri, query_parameters),
+    do: Enum.reduce(query_parameters, uri, &add_query_parameter/2)
+
+  defp add_query_parameter({param, _value}, uri), do: uri <> "{?#{param}}"
+
   defp reduce_group_resources(resources) do
     Enum.reduce(resources, "", fn {name, res}, acc -> acc <> full_resource(name, res) end)
   end
@@ -120,6 +131,15 @@ defmodule Xcribe.ApiBlueprint.APIB do
 
   defp reduce_parameters_items(parameters),
     do: Enum.reduce(parameters, "", &parameter_item/2)
+
+  defp parameter_item({name, %{items: items, type: "array"}}, acc) do
+    acc <>
+      apply_template(@item_template,
+        name: name,
+        value: items[:example],
+        type: "array(#{items[:type]})"
+      )
+  end
 
   defp parameter_item({name, %{example: ex, type: type}}, acc),
     do: acc <> apply_template(@item_template, name: name, value: ex, type: type)
