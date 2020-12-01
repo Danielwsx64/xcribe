@@ -1,6 +1,7 @@
 defmodule Xcribe.Swagger.FormatterTest do
   use ExUnit.Case, async: true
 
+  alias Plug.Upload
   alias Xcribe.Request
   alias Xcribe.Support.Information, as: ExampleInformation
   alias Xcribe.Support.Samples.SwaggerFormater.PathItemObject, as: Samples
@@ -240,6 +241,38 @@ defmodule Xcribe.Swagger.FormatterTest do
                 "name" => %{type: "string", example: "some name"}
               }
             }
+          }
+        }
+      }
+
+      assert Formatter.request_body_object_from_request(request) == expected
+    end
+
+    test "with upload body" do
+      request = %Request{
+        header_params: [{"content-type", "multipart/form-data; boundary=---boundary"}],
+        request_body: %{
+          "user_id" => "123",
+          "file" => %Upload{
+            content_type: "image/png",
+            filename: "screenshot.png",
+            path: "/tmp/multipart-id"
+          }
+        }
+      }
+
+      expected = %{
+        description: "",
+        content: %{
+          "multipart/form-data" => %{
+            schema: %{
+              type: "object",
+              properties: %{
+                "file" => %{format: "binary", type: "string"},
+                "user_id" => %{example: "123", type: "string"}
+              }
+            },
+            encoding: %{"file" => %{contentType: "image/png"}}
           }
         }
       }

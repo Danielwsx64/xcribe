@@ -1,6 +1,7 @@
 defmodule Xcribe.ApiBlueprint.APIB do
   @moduledoc false
 
+  alias Xcribe.ApiBlueprint.Multipart
   alias Xcribe.JSON
 
   @metadata_template "FORMAT: 1A\nHOST: --host--\n\n# --name--\n--description--\n\n"
@@ -15,6 +16,8 @@ defmodule Xcribe.ApiBlueprint.APIB do
   @response_template "+ Response --code-- (--media_type--)\n"
   @schema_template "    + Schema\n\n--schema--\n\n"
   @body_template "    + Body\n\n--body--\n\n"
+
+  @multipart_template "\n\n--boundary--\nContent-Disposition: form-data; name=\"--name--\"\nContent-Type: --content_type--\n\n--value--"
 
   @tab_size 4
 
@@ -103,6 +106,13 @@ defmodule Xcribe.ApiBlueprint.APIB do
     )
   end
 
+  def body(%Multipart{} = multipart) do
+    apply_template(
+      @body_template,
+      body: build_multipart_body(multipart)
+    )
+  end
+
   def body(body) when body == %{}, do: ""
 
   def body(body) do
@@ -110,6 +120,22 @@ defmodule Xcribe.ApiBlueprint.APIB do
       @body_template,
       body: body |> JSON.encode!(pretty: true) |> apply_tab(3)
     )
+  end
+
+  defp build_multipart_body(multipart),
+    do: Enum.reduce(multipart.parts, "", &build_multipart_template(&1, &2, multipart.boundary))
+
+  defp build_multipart_template(part, acc, boundary) do
+    part_template =
+      apply_template(
+        @multipart_template,
+        boundary: boundary,
+        name: part.name,
+        content_type: part.content_type,
+        value: part.value
+      )
+
+    acc <> apply_tab(part_template, 3)
   end
 
   defp action_uri(uri, query_parameters),

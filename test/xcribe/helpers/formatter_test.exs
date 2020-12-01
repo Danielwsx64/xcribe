@@ -11,11 +11,13 @@ defmodule Xcribe.Helpers.FormatterTest do
       ]
 
       headers_two = [{"content-type", "text/plain"}]
-      headers_three = []
+      headers_three = [{"content-type", "multipart/form-data; boundary=---boundary"}]
+      headers_four = []
 
       assert Formatter.content_type(headers_one) == "application/json"
       assert Formatter.content_type(headers_two) == "text/plain"
-      assert Formatter.content_type(headers_three) == nil
+      assert Formatter.content_type(headers_three) == "multipart/form-data"
+      assert Formatter.content_type(headers_four) == nil
     end
 
     test "handle composed vnd type" do
@@ -37,6 +39,14 @@ defmodule Xcribe.Helpers.FormatterTest do
       assert Formatter.content_type(headers_one, opt) == "application/json"
       assert Formatter.content_type(headers_two, opt) == "text/plain"
       assert Formatter.content_type(headers_three, opt) == "multipart/mixed"
+    end
+  end
+
+  describe "content_type_boundary/1" do
+    test "return content_type boundary" do
+      headers = [{"content-type", "multipart/form-data; boundary=---boundary123"}]
+
+      assert Formatter.content_type_boundary(headers) == "---boundary123"
     end
   end
 

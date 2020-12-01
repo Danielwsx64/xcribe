@@ -1,6 +1,7 @@
 defmodule Xcribe.Request.ValidatorTest do
   use ExUnit.Case, async: true
 
+  alias Plug.Upload
   alias Xcribe.Request
   alias Xcribe.Request.{Error, Validator}
 
@@ -121,6 +122,12 @@ defmodule Xcribe.Request.ValidatorTest do
                     "The Plug.Conn params must be valid HTTP params. A struct Date was found!",
                   type: :validation
                 }}
+    end
+
+    test "ignore Plug.Upload struct" do
+      request = %Request{request_body: %{"file" => %Upload{}, "other" => "value"}}
+
+      assert Validator.validate(request) == {:ok, request}
     end
   end
 end

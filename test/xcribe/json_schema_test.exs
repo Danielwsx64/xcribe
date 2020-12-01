@@ -1,6 +1,7 @@
 defmodule Xcribe.JsonSchemaTest do
   use ExUnit.Case, async: true
 
+  alias Plug.Upload
   alias Xcribe.JsonSchema
 
   describe "type_for/1" do
@@ -154,6 +155,21 @@ defmodule Xcribe.JsonSchemaTest do
                  "attributes" => %{items: %{type: "string"}, type: "array"},
                  "id" => %{example: 1, format: "int32", type: "number"}
                }
+             }
+    end
+
+    test "schema for Plug.Upload" do
+      data = %{
+        "file" => %Upload{
+          content_type: "image/png",
+          filename: "screenshot.png",
+          path: "/tmp/multipart-id"
+        }
+      }
+
+      assert JsonSchema.schema_for(data) == %{
+               type: "object",
+               properties: %{"file" => %{format: "binary", type: "string"}}
              }
     end
   end
