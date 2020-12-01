@@ -206,11 +206,9 @@ defmodule Xcribe.Swagger.Formatter do
   defp add_enconding_if_needed(schema, _content), do: schema
 
   defp enconding_for(%Upload{} = upload, schema, property) do
-    schema_encoding = Map.get(schema, :encoding, %{})
+    encoding = %{property => %{contentType: upload.content_type}}
 
-    new_encoding = Map.merge(schema_encoding, %{property => %{contentType: upload.content_type}})
-
-    Map.put(schema, :encoding, new_encoding)
+    Map.update(schema, :encoding, encoding, &Map.merge(&1, encoding))
   end
 
   defp enconding_for(_value, schema, _property), do: schema
