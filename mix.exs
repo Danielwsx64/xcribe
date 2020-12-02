@@ -54,8 +54,8 @@ defmodule Xcribe.MixProject do
       {:floki, "~> 0.26", only: [:test]},
       {:jason, "~> 1.1", only: [:dev, :test]},
       {:excoveralls, "~> 0.13", only: :test},
-      {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
-      {:credo_naming, "~> 0.5", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
+      {:credo_naming, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
 
