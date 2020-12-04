@@ -1,4 +1,6 @@
 defmodule Xcribe.Request.Validator do
+  @moduledoc false
+
   alias Plug.Upload
   alias Xcribe.Request
   alias Xcribe.Request.Error
