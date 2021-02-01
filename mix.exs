@@ -3,7 +3,7 @@ defmodule Xcribe.MixProject do
 
   @version "0.7.9"
   @description "A lib to generate API documentation from test specs"
-  @links %{"GitHub" => "https://github.com/brainn-co/xcribe"}
+  @links %{"GitHub" => "https://github.com/brainnco/xcribe"}
 
   def project do
     [

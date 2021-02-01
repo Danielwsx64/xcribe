@@ -119,18 +119,18 @@ Improve CI/CD flow:
 - New "tags" parameter to operations object in Swagger format.
 - Add changelog and Makefile.
 
-[unreleased]: https://github.com/brainn-co/xcribe/compare/v0.7.9...master
-[0.7.9]: https://github.com/brainn-co/xcribe/compare/v0.7.8...v0.7.9
-[0.7.8]: https://github.com/brainn-co/xcribe/compare/v0.7.7...v0.7.8
-[0.7.7]: https://github.com/brainn-co/xcribe/compare/v0.7.6...v0.7.7
-[0.7.6]: https://github.com/brainn-co/xcribe/compare/v0.7.5...v0.7.6
-[0.7.5]: https://github.com/brainn-co/xcribe/compare/v0.7.4...v0.7.5
-[0.7.4]: https://github.com/brainn-co/xcribe/compare/v0.7.3...v0.7.4
-[0.7.3]: https://github.com/brainn-co/xcribe/compare/v0.7.2...v0.7.3
-[0.7.2]: https://github.com/brainn-co/xcribe/compare/v0.7.1...v0.7.2
-[0.7.1]: https://github.com/brainn-co/xcribe/compare/v0.7.0...v0.7.1
-[0.7.0]: https://github.com/brainn-co/xcribe/compare/v0.6.1...v0.7.0
-[0.6.1]: https://github.com/brainn-co/xcribe/compare/0.6.0...v0.6.1
-[0.6.0]: https://github.com/brainn-co/xcribe/compare/0.5.0...0.6.0
-[0.5.0]: https://github.com/brainn-co/xcribe/compare/0.4.0...0.5.0
-[0.4.0]: https://github.com/brainn-co/xcribe/compare/0.3.0...0.4.0
+[unreleased]: https://github.com/brainnco/xcribe/compare/v0.7.9...master
+[0.7.9]: https://github.com/brainnco/xcribe/compare/v0.7.8...v0.7.9
+[0.7.8]: https://github.com/brainnco/xcribe/compare/v0.7.7...v0.7.8
+[0.7.7]: https://github.com/brainnco/xcribe/compare/v0.7.6...v0.7.7
+[0.7.6]: https://github.com/brainnco/xcribe/compare/v0.7.5...v0.7.6
+[0.7.5]: https://github.com/brainnco/xcribe/compare/v0.7.4...v0.7.5
+[0.7.4]: https://github.com/brainnco/xcribe/compare/v0.7.3...v0.7.4
+[0.7.3]: https://github.com/brainnco/xcribe/compare/v0.7.2...v0.7.3
+[0.7.2]: https://github.com/brainnco/xcribe/compare/v0.7.1...v0.7.2
+[0.7.1]: https://github.com/brainnco/xcribe/compare/v0.7.0...v0.7.1
+[0.7.0]: https://github.com/brainnco/xcribe/compare/v0.6.1...v0.7.0
+[0.6.1]: https://github.com/brainnco/xcribe/compare/0.6.0...v0.6.1
+[0.6.0]: https://github.com/brainnco/xcribe/compare/0.5.0...0.6.0
+[0.5.0]: https://github.com/brainnco/xcribe/compare/0.4.0...0.5.0
+[0.4.0]: https://github.com/brainnco/xcribe/compare/0.3.0...0.4.0
