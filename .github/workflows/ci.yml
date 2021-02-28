@@ -127,6 +127,6 @@ jobs:
         with:
           tag_name: ${{ needs.mix_publish.outputs.version }}
           release_name: Release ${{ needs.mix_publish.outputs.version }}
-          body: Checkout the [changelog](https://github.com/brainn-co/xcribe/blob/master/CHANGELOG.md)
+          body: Checkout the [changelog](https://github.com/brainnco/xcribe/blob/master/CHANGELOG.md)
           draft: false
           prerelease: false
