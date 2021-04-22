@@ -165,7 +165,7 @@ defmodule Xcribe.CLI.OutputTest do
              end) == expected_output
     end
   end
-  
+
   describe "print_file_errors/1" do
     test "prints output file erro message" do
       expected_output = """

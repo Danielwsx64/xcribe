@@ -31,7 +31,7 @@ defmodule Xcribe.CLI.Output do
 
     Enum.each(errors, &print_error/1)
   end
-  
+
   def print_file_errors({file_path, reason}) do
     print_header_error("[ Xcribe ] Output file errors", @bg_red)
 

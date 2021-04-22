@@ -21,8 +21,8 @@ defmodule Xcribe.WritterTest do
       Application.put_env(:xcribe, :output, @invalid_output_path)
 
       assert capture_io(fn ->
-        assert :error == Writter.write("sample test")
-      end) =~ "Output file errors"
+               assert :error == Writter.write("sample test")
+             end) =~ "Output file errors"
     end
   end
 end

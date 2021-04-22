@@ -1,8 +1,8 @@
 defmodule Xcribe.Writter do
   @moduledoc false
 
-  alias Xcribe.Config
   alias Xcribe.CLI.Output
+  alias Xcribe.Config
 
   @doc """
   This writes the given text to the configured output file
