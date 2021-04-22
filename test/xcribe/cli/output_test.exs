@@ -165,6 +165,26 @@ defmodule Xcribe.CLI.OutputTest do
              end) == expected_output
     end
   end
+  
+  describe "print_file_errors/1" do
+    test "prints output file erro message" do
+      expected_output = """
+      \e[41m\e[37m  [ Xcribe ] Output file errors                                                                  \e[0m
+      \e[31m┃\e[0m
+      \e[31m┃\e[0m [E] → \e[31m Could not write to /some/file/path
+      \e[31m┃\e[0m        \e[31mError: eacces
+      \e[38;5;88m┃\e[0m
+      \e[38;5;88m┃\e[0m \e[38;5;88mThe destination path for documentation artifact cannot be accessed.
+      \e[38;5;88m┃\e[0m \e[38;5;88mCommon reasons for this error are missing write permissions or the directory does not exist.
+      \e[38;5;88m┃\e[0m
+
+      """
+
+      assert capture_io(fn ->
+               assert Output.print_file_errors({"/some/file/path", :eacces}) == :ok
+             end) == expected_output
+    end
+  end
 
   describe "print_doc_exception/1" do
     test "document excption" do
