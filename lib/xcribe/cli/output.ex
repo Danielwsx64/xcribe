@@ -32,6 +32,20 @@ defmodule Xcribe.CLI.Output do
     Enum.each(errors, &print_error/1)
   end
 
+  def print_file_errors({file_path, reason}) do
+    print_header_error("[ Xcribe ] Output file errors", @bg_red)
+
+    IO.puts("""
+    #{tab(@red)}
+    #{tab(@red)} [E] → #{@red} Could not write to #{file_path}
+    #{tab(@red)} #{space(6)} #{@red}Error: #{reason}
+    #{tab(@dark_red)}
+    #{tab(@dark_red)} #{@dark_red}The destination path for documentation artifact cannot be accessed.
+    #{tab(@dark_red)} #{@dark_red}Common reasons for this error are missing write permissions or the directory does not exist.
+    #{tab(@dark_red)}
+    """)
+  end
+
   def print_doc_exception(%DocException{
         request_error: %{__meta__: %{call: call}},
         message: msg,
