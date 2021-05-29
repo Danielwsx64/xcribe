@@ -41,7 +41,11 @@ defmodule Xcribe.Formatter do
   def init(_config), do: {:ok, nil}
 
   @doc false
-  def handle_cast({:suite_finished, _run_us, _load_us}, nil) do
+  def handle_cast({:suite_finished, _run_us, _load_us}, _state), do: suite_finished()
+  def handle_cast({:suite_finished, _time_us}, _state), do: suite_finished()
+  def handle_cast(_event, state), do: {:noreply, state}
+
+  defp suite_finished do
     if Config.active?() do
       check_configurations()
       |> get_recorded_requests()
@@ -51,16 +55,13 @@ defmodule Xcribe.Formatter do
       |> write()
     end
 
-    {:noreply, nil}
+    {:noreply, :ok}
   rescue
     e in DocException ->
       Output.print_doc_exception(e)
 
-      {:noreply, nil}
+      {:noreply, :ok}
   end
-
-  @doc false
-  def handle_cast(_event, nil), do: {:noreply, nil}
 
   defp check_configurations do
     case Config.check_configurations() do
