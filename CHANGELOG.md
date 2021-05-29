@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.11] - 2021-05-29
+
+### Fixed
+
+- Handle events from ExUnit 1.12
+
 ## [0.7.10] - 2021-04-25
 
 ### Fixed
@@ -126,6 +132,7 @@ Improve CI/CD flow:
 - Add changelog and Makefile.
 
 [unreleased]: https://github.com/brainnco/xcribe/compare/v0.7.9...master
+[0.7.11]: https://github.com/brainnco/xcribe/compare/v0.7.10...v0.7.11
 [0.7.9]: https://github.com/brainnco/xcribe/compare/v0.7.8...v0.7.9
 [0.7.8]: https://github.com/brainnco/xcribe/compare/v0.7.7...v0.7.8
 [0.7.7]: https://github.com/brainnco/xcribe/compare/v0.7.6...v0.7.7
