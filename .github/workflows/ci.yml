@@ -8,27 +8,27 @@ on:
       - '*'
 jobs:
   mix_format:
-    name: mix format (Elixir 1.10.2 OTP 22.3)
+    name: mix format (Elixir 1.12.1 OTP 24.0.1)
     runs-on: ubuntu-16.04
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-elixir@v1.0.0
+      - uses: erlef/setup-beam@v1
         with:
-          otp-version: "22.3"
-          elixir-version: "1.10.2"
+          otp-version: "24.0.1"
+          elixir-version: "1.12.1"
       - name: Install Dependencies
         run: mix deps.get
       - name: Run Formatter
         run: mix format --check-formatted
   mix_credo:
-    name: mix credo (Elixir 1.10.2 OTP 22.3)
+    name: mix credo (Elixir 1.12.1 OTP 24.0.1)
     runs-on: ubuntu-16.04
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-elixir@v1.0.0
+      - uses: erlef/setup-beam@v1
         with:
-          otp-version: "22.3"
-          elixir-version: "1.10.2"
+          otp-version: "24.0.1"
+          elixir-version: "1.12.1"
       - name: Install Dependencies
         run: mix deps.get
       - name: Run Credo
@@ -37,7 +37,7 @@ jobs:
     name: mix test (Elixir ${{ matrix.elixir }} OTP ${{ matrix.otp }})
     strategy:
       matrix:
-        elixir: ["1.8.2", "1.9.1", "1.10.2"]
+        elixir: ["1.8.2", "1.9.1", "1.10.2", "1.12.1"]
         include:
           - elixir: "1.8.2"
             otp: "21.3.8"
@@ -45,10 +45,12 @@ jobs:
             otp: "22.1.8"
           - elixir: "1.10.2"
             otp: "22.3"
+          - elixir: "1.12.1"
+            otp: "24.0.1"
     runs-on: ubuntu-16.04
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-elixir@v1.0.0
+      - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
@@ -62,10 +64,10 @@ jobs:
     needs: [mix_format, mix_credo, mix_test]
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-elixir@v1.0.0
+      - uses: erlef/setup-beam@v1
         with:
-          otp-version: "22.3"
-          elixir-version: "1.10.2"
+          otp-version: "24.0.1"
+          elixir-version: "1.12.1"
       - name: Install Dependencies
         run: mix deps.get
       - name: Run Mix Coverage
@@ -75,16 +77,16 @@ jobs:
       - name: Run codecov script
         run: bash <(curl -s https://codecov.io/bash)
   mix_check_version:
-    name: Check version (Elixir 1.10.2 OTP 22.3)
+    name: Check version (Elixir 1.12.1 OTP 24.0.1)
     runs-on: ubuntu-16.04
     needs: [mix_format, mix_credo, mix_test]
     if: github.ref != 'refs/heads/master' && github.event_name == 'pull_request' && github.base_ref == 'master'
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-elixir@v1.0.0
+      - uses: erlef/setup-beam@v1
         with:
-          otp-version: "22.3"
-          elixir-version: "1.10.2"
+          otp-version: "24.0.1"
+          elixir-version: "1.12.1"
       - name: Install Dependencies
         run: mix deps.get
       - name: Check version
@@ -92,7 +94,7 @@ jobs:
           HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
         run: mix run bin/check_version.exs
   mix_publish:
-    name: Publish (Elixir 1.10.2 OTP 22.3)
+    name: Publish (Elixir 1.12.1 OTP 24.0.1)
     runs-on: ubuntu-16.04
     needs: [mix_format, mix_credo, mix_test]
     outputs:
@@ -100,10 +102,10 @@ jobs:
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-elixir@v1.0.0
+      - uses: erlef/setup-beam@v1
         with:
-          otp-version: "22.3"
-          elixir-version: "1.10.2"
+          otp-version: "24.0.1"
+          elixir-version: "1.12.1"
       - name: Install Dependencies
         run: mix do deps.get, deps.compile, compile
       - name: Publish

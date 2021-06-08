@@ -50,7 +50,7 @@ defmodule Xcribe.FormatterTest do
       expected_content = String.replace(@sample_swagger_output, ~r/\s/, "")
 
       assert capture_io(fn ->
-               assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
+               assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
              end) =~ "Xcribe documentation written in"
 
       assert @output_path |> File.read!() |> String.replace(~r/\s/, "") == expected_content
@@ -74,7 +74,7 @@ defmodule Xcribe.FormatterTest do
       Application.put_env(:xcribe, :format, :api_blueprint)
 
       assert capture_io(fn ->
-               assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
+               assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
              end) =~ "Xcribe documentation written in"
 
       assert File.read!(@output_path) == @sample_apib_output
@@ -100,7 +100,7 @@ defmodule Xcribe.FormatterTest do
 
       output =
         capture_io(fn ->
-          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
+          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
         end)
 
       assert output =~ "route not found"
@@ -139,7 +139,7 @@ defmodule Xcribe.FormatterTest do
 
       output =
         capture_io(fn ->
-          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
+          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
         end)
 
       assert output =~ "route not found"
@@ -154,7 +154,7 @@ defmodule Xcribe.FormatterTest do
 
       output =
         capture_io(fn ->
-          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
+          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
         end)
 
       assert output =~ "Config key: json_library"
@@ -177,10 +177,29 @@ defmodule Xcribe.FormatterTest do
 
       output =
         capture_io(fn ->
-          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, nil}
+          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
         end)
 
       assert output =~ "An exception was raised"
+    end
+  end
+
+  describe "Handle events from all ExUnit versions" do
+    test "ExUnit =< 1.11" do
+      capture_io(fn ->
+        assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
+      end)
+    end
+
+    test "ExUnit =~ 1.12" do
+      capture_io(fn ->
+        assert Formatter.handle_cast({:suite_finished, %{run: 1, async: 2, load: 3}}, nil) ==
+                 {:noreply, :ok}
+      end)
+    end
+
+    test "unexpected event" do
+      assert Formatter.handle_cast({:other_event}, nil) == {:noreply, nil}
     end
   end
 end
