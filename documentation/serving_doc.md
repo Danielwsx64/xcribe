@@ -22,7 +22,7 @@ must be `priv/static` and you must enable `serve` config.
 Add a doc scope to your router, and forward all requests to `Xcribe.Web.Plug`
 
 ```
-      scope "doc/swagger" do
+      scope "/doc/swagger" do
         forward "/", Xcribe.Web.Plug
       end
 
