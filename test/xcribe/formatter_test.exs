@@ -18,12 +18,11 @@ defmodule Xcribe.FormatterTest do
     Application.put_env(:xcribe, :format, :swagger)
     Application.delete_env(:xcribe, :json_library)
 
-    Recorder.start_link()
-
     on_exit(fn ->
       Application.delete_env(:xcribe, :env_var)
       Application.delete_env(:xcribe, :output)
       Application.delete_env(:xcribe, :information_source)
+      Recorder.clear()
     end)
 
     :ok

@@ -9,13 +9,13 @@ defmodule Xcribe.DocumentTest do
     Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
     Application.put_env(:xcribe, :env_var, "PWD")
 
-    :ok
+    on_exit(fn ->
+      Recorder.clear()
+    end)
   end
 
   describe "document/1" do
     test "parse conn and save it", %{conn: conn} do
-      Recorder.start_link()
-
       conn =
         conn
         |> put_req_header("authorization", "token")
@@ -40,8 +40,6 @@ defmodule Xcribe.DocumentTest do
     end
 
     test "parse conn and save it whith custom description", %{conn: conn} do
-      Recorder.start_link()
-
       request_description = "some description"
 
       conn =
@@ -60,7 +58,7 @@ defmodule Xcribe.DocumentTest do
           call: %{
             description: test_name,
             file: file_name,
-            line: 51
+            line: 49
           }
         })
 
@@ -68,8 +66,6 @@ defmodule Xcribe.DocumentTest do
     end
 
     test "handle parse errors" do
-      Recorder.start_link()
-
       document(%{})
 
       test_name = "test document/1 handle parse errors"
@@ -81,7 +77,7 @@ defmodule Xcribe.DocumentTest do
           call: %{
             description: test_name,
             file: file_name,
-            line: 73
+            line: 69
           }
         })
 
@@ -90,8 +86,6 @@ defmodule Xcribe.DocumentTest do
 
     test "dont document when env var is not defined", %{conn: conn} do
       Application.put_env(:xcribe, :env_var, "NOT_DEFINED_ENV_VAR_TEST")
-
-      Recorder.start_link()
 
       conn
       |> put_req_header("authorization", "token")

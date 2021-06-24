@@ -86,25 +86,22 @@ defmodule Xcribe do
   alias Xcribe.Config
 
   @doc false
-  def start(_type, _opts) do
-    opts = [strategy: :one_for_one, name: Xcribe.Supervisor]
-
+  def start(_type, opts) do
     case Config.check_configurations([:serve]) do
       {:error, errors} -> Output.print_configuration_errors(errors)
       :ok -> :ok
     end
 
-    Supervisor.start_link(children(), opts)
+    opts
+    |> Keyword.get(:children, [])
+    |> Enum.concat(xcribe_children())
+    |> Supervisor.start_link(strategy: :one_for_one, name: Xcribe.Supervisor)
   end
 
-  @doc false
-  def start(_options \\ []) do
-    {:ok, _} = Application.start(:xcribe)
-
-    :ok
-  end
-
-  defp children do
-    [{Xcribe.Recorder, []}]
+  defp xcribe_children do
+    [
+      {Xcribe.Config, []},
+      {Xcribe.Recorder, []}
+    ]
   end
 end
