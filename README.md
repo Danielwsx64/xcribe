@@ -54,10 +54,7 @@ Add a new configuration with the created module
 config/test.exs
 
 ```elixir
-  config :xcribe,
-    information_source: YourAppWeb.Support.DocInformation,
-    format: :swagger,
-    output: "app_doc.json"
+  config :xcribe, information_source: YourAppWeb.Support.DocInformation
 ```
 
 Next, in your `test/test_helper.exs` you should configure ExUnit to use Xcribe
@@ -167,6 +164,8 @@ config :xcribe, [
   json_library: Jason
 ]
 ```
+
+See `Xcribe` to more configuration options.
 
 ### Serve documentation
 

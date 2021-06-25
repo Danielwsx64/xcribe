@@ -31,5 +31,5 @@ defmodule Xcribe.JSON do
     json_library().decode!(value, options)
   end
 
-  defp json_library, do: Config.json_library()
+  defp json_library, do: Config.fetch(:json_library)
 end

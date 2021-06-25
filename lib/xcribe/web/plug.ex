@@ -31,7 +31,7 @@ defmodule Xcribe.Web.Plug do
   )
 
   get "/" do
-    if Config.serving?() do
+    if Config.fetch(:serving?) do
       uri =
         URI.to_string(%URI{
           host: conn.host,
@@ -50,7 +50,7 @@ defmodule Xcribe.Web.Plug do
 
   @doc false
   def init(_opts) do
-    file = String.replace_prefix(Config.output_file(), "priv/static", "")
+    file = String.replace_prefix(Config.fetch(:output_file), "priv/static", "")
 
     [file: file]
   end

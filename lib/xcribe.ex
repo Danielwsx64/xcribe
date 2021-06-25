@@ -57,13 +57,11 @@ defmodule Xcribe do
 
   ## Configuration
 
-  You must configure at least the `information_source` and `format` for basic use.
+  You must configure  the `information_source`.
 
-  eg
+  eg:
 
-      config :xcribe,
-        information_source: YourApp.YouModuleInformation,
-        format: :swagger
+      config :xcribe, information_source: YourApp.YouModuleInformation
 
   #### Available configurations:
 
@@ -73,7 +71,7 @@ defmodule Xcribe do
     value changes by the format, 'api_blueprint.apib' for Blueprint and
     'app_doc.json' for swagger.
     * `:format` - Format to generate documentation, allowed `:api_blueprint` and
-    `:swagger`. Default `:api_blueprint`.
+    `:swagger`. Default `:swagger`.
     * `:env_var` - Environment variable name for active Xcribe documentation
     generator. Default is `XCRIBE_ENV`.
     * `:json_library` - The library to be used for json decode/encode (Jason
@@ -87,7 +85,7 @@ defmodule Xcribe do
 
   @doc false
   def start(_type, opts) do
-    case Config.check_configurations([:serve]) do
+    case Config.check_configurations([:serving?]) do
       {:error, errors} -> Output.print_configuration_errors(errors)
       :ok -> :ok
     end

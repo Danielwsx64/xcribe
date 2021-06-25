@@ -46,7 +46,7 @@ defmodule Xcribe.Formatter do
   def handle_cast(_event, state), do: {:noreply, state}
 
   defp suite_finished do
-    if Config.active?() do
+    if Config.fetch(:active?) do
       check_configurations()
       |> get_recorded_requests()
       |> validate_records()
@@ -104,7 +104,7 @@ defmodule Xcribe.Formatter do
   defp generate_docs(:error), do: :error
 
   defp generate_docs(requests) when is_list(requests) do
-    case Config.doc_format!() do
+    case Config.fetch!(:doc_format) do
       :api_blueprint -> ApiBlueprint.generate_doc(requests)
       :swagger -> Swagger.generate_doc(requests)
     end

@@ -8,7 +8,7 @@ defmodule Xcribe.Writter do
   This writes the given text to the configured output file
   """
   def write(text) do
-    output_file = Config.output_file()
+    output_file = Config.fetch(:output_file)
 
     output_file
     |> Path.dirname()

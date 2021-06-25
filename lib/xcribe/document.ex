@@ -30,6 +30,8 @@ defmodule Xcribe.Document do
     test_description = __CALLER__.function |> elem(0) |> to_string
     "test " <> suggest_from_test = test_description
 
+    :ok = Module.put_attribute(__CALLER__.module, :tag, :xcribe_document)
+
     meta =
       Macro.escape(%{
         call: %{description: test_description, file: __CALLER__.file, line: __CALLER__.line}
@@ -38,7 +40,7 @@ defmodule Xcribe.Document do
     quote bind_quoted: [conn: conn, opts: opts, suggestion: suggest_from_test, meta: meta] do
       options = Keyword.merge([as: suggestion], opts)
 
-      if Config.active?() do
+      if Config.fetch(:active?) do
         conn
         |> ConnParser.execute(Keyword.fetch!(options, :as))
         |> Map.put(:__meta__, meta)

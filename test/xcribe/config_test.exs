@@ -12,131 +12,135 @@ defmodule Xcribe.ConfigTest do
       Application.delete_env(:xcribe, :json_library)
       Application.delete_env(:xcribe, :information_source)
       Application.delete_env(:xcribe, :serve)
+      Config.clear_override()
     end)
-
-    :ok
   end
 
-  describe "serving?/0" do
+  describe "fetch [ :serving? ]" do
     test "return true when serve mode is enable" do
       Application.put_env(:xcribe, :serve, true)
-      assert Config.serving?() == true
+      assert Config.fetch(:serving?) == true
     end
 
     test "return false when config was not given" do
-      assert Config.serving?() == false
+      assert Config.fetch(:serving?) == false
     end
 
     test "return false for invalid configuration" do
       Application.put_env(:xcribe, :serve, "true")
-      assert Config.serving?() == false
+      assert Config.fetch(:serving?) == false
     end
   end
 
-  describe "output_file/0" do
+  describe "fetch [ :output_file ]" do
     test "return configured output name" do
       Application.put_env(:xcribe, :output, "example.md")
-      assert Config.output_file() == "example.md"
+      assert Config.fetch(:output_file) == "example.md"
     end
 
     test "return default file name for ApiBlueprint" do
       Application.put_env(:xcribe, :format, :api_blueprint)
-      assert Config.output_file() == "api_doc.apib"
+      assert Config.fetch(:output_file) == "api_doc.apib"
     end
 
     test "return default file name for Swagger" do
       Application.put_env(:xcribe, :format, :swagger)
-      assert Config.output_file() == "openapi.json"
+      assert Config.fetch(:output_file) == "openapi.json"
     end
 
     test "return empty string for invalid format" do
       Application.put_env(:xcribe, :format, :invalid)
-      assert Config.output_file() == ""
+      assert Config.fetch(:output_file) == ""
+    end
+
+    test "override configuration" do
+      Config.override(:output_file, "override_value.md")
+      assert Config.fetch(:output_file) == "override_value.md"
     end
   end
 
-  describe "active?/0" do
+  describe "fetch [ :active? ]" do
     test "return true when xcribe env var is defined" do
       Application.put_env(:xcribe, :env_var, "EXISTING_ENV_VAR_NEW_CONFIG")
       System.put_env("EXISTING_ENV_VAR_NEW_CONFIG", "1")
 
-      assert Config.active?() == true
+      assert Config.fetch(:active?) == true
     end
 
     test "return false when xcribe env var is undefined" do
       Application.put_env(:xcribe, :env_var, "UNDEFINED_XCRIBE_ENV_VAR_!@#")
 
-      assert Config.active?() == false
+      assert Config.fetch(:active?) == false
     end
 
     test "return true for default env var name" do
       System.put_env("XCRIBE_ENV", "1")
 
-      assert Config.active?() == true
+      assert Config.fetch(:active?) == true
     end
   end
 
-  describe "doc_format!/0" do
+  describe "fetch! [ :doc_format ]" do
     test "when ApiBlueprint format is specified" do
       Application.put_env(:xcribe, :format, :api_blueprint)
 
-      assert Config.doc_format!() == :api_blueprint
+      assert Config.fetch!(:doc_format) == :api_blueprint
     end
 
     test "when an invalid format is specified" do
       Application.put_env(:xcribe, :format, :invalid)
 
       assert_raise UnknownFormat, fn ->
-        Config.doc_format!()
+        Config.fetch!(:doc_format)
       end
     end
   end
 
-  describe "doc_format/0" do
+  describe "fetch [ :doc_format ]" do
     test "when ApiBlueprint format is specified" do
       Application.put_env(:xcribe, :format, :api_blueprint)
 
-      assert Config.doc_format() == :api_blueprint
+      assert Config.fetch(:doc_format) == :api_blueprint
     end
 
     test "when Swagger format is specified" do
       Application.put_env(:xcribe, :format, :swagger)
 
-      assert Config.doc_format() == :swagger
+      assert Config.fetch(:doc_format) == :swagger
     end
   end
 
-  describe "xcribe_information_source!/0" do
+  describe "fetch! [ :xcribe_information_source ]" do
     test "return information source" do
       Application.put_env(:xcribe, :information_source, FakeOne)
-      assert Config.xcribe_information_source!() == FakeOne
+      assert Config.fetch!(:xcribe_information_source) == FakeOne
     end
 
     test "when module is not configured" do
       Application.delete_env(:xcribe, :information_source)
 
       assert_raise MissingInformationSource, fn ->
-        Config.xcribe_information_source!()
+        Config.fetch!(:xcribe_information_source)
       end
     end
   end
 
-  describe "xcribe_information_source/0" do
+  describe "fetch [ :xcribe_information_source ]" do
     test "return information source" do
       Application.put_env(:xcribe, :information_source, FakeOne)
-      assert Config.xcribe_information_source() == FakeOne
+      assert Config.fetch(:xcribe_information_source) == FakeOne
     end
   end
 
-  describe "json_library/o" do
+  describe "fetch [ json_library ]" do
     test "return configured json library" do
       Application.put_env(:xcribe, :json_library, FakeOne)
-      assert Config.json_library() == FakeOne
+      assert Config.fetch(:json_library) == FakeOne
     end
 
     test "return Phoenix configured json library" do
       Application.delete_env(:xcribe, :json_library)
-      assert Config.json_library() == Jason
+      assert Config.fetch(:json_library) == Jason
     end
   end
 
@@ -183,7 +187,7 @@ defmodule Xcribe.ConfigTest do
       Application.put_env(:xcribe, :format, :invalid)
       Application.put_env(:xcribe, :serve, true)
 
-      assert Config.check_configurations([:format, :information_source]) ==
+      assert Config.check_configurations([:doc_format, :xcribe_information_source]) ==
                {:error,
                 [
                   {:information_source, FakeInfo,
