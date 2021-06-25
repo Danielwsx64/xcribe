@@ -10,22 +10,34 @@ defmodule Xcribe.FormatterTest do
   @sample_swagger_output File.read!("test/support/swagger_example.json")
   @sample_apib_output File.read!("test/support/api_blueprint_example.apib")
   @output_path "/tmp/test"
+  @active_state [active?: true]
 
   setup do
-    Application.put_env(:xcribe, :env_var, "PWD")
     Application.put_env(:xcribe, :output, @output_path)
     Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
     Application.put_env(:xcribe, :format, :swagger)
     Application.delete_env(:xcribe, :json_library)
 
     on_exit(fn ->
-      Application.delete_env(:xcribe, :env_var)
       Application.delete_env(:xcribe, :output)
       Application.delete_env(:xcribe, :information_source)
+      Application.delete_env(:xcribe, :env_var)
       Recorder.clear()
     end)
 
     :ok
+  end
+
+  describe "init/1" do
+    test "return active false" do
+      assert Formatter.init([]) == {:ok, active?: false}
+    end
+
+    test "return active true by env var" do
+      Application.put_env(:xcribe, :env_var, "PWD")
+
+      assert Formatter.init([]) == {:ok, active?: true}
+    end
   end
 
   describe "write document" do
@@ -49,7 +61,8 @@ defmodule Xcribe.FormatterTest do
       expected_content = String.replace(@sample_swagger_output, ~r/\s/, "")
 
       assert capture_io(fn ->
-               assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
+               assert Formatter.handle_cast({:suite_finished, 1, 2}, @active_state) ==
+                        {:noreply, :ok}
              end) =~ "Xcribe documentation written in"
 
       assert @output_path |> File.read!() |> String.replace(~r/\s/, "") == expected_content
@@ -73,10 +86,21 @@ defmodule Xcribe.FormatterTest do
       Application.put_env(:xcribe, :format, :api_blueprint)
 
       assert capture_io(fn ->
-               assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
+               assert Formatter.handle_cast({:suite_finished, 1, 2}, @active_state) ==
+                        {:noreply, :ok}
              end) =~ "Xcribe documentation written in"
 
       assert File.read!(@output_path) == @sample_apib_output
+    end
+
+    test "ignore suite_finished when is not active" do
+      Recorder.save(RequestsGenerator.users_posts_update([:api_key_auth]))
+      status = [active?: false]
+
+      assert capture_io(fn ->
+               assert Formatter.handle_cast({:suite_finished, 1, 2}, status) ==
+                        {:noreply, status}
+             end) == ""
     end
   end
 
@@ -99,7 +123,7 @@ defmodule Xcribe.FormatterTest do
 
       output =
         capture_io(fn ->
-          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
+          assert Formatter.handle_cast({:suite_finished, 1, 2}, @active_state) == {:noreply, :ok}
         end)
 
       assert output =~ "route not found"
@@ -138,7 +162,7 @@ defmodule Xcribe.FormatterTest do
 
       output =
         capture_io(fn ->
-          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
+          assert Formatter.handle_cast({:suite_finished, 1, 2}, @active_state) == {:noreply, :ok}
         end)
 
       assert output =~ "route not found"
@@ -153,7 +177,7 @@ defmodule Xcribe.FormatterTest do
 
       output =
         capture_io(fn ->
-          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
+          assert Formatter.handle_cast({:suite_finished, 1, 2}, @active_state) == {:noreply, :ok}
         end)
 
       assert output =~ "Config key: json_library"
@@ -176,7 +200,7 @@ defmodule Xcribe.FormatterTest do
 
       output =
         capture_io(fn ->
-          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
+          assert Formatter.handle_cast({:suite_finished, 1, 2}, @active_state) == {:noreply, :ok}
         end)
 
       assert output =~ "An exception was raised"
@@ -186,13 +210,16 @@ defmodule Xcribe.FormatterTest do
   describe "Handle events from all ExUnit versions" do
     test "ExUnit =< 1.11" do
       capture_io(fn ->
-        assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
+        assert Formatter.handle_cast({:suite_finished, 1, 2}, @active_state) == {:noreply, :ok}
       end)
     end
 
     test "ExUnit =~ 1.12" do
       capture_io(fn ->
-        assert Formatter.handle_cast({:suite_finished, %{run: 1, async: 2, load: 3}}, nil) ==
+        assert Formatter.handle_cast(
+                 {:suite_finished, %{run: 1, async: 2, load: 3}},
+                 @active_state
+               ) ==
                  {:noreply, :ok}
       end)
     end

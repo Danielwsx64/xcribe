@@ -38,22 +38,20 @@ defmodule Xcribe.Formatter do
   }
 
   @doc false
-  def init(_config), do: {:ok, nil}
+  def init(_config), do: {:ok, active?: Config.fetch(:active?)}
 
   @doc false
-  def handle_cast({:suite_finished, _run_us, _load_us}, _state), do: suite_finished()
-  def handle_cast({:suite_finished, _time_us}, _state), do: suite_finished()
+  def handle_cast({:suite_finished, _run_us, _load_us}, active?: true), do: suite_finished()
+  def handle_cast({:suite_finished, _time_us}, active?: true), do: suite_finished()
   def handle_cast(_event, state), do: {:noreply, state}
 
   defp suite_finished do
-    if Config.fetch(:active?) do
-      check_configurations()
-      |> get_recorded_requests()
-      |> validate_records()
-      |> order_by_path()
-      |> generate_docs()
-      |> write()
-    end
+    check_configurations()
+    |> get_recorded_requests()
+    |> validate_records()
+    |> order_by_path()
+    |> generate_docs()
+    |> write()
 
     {:noreply, :ok}
   rescue
