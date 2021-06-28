@@ -33,6 +33,7 @@ defmodule Xcribe.ConnParser do
       header_params: conn.req_headers,
       controller: controller_module(route),
       description: description,
+      endpoint: Map.fetch!(conn.private, :phoenix_endpoint),
       params: conn.params,
       path: path,
       path_params: conn.path_params,
