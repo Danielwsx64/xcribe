@@ -78,28 +78,81 @@ defmodule Xcribe do
     and Poison are supported). The default is the same as `Phoenix` configuration.
     * `:serve` - Enable Xcribe serve mode. Default `false`. See more `Serving doc`
   """
-  use Application
+  require Logger
 
-  alias Xcribe.CLI.Output
-  alias Xcribe.Config
+  alias Xcribe.{
+    ApiBlueprint,
+    CLI.Output,
+    Config,
+    DocException,
+    Recorder,
+    Request,
+    Request.Error,
+    Request.Validator,
+    Swagger,
+    Writter
+  }
 
   @doc false
-  def start(_type, opts) do
-    case Config.check_configurations([:serving?]) do
-      {:error, errors} -> Output.print_configuration_errors(errors)
+  def suite_finished do
+    check_configurations()
+    |> get_recorded_requests()
+    |> validate_records()
+    |> order_by_path()
+    |> generate_docs()
+    |> write()
+  rescue
+    e in DocException ->
+      Output.print_doc_exception(e)
+  end
+
+  defp check_configurations do
+    case Config.check_configurations() do
+      {:error, errs} -> Output.print_configuration_errors(errs) && :error
       :ok -> :ok
     end
-
-    opts
-    |> Keyword.get(:children, [])
-    |> Enum.concat(xcribe_children())
-    |> Supervisor.start_link(strategy: :one_for_one, name: Xcribe.Supervisor)
   end
 
-  defp xcribe_children do
-    [
-      {Xcribe.Config, []},
-      {Xcribe.Recorder, []}
-    ]
+  defp get_recorded_requests(:ok), do: Recorder.get_all()
+  defp get_recorded_requests(:error), do: :error
+
+  defp validate_records(:error), do: :error
+
+  defp validate_records(records) when is_list(records) do
+    records
+    |> Enum.reduce({:ok, []}, &validate_request/2)
+    |> handle_errors()
   end
+
+  defp validate_request(%Request{} = request, acc) do
+    request
+    |> Validator.validate()
+    |> add_result(acc)
+  end
+
+  defp validate_request(%Error{} = err, {:ok, _requests}), do: {:error, [err]}
+  defp validate_request(%Error{} = err, {:error, errs}), do: {:error, [err | errs]}
+
+  defp add_result({:error, error}, {:error, errs}), do: {:error, [error | errs]}
+  defp add_result({:error, error}, {:ok, _requests}), do: {:error, [error]}
+  defp add_result({:ok, request}, {:ok, requests}), do: {:ok, [request | requests]}
+  defp add_result({:ok, _request}, {:error, _errs} = errs), do: errs
+
+  defp handle_errors({:error, errs}), do: Output.print_request_errors(errs) && :error
+  defp handle_errors({:ok, requests}), do: requests
+
+  defp order_by_path(:error), do: :error
+  defp order_by_path(requests), do: Enum.sort(requests, &(&1.path >= &2.path))
+
+  defp generate_docs(:error), do: :error
+
+  defp generate_docs(requests) when is_list(requests) do
+    case Config.fetch!(:doc_format) do
+      :api_blueprint -> ApiBlueprint.generate_doc(requests)
+      :swagger -> Swagger.generate_doc(requests)
+    end
+  end
+
+  defp write(:error), do: :error
+  defp write(text) when is_binary(text), do: Writter.write(text)
 end
