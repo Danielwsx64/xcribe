@@ -3,9 +3,7 @@ defmodule Xcribe.JsonSchema do
 
   alias Plug.Upload
 
-  @doc """
-  Return the type of given data
-  """
+  @doc "Return the type of given data"
   def type_for(item) when is_number(item), do: "number"
   def type_for(item) when is_binary(item), do: "string"
   def type_for(item) when is_boolean(item), do: "boolean"
@@ -13,9 +11,7 @@ defmodule Xcribe.JsonSchema do
   def type_for(item) when is_list(item), do: "array"
   def type_for(_), do: "string"
 
-  @doc ~S"""
-  Return the format of given data
-  """
+  @doc "Return the format of given data"
   def format_for(data) when is_float(data), do: "float"
   def format_for(data) when is_integer(data), do: "int32"
   def format_for(_), do: ""

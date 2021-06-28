@@ -9,9 +9,9 @@ defmodule Xcribe.DocumentTest do
     Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
     Application.put_env(:xcribe, :env_var, "PWD")
 
-    on_exit(fn ->
-      Recorder.clear()
-    end)
+    Recorder.pop_all()
+
+    :ok
   end
 
   describe "document/1" do
@@ -36,7 +36,7 @@ defmodule Xcribe.DocumentTest do
           }
         })
 
-      assert Recorder.get_all() == [parsed_request_with_meta]
+      assert Recorder.pop_all() == %{Xcribe.Endpoint => [parsed_request_with_meta]}
     end
 
     test "parse conn and save it whith custom description", %{conn: conn} do
@@ -62,7 +62,7 @@ defmodule Xcribe.DocumentTest do
           }
         })
 
-      assert Recorder.get_all() == [parsed_request_with_meta]
+      assert Recorder.pop_all() == %{Xcribe.Endpoint => [parsed_request_with_meta]}
     end
 
     test "handle parse errors" do
@@ -81,7 +81,7 @@ defmodule Xcribe.DocumentTest do
           }
         })
 
-      assert Recorder.get_all() == [parsed_request_with_meta]
+      assert Recorder.pop_all() == %{error: [parsed_request_with_meta]}
     end
 
     test "dont document when env var is not defined", %{conn: conn} do
@@ -92,7 +92,7 @@ defmodule Xcribe.DocumentTest do
       |> get(users_path(conn, :index))
       |> document()
 
-      assert Recorder.get_all() == []
+      assert Recorder.pop_all() == %{}
     end
   end
 end

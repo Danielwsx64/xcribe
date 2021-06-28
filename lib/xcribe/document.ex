@@ -44,7 +44,7 @@ defmodule Xcribe.Document do
         conn
         |> ConnParser.execute(Keyword.fetch!(options, :as))
         |> Map.put(:__meta__, meta)
-        |> Recorder.save()
+        |> Recorder.add()
       end
 
       conn

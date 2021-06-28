@@ -104,25 +104,34 @@ defmodule Xcribe do
   rescue
     e in DocException ->
       Output.print_doc_exception(e)
+      {:error, e.message}
   end
 
   defp check_configurations do
     case Config.check_configurations() do
-      {:error, errs} -> Output.print_configuration_errors(errs) && :error
-      :ok -> :ok
+      {:error, errs} ->
+        Output.print_configuration_errors(errs)
+
+        {:error, errs}
+
+      :ok ->
+        :ok
     end
   end
 
-  defp get_recorded_requests(:ok), do: Recorder.get_all()
-  defp get_recorded_requests(:error), do: :error
+  defp get_recorded_requests(:ok), do: {:ok, Recorder.pop_all()}
+  defp get_recorded_requests(error), do: error
 
-  defp validate_records(:error), do: :error
-
-  defp validate_records(records) when is_list(records) do
+  defp validate_records({:ok, records}) when is_map(records) do
     records
-    |> Enum.reduce({:ok, []}, &validate_request/2)
+    |> Enum.reduce({:ok, []}, &reduce_records_lists/2)
     |> handle_errors()
   end
+
+  defp validate_records(error), do: error
+
+  defp reduce_records_lists({_endpoint, records}, acc) when is_list(records),
+    do: Enum.reduce(records, acc, &validate_request/2)
 
   defp validate_request(%Request{} = request, acc) do
     request
@@ -138,21 +147,21 @@ defmodule Xcribe do
   defp add_result({:ok, request}, {:ok, requests}), do: {:ok, [request | requests]}
   defp add_result({:ok, _request}, {:error, _errs} = errs), do: errs
 
-  defp handle_errors({:error, errs}), do: Output.print_request_errors(errs) && :error
-  defp handle_errors({:ok, requests}), do: requests
+  defp handle_errors({:error, errs} = err), do: Output.print_request_errors(errs) && err
+  defp handle_errors({:ok, _requests} = success), do: success
 
-  defp order_by_path(:error), do: :error
-  defp order_by_path(requests), do: Enum.sort(requests, &(&1.path >= &2.path))
+  defp order_by_path({:ok, requests}), do: {:ok, Enum.sort(requests, &(&1.path >= &2.path))}
+  defp order_by_path(error), do: error
 
-  defp generate_docs(:error), do: :error
-
-  defp generate_docs(requests) when is_list(requests) do
+  defp generate_docs({:ok, requests}) when is_list(requests) do
     case Config.fetch!(:doc_format) do
       :api_blueprint -> ApiBlueprint.generate_doc(requests)
       :swagger -> Swagger.generate_doc(requests)
     end
   end
 
-  defp write(:error), do: :error
+  defp generate_docs(error), do: error
+
+  defp write({:error, _msg} = err), do: err
   defp write(text) when is_binary(text), do: Writter.write(text)
 end

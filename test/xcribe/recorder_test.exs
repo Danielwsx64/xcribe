@@ -4,37 +4,47 @@ defmodule Xcribe.RecorderTest do
   alias Xcribe.{Recorder, Request, Request.Error}
 
   setup do
-    on_exit(fn ->
-      Recorder.clear()
-    end)
+    Recorder.pop_all()
+
+    :ok
   end
 
-  describe "save and get requests records" do
-    test "use genserver to save and recover requests" do
-      request_one = %Request{description: "first request"}
-      request_two = %Request{description: "second request"}
+  describe "add/1" do
+    test "use genserver to save and recover requests and errors" do
+      request_one = %Request{description: "first request", endpoint: "first_endpoint"}
+      request_two = %Request{description: "second request", endpoint: "first_endpoint"}
+      request_three = %Request{description: "third request", endpoint: "second_endpoint"}
       request_error = %Error{message: "some error"}
 
-      Recorder.save(request_one)
-      Recorder.save(request_two)
-      Recorder.save(request_error)
+      Recorder.add(request_one)
+      Recorder.add(request_two)
+      Recorder.add(request_three)
+      Recorder.add(request_error)
 
-      assert Recorder.get_all() == [request_error, request_two, request_one]
+      assert :sys.get_state(Recorder) == %{
+               :error => [request_error],
+               "first_endpoint" => [request_two, request_one],
+               "second_endpoint" => [request_three]
+             }
     end
   end
 
-  describe "clear saved records" do
-    test "use genserver to save and recover requests" do
-      request_one = %Request{description: "first request"}
-      request_two = %Request{description: "second request"}
+  describe "pop_all/0" do
+    test "pop all registered errors and requests from state" do
+      request_one = %Request{description: "first request", endpoint: "endpoint"}
+      request_two = %Request{description: "second request", endpoint: "endpoint"}
       request_error = %Error{message: "some error"}
 
-      Recorder.save(request_one)
-      Recorder.save(request_two)
-      Recorder.save(request_error)
+      Recorder.add(request_one)
+      Recorder.add(request_two)
+      Recorder.add(request_error)
 
-      assert Recorder.clear() == [request_error, request_two, request_one]
-      assert Recorder.get_all() == []
+      assert Recorder.pop_all() == %{
+               :error => [request_error],
+               "endpoint" => [request_two, request_one]
+             }
+
+      assert :sys.get_state(Recorder) == %{}
     end
   end
 end

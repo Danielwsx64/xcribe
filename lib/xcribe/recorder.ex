@@ -5,19 +5,22 @@ defmodule Xcribe.Recorder do
 
   alias Xcribe.{Request, Request.Error}
 
-  def start_link(_opts \\ []), do: GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  def start_link(_opts \\ []), do: GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
 
   def init(state), do: {:ok, state}
 
-  def save(%Request{} = request), do: GenServer.cast(__MODULE__, {:save, request})
-  def save(%Error{} = error), do: GenServer.cast(__MODULE__, {:save, error})
+  def add(%Request{} = request), do: GenServer.cast(__MODULE__, {:add_request, request})
+  def add(%Error{} = error), do: GenServer.cast(__MODULE__, {:add_error, error})
 
-  def get_all, do: GenServer.call(__MODULE__, :get_all)
+  def pop_all, do: GenServer.call(__MODULE__, :pop_all)
 
-  def clear, do: GenServer.call(__MODULE__, :clear)
+  def handle_cast({:add_request, request}, records) do
+    {:noreply, Map.update(records, request.endpoint, [request], &[request | &1])}
+  end
 
-  def handle_cast({:save, request}, records), do: {:noreply, [request | records]}
+  def handle_cast({:add_error, error}, records) do
+    {:noreply, Map.update(records, :error, [error], &[error | &1])}
+  end
 
-  def handle_call(:get_all, _from, records), do: {:reply, records, records}
-  def handle_call(:clear, _from, records), do: {:reply, records, []}
+  def handle_call(:pop_all, _from, records), do: {:reply, records, %{}}
 end
