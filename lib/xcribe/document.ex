@@ -3,7 +3,7 @@ defmodule Xcribe.Document do
   Exposes document/2 macro to be used in test specs.
   """
 
-  alias Xcribe.{Config, ConnParser, Recorder}
+  alias Xcribe.{ConnParser, Recorder}
 
   @doc """
   Document a request by a given `Plug.Conn`.
@@ -40,7 +40,7 @@ defmodule Xcribe.Document do
     quote bind_quoted: [conn: conn, opts: opts, suggestion: suggest_from_test, meta: meta] do
       options = Keyword.merge([as: suggestion], opts)
 
-      if Config.active?() do
+      if Recorder.active?() do
         conn
         |> ConnParser.execute(Keyword.fetch!(options, :as))
         |> Map.put(:__meta__, meta)

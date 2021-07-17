@@ -5,8 +5,40 @@ defmodule Xcribe.RecorderTest do
 
   setup do
     Recorder.pop_all()
+    Recorder.set_active(false)
 
-    :ok
+    on_exit(fn ->
+      System.delete_env("XCRIBE_ENV")
+    end)
+  end
+
+  describe "init/1" do
+    test "return active false" do
+      assert Recorder.init([]) == {:ok, %{active?: false, records: %{errors: []}}}
+    end
+
+    test "return active true by env var" do
+      System.put_env("XCRIBE_ENV", "asdf")
+      assert Recorder.init([]) == {:ok, %{active?: true, records: %{errors: []}}}
+    end
+  end
+
+  describe "active?/0" do
+    test "return true when is active" do
+      Recorder.set_active(true)
+      assert Recorder.active?() == true
+    end
+
+    test "return false when not active" do
+      assert Recorder.active?() == false
+    end
+  end
+
+  describe "set_active/1" do
+    test "set active value" do
+      assert Recorder.set_active(true) == :ok
+      assert :sys.get_state(Recorder) == %{active?: true, records: %{errors: []}}
+    end
   end
 
   describe "add/1" do
@@ -22,9 +54,12 @@ defmodule Xcribe.RecorderTest do
       Recorder.add(request_error)
 
       assert :sys.get_state(Recorder) == %{
-               :errors => [request_error],
-               "first_endpoint" => [request_two, request_one],
-               "second_endpoint" => [request_three]
+               active?: false,
+               records: %{
+                 :errors => [request_error],
+                 "first_endpoint" => [request_two, request_one],
+                 "second_endpoint" => [request_three]
+               }
              }
     end
   end
@@ -44,7 +79,7 @@ defmodule Xcribe.RecorderTest do
                "endpoint" => [request_two, request_one]
              }
 
-      assert :sys.get_state(Recorder) == %{errors: []}
+      assert :sys.get_state(Recorder) == %{active?: false, records: %{errors: []}}
     end
   end
 end

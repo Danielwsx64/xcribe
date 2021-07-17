@@ -25,17 +25,17 @@ defmodule Xcribe.FormatterTest do
       |> Keyword.keys()
       |> Enum.each(&Application.delete_env(:xcribe, &1))
 
-      System.delete_env("XCRIBE_ENV")
+      Recorder.set_active(false)
     end)
   end
 
   describe "init/1" do
-    test "return active false" do
+    test "return active false when recorder is not active" do
       assert Formatter.init([]) == {:ok, active?: false}
     end
 
-    test "return active true by env var" do
-      System.put_env("XCRIBE_ENV", "asdf")
+    test "return active true when recorder is active" do
+      Recorder.set_active(true)
       assert Formatter.init([]) == {:ok, active?: true}
     end
   end

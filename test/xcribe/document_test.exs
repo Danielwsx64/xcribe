@@ -6,11 +6,11 @@ defmodule Xcribe.DocumentTest do
   import Xcribe.Document
 
   setup do
-    System.put_env("XCRIBE_ENV", "true")
+    Recorder.set_active(true)
     Recorder.pop_all()
 
     on_exit(fn ->
-      System.delete_env("XCRIBE_ENV")
+      Recorder.set_active(false)
     end)
   end
 
@@ -84,8 +84,8 @@ defmodule Xcribe.DocumentTest do
       assert Recorder.pop_all() == %{errors: [parsed_request_with_meta]}
     end
 
-    test "dont document when env var is not defined", %{conn: conn} do
-      System.delete_env("XCRIBE_ENV")
+    test "dont document when recorder is not active", %{conn: conn} do
+      Recorder.set_active(false)
 
       conn
       |> put_req_header("authorization", "token")

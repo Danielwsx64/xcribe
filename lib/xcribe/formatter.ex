@@ -26,9 +26,7 @@ defmodule Xcribe.Formatter do
 
   @doc false
   def init(_config) do
-    active = (Config.active?() && true) || false
-
-    {:ok, active?: active}
+    {:ok, active?: Recorder.active?()}
   end
 
   @doc false
