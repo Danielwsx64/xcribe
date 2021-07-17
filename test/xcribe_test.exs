@@ -1,15 +1,14 @@
 defmodule XcribeTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   import ExUnit.CaptureIO
 
-  alias Xcribe.{Recorder, Request, Request.Error}
+  alias Xcribe.{DocException, Request, Request.Error}
 
   alias Xcribe.Support.RequestsGenerator
 
   @sample_swagger_output File.read!("test/support/swagger_example.json")
   @sample_apib_output File.read!("test/support/api_blueprint_example.apib")
-  @output_path "/tmp/test"
 
   test "README install version check" do
     app = :xcribe
@@ -21,71 +20,77 @@ defmodule XcribeTest do
     assert Version.match?(app_version, readme_versions)
   end
 
-  describe "suite_finished/0" do
-    setup do
-      Application.put_env(:xcribe, :output, @output_path)
-      Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
-      Application.put_env(:xcribe, :format, :swagger)
-      Application.delete_env(:xcribe, :json_library)
-      Recorder.pop_all()
-
-      on_exit(fn ->
-        Application.delete_env(:xcribe, :output)
-        Application.delete_env(:xcribe, :information_source)
-        Application.delete_env(:xcribe, :env_var)
-      end)
-
-      :ok
-    end
-
+  describe "generate_doc/2" do
     test "write documentation with swagger format" do
-      Application.put_env(:xcribe, :format, :swagger)
+      output_path = "/tmp/xcribe_test_#{:rand.uniform()}"
 
-      requests = [
-        RequestsGenerator.users_index([:basic_auth]),
-        RequestsGenerator.users_show([:basic_auth]),
-        RequestsGenerator.users_create([:bearer_auth]),
-        RequestsGenerator.users_update([:bearer_auth]),
-        RequestsGenerator.users_delete([:bearer_auth]),
-        RequestsGenerator.users_custom_action([:api_key_auth]),
-        RequestsGenerator.users_posts_index([:api_key_auth]),
-        RequestsGenerator.users_posts_create([:api_key_auth]),
-        RequestsGenerator.users_posts_update([:api_key_auth])
-      ]
+      recorded = %{
+        records: [
+          RequestsGenerator.users_index([:basic_auth]),
+          RequestsGenerator.users_show([:basic_auth]),
+          RequestsGenerator.users_create([:bearer_auth]),
+          RequestsGenerator.users_update([:bearer_auth]),
+          RequestsGenerator.users_delete([:bearer_auth]),
+          RequestsGenerator.users_custom_action([:api_key_auth]),
+          RequestsGenerator.users_posts_index([:api_key_auth]),
+          RequestsGenerator.users_posts_create([:api_key_auth]),
+          RequestsGenerator.users_posts_update([:api_key_auth])
+        ],
+        errors: []
+      }
 
-      Enum.each(requests, &Recorder.add(&1))
+      config = %{
+        format: :swagger,
+        information_source: Xcribe.Support.Information,
+        json_library: Jason,
+        output: output_path
+      }
 
       expected_content = String.replace(@sample_swagger_output, ~r/\s/, "")
 
-      assert capture_io(fn ->
-               assert Xcribe.suite_finished() == :ok
-             end) =~ "Xcribe documentation written in"
+      io_output =
+        capture_io(fn ->
+          assert Xcribe.generate_doc(recorded, config) == :ok
+        end)
 
-      assert @output_path |> File.read!() |> String.replace(~r/\s/, "") == expected_content
+      assert io_output =~ "Xcribe documentation written in"
+
+      assert output_path |> File.read!() |> String.replace(~r/\s/, "") == expected_content
     end
 
     test "write documentation with api_blueprint format" do
-      Application.put_env(:xcribe, :format, :api_blueprint)
+      output_path = "/tmp/xcribe_test_#{:rand.uniform()}"
 
-      requests = [
-        RequestsGenerator.users_index([:basic_auth]),
-        RequestsGenerator.users_show([:basic_auth]),
-        RequestsGenerator.users_create([:bearer_auth]),
-        RequestsGenerator.users_update([:bearer_auth]),
-        RequestsGenerator.users_delete([:bearer_auth]),
-        RequestsGenerator.users_custom_action([:api_key_auth]),
-        RequestsGenerator.users_posts_index([:api_key_auth]),
-        RequestsGenerator.users_posts_create([:api_key_auth]),
-        RequestsGenerator.users_posts_update([:api_key_auth])
-      ]
+      recorded = %{
+        records: [
+          RequestsGenerator.users_index([:basic_auth]),
+          RequestsGenerator.users_show([:basic_auth]),
+          RequestsGenerator.users_create([:bearer_auth]),
+          RequestsGenerator.users_update([:bearer_auth]),
+          RequestsGenerator.users_delete([:bearer_auth]),
+          RequestsGenerator.users_custom_action([:api_key_auth]),
+          RequestsGenerator.users_posts_index([:api_key_auth]),
+          RequestsGenerator.users_posts_create([:api_key_auth]),
+          RequestsGenerator.users_posts_update([:api_key_auth])
+        ],
+        errors: []
+      }
 
-      Enum.each(requests, &Recorder.add(&1))
+      config = %{
+        format: :api_blueprint,
+        information_source: Xcribe.Support.Information,
+        json_library: Jason,
+        output: output_path
+      }
 
-      assert capture_io(fn ->
-               assert Xcribe.suite_finished() == :ok
-             end) =~ "Xcribe documentation written in"
+      io_output =
+        capture_io(fn ->
+          assert Xcribe.generate_doc(recorded, config) == :ok
+        end)
 
-      assert File.read!(@output_path) == @sample_apib_output
+      assert io_output =~ "Xcribe documentation written in"
+
+      assert File.read!(output_path) == @sample_apib_output
     end
 
     test "handle parsing errors" do
@@ -101,16 +106,14 @@ defmodule XcribeTest do
         }
       }
 
-      Recorder.add(%Request{})
-      Recorder.add(error)
+      recorded = %{
+        records: [%Request{}],
+        errors: [error]
+      }
 
-      output =
-        capture_io(fn ->
-          assert {:error, _errors_list} = Xcribe.suite_finished()
-        end)
-
-      assert output =~ "route not found"
-      assert output =~ "xcribe_test.exs"
+      assert capture_io(fn ->
+               assert Xcribe.generate_doc(recorded, %{}) == {:error, [error]}
+             end) == ""
     end
 
     test "handle parsing and validation errors" do
@@ -126,7 +129,7 @@ defmodule XcribeTest do
         }
       }
 
-      validation_error = %Request{
+      invalid_request = %Request{
         request_body: %{date: ~D[2021-01-01]},
         __meta__: %{
           call: %{
@@ -137,36 +140,22 @@ defmodule XcribeTest do
         }
       }
 
-      Recorder.add(parsing_error)
-      Recorder.add(validation_error)
+      recorded = %{records: [invalid_request], errors: [parsing_error]}
 
-      output =
-        capture_io(fn ->
-          assert {:error, _errors_list} = Xcribe.suite_finished()
-        end)
-
-      assert output =~ "route not found"
-      assert output =~ "xcribe_test.exs"
-      assert output =~ "The Plug.Conn params must be valid HTTP params"
-    end
-
-    test "handle invalid configuration" do
-      Application.put_env(:xcribe, :format, :invalid)
-      Application.put_env(:xcribe, :json_library, Fake)
-      Application.put_env(:xcribe, :information_source, Fake)
-
-      output =
-        capture_io(fn ->
-          assert {:error, _errors_list} = Xcribe.suite_finished()
-        end)
-
-      assert output =~ "Config key: json_library"
-      assert output =~ "Config key: format"
-      assert output =~ "Config key: information_source"
+      assert capture_io(fn ->
+               assert {:error,
+                       [
+                         %Error{
+                           message:
+                             "The Plug.Conn params must be valid HTTP params. A struct Date was found!"
+                         },
+                         ^parsing_error
+                       ]} = Xcribe.generate_doc(recorded, %{})
+             end) == ""
     end
 
     test "handle document exceptions" do
-      Recorder.add(%Request{
+      request_with_error = %Request{
         __meta__: %{
           call: %{
             description: "conn test",
@@ -174,17 +163,19 @@ defmodule XcribeTest do
             line: 25
           }
         }
-      })
+      }
 
-      Application.put_env(:xcribe, :format, :swagger)
+      recorded = %{records: [request_with_error], errors: []}
 
-      output =
-        capture_io(fn ->
-          assert Xcribe.suite_finished() ==
-                   {:error, "An exception was raised. Elixir.FunctionClauseError"}
-        end)
+      config = %{
+        format: :swagger,
+        information_source: Xcribe.Support.Information,
+        json_library: Jason
+      }
 
-      assert output =~ "An exception was raised"
+      assert capture_io(fn ->
+               assert {:error, %DocException{}} = Xcribe.generate_doc(recorded, config)
+             end) == ""
     end
   end
 end

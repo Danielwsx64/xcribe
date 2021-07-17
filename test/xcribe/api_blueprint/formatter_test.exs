@@ -6,15 +6,13 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   alias Xcribe.Request
   alias Xcribe.Support.RequestsGenerator
 
+  setup do
+    {:ok, %{config: %{json_library: Jason}}}
+  end
+
   describe "merge_request/2" do
-    setup do
-      Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
-
-      on_exit(fn -> Application.delete_env(:xcribe, :information_source) end)
-    end
-
-    test "merge two request objects" do
-      base_request = RequestsGenerator.users_index()
+    test "merge two request objects", %{config: config} do
+      base_request = put_in(RequestsGenerator.users_index().__meta__, %{config: config})
 
       request_one = %{
         base_request
@@ -117,8 +115,9 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   end
 
   describe "full_request_object/1" do
-    test "return group object" do
+    test "return group object", %{config: config} do
       struct = %Request{
+        __meta__: %{config: config},
         action: "show",
         controller: Elixir.Xcribe.PostsController,
         description: "get all user posts",
@@ -128,7 +127,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         path_params: %{},
         query_params: %{},
         request_body: %{},
-        resource: "users",
+        resource: ["users"],
         resource_group: :api,
         resp_body: "{\"id\":1,\"title\":\"user 1\"}",
         resp_headers: [{"content-type", "application/json"}],
@@ -182,8 +181,9 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
              }
     end
 
-    test "return group with resource group nil" do
+    test "return group with resource group nil", %{config: config} do
       struct = %Request{
+        __meta__: %{config: config},
         action: "show",
         controller: Elixir.Xcribe.PostsController,
         description: "get all user posts",
@@ -193,7 +193,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         path_params: %{},
         query_params: %{},
         request_body: %{},
-        resource: "users",
+        resource: ["users"],
         resource_group: nil,
         resp_body: "{\"id\":1,\"title\":\"user 1\"}",
         resp_headers: [{"content-type", "application/json"}],
@@ -206,8 +206,9 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   end
 
   describe "resource_object/1" do
-    test "return resource object" do
+    test "return resource object", %{config: config} do
       struct = %Request{
+        __meta__: %{config: config},
         action: "show",
         controller: Elixir.Xcribe.PostsController,
         description: "get all user posts",
@@ -220,7 +221,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         path_params: %{"users_id" => "1", "id" => "2"},
         query_params: %{"user_age" => "34"},
         request_body: %{},
-        resource: "users_posts",
+        resource: ["users", "posts"],
         resource_group: :api,
         resp_body: "{\"id\":1,\"title\":\"user 1\"}",
         resp_headers: [
@@ -276,8 +277,9 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   end
 
   describe "action_object/1" do
-    test "return full action object" do
+    test "return full action object", %{config: config} do
       struct = %Request{
+        __meta__: %{config: config},
         action: "show",
         controller: Elixir.Xcribe.PostsController,
         description: "get all user posts",
@@ -290,7 +292,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         path_params: %{"users_id" => "1", "id" => "2"},
         query_params: %{"user_age" => "16"},
         request_body: %{},
-        resource: "users_posts",
+        resource: ["users", "posts"],
         resource_group: :api,
         resp_body: "{\"id\":1,\"title\":\"user 1\"}",
         resp_headers: [
@@ -338,8 +340,9 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   end
 
   describe "request_object/1" do
-    test "return full request object" do
+    test "return full request object", %{config: config} do
       struct = %Request{
+        __meta__: %{config: config},
         description: "create an user",
         header_params: [
           {"authorization", "token"},
@@ -380,8 +383,9 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
              }
     end
 
-    test "with a Upload struct in body" do
+    test "with a Upload struct in body", %{config: config} do
       request = %Request{
+        __meta__: %{config: config},
         header_params: [{"content-type", "multipart/form-data; boundary=---boundary"}],
         request_body: %{
           "file" => %Upload{
@@ -417,8 +421,9 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   end
 
   describe "response_object/1" do
-    test "return full response object" do
+    test "return full response object", %{config: config} do
       struct = %Request{
+        __meta__: %{config: config},
         resp_body: "{\"age\":5,\"name\":\"teste\"}",
         resp_headers: [{"content-type", "application/json; charset=utf-8"}],
         status_code: 201
@@ -441,8 +446,9 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   end
 
   describe "resource_parameters/1" do
-    test "format resource URI parameters" do
+    test "format resource URI parameters", %{config: config} do
       struct = %Request{
+        __meta__: %{config: config},
         path_params: %{"users_id" => "1", "id" => 5},
         path: "/users/{users_id}/posts/{id}"
       }
@@ -456,8 +462,9 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
              }
     end
 
-    test "no path paramters" do
+    test "no path paramters", %{config: config} do
       struct = %Request{
+        __meta__: %{config: config},
         path_params: %{},
         path: "/users/{id}"
       }
@@ -512,8 +519,9 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   end
 
   describe "response_schema/1" do
-    test "return response schema for json content" do
+    test "return response schema for json content", %{config: config} do
       struct = %Request{
+        __meta__: %{config: config},
         resp_body: "{\"age\":5,\"name\":\"teste\"}",
         resp_headers: [{"content-type", "application/json; charset=utf-8"}]
       }
@@ -527,8 +535,9 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
              }
     end
 
-    test "return schema for text/plain" do
+    test "return schema for text/plain", %{config: config} do
       struct = %Request{
+        __meta__: %{config: config},
         resp_body: "success",
         resp_headers: [{"content-type", "text/plain; charset=utf-8"}]
       }
@@ -642,7 +651,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   describe "action_name/1" do
     test "return formatted action name" do
       struct = %Request{
-        resource: "users_posts",
+        resource: ["users", "posts"],
         action: "show"
       }
 
@@ -662,8 +671,8 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
   describe "resource_name/1" do
     test "return formatted resource name" do
-      struct_one = %Request{resource: "users_posts"}
-      struct_two = %Request{resource: "users"}
+      struct_one = %Request{resource: ["users", "posts"]}
+      struct_two = %Request{resource: ["users"]}
 
       assert Formatter.resource_name(struct_one) == "Users Posts"
       assert Formatter.resource_name(struct_two) == "Users"
@@ -671,8 +680,9 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   end
 
   describe "response_body/1" do
-    test "return response body" do
+    test "return response body", %{config: config} do
       struct = %Request{
+        __meta__: %{config: config},
         resp_body: "{\"id\":1,\"title\":\"user 1\"}",
         resp_headers: [{"content-type", "application/json"}]
       }
@@ -680,8 +690,9 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       assert Formatter.response_body(struct) == %{"id" => 1, "title" => "user 1"}
     end
 
-    test "response without content type" do
+    test "response without content type", %{config: config} do
       struct = %Request{
+        __meta__: %{config: config},
         resp_body: "",
         resp_headers: [{"cache-control", "max-age=0, private, must-revalidate"}]
       }

@@ -40,7 +40,7 @@ defmodule Xcribe.Document do
     quote bind_quoted: [conn: conn, opts: opts, suggestion: suggest_from_test, meta: meta] do
       options = Keyword.merge([as: suggestion], opts)
 
-      if Config.fetch(:active?) do
+      if Config.active?() do
         conn
         |> ConnParser.execute(Keyword.fetch!(options, :as))
         |> Map.put(:__meta__, meta)

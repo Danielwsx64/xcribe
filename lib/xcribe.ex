@@ -61,7 +61,7 @@ defmodule Xcribe do
 
   eg:
 
-      config :xcribe, information_source: YourApp.YouModuleInformation
+      config :xcribe, YourAppWeb.Endpoint, information_source: YourAppWeb.YouModuleInformation
 
   #### Available configurations:
 
@@ -72,8 +72,6 @@ defmodule Xcribe do
     'app_doc.json' for swagger.
     * `:format` - Format to generate documentation, allowed `:api_blueprint` and
     `:swagger`. Default `:swagger`.
-    * `:env_var` - Environment variable name for active Xcribe documentation
-    generator. Default is `XCRIBE_ENV`.
     * `:json_library` - The library to be used for json decode/encode (Jason
     and Poison are supported). The default is the same as `Phoenix` configuration.
     * `:serve` - Enable Xcribe serve mode. Default `false`. See more `Serving doc`
@@ -82,10 +80,7 @@ defmodule Xcribe do
 
   alias Xcribe.{
     ApiBlueprint,
-    CLI.Output,
-    Config,
     DocException,
-    Recorder,
     Request,
     Request.Error,
     Request.Validator,
@@ -94,44 +89,22 @@ defmodule Xcribe do
   }
 
   @doc false
-  def suite_finished do
-    check_configurations()
-    |> get_recorded_requests()
-    |> validate_records()
-    |> order_by_path()
-    |> generate_docs()
-    |> write()
-  rescue
-    e in DocException ->
-      Output.print_doc_exception(e)
-      {:error, e.message}
-  end
-
-  defp check_configurations do
-    case Config.check_configurations() do
-      {:error, errs} ->
-        Output.print_configuration_errors(errs)
-
-        {:error, errs}
-
-      :ok ->
-        :ok
-    end
-  end
-
-  defp get_recorded_requests(:ok), do: {:ok, Recorder.pop_all()}
-  defp get_recorded_requests(error), do: error
-
-  defp validate_records({:ok, records}) when is_map(records) do
+  def generate_doc(%{records: records, errors: errors}, config)
+      when is_list(errors) and is_list(records) do
     records
-    |> Enum.reduce({:ok, []}, &reduce_records_lists/2)
-    |> handle_errors()
+    |> validate_records(errors)
+    |> order_by_path()
+    |> generate_docs(config)
+    |> write(config)
+  rescue
+    e in DocException -> {:error, e}
   end
 
-  defp validate_records(error), do: error
+  defp validate_records(records, errors),
+    do: Enum.reduce(records, initial_acc(errors), &validate_request/2)
 
-  defp reduce_records_lists({_endpoint, records}, acc) when is_list(records),
-    do: Enum.reduce(records, acc, &validate_request/2)
+  defp initial_acc([]), do: {:ok, []}
+  defp initial_acc(errors), do: {:error, errors}
 
   defp validate_request(%Request{} = request, acc) do
     request
@@ -147,21 +120,18 @@ defmodule Xcribe do
   defp add_result({:ok, request}, {:ok, requests}), do: {:ok, [request | requests]}
   defp add_result({:ok, _request}, {:error, _errs} = errs), do: errs
 
-  defp handle_errors({:error, errs} = err), do: Output.print_request_errors(errs) && err
-  defp handle_errors({:ok, _requests} = success), do: success
-
   defp order_by_path({:ok, requests}), do: {:ok, Enum.sort(requests, &(&1.path >= &2.path))}
   defp order_by_path(error), do: error
 
-  defp generate_docs({:ok, requests}) when is_list(requests) do
-    case Config.fetch!(:doc_format) do
-      :api_blueprint -> ApiBlueprint.generate_doc(requests)
-      :swagger -> Swagger.generate_doc(requests)
+  defp generate_docs({:ok, requests}, %{format: doc_format} = config) do
+    case doc_format do
+      :api_blueprint -> ApiBlueprint.generate_doc(requests, config)
+      :swagger -> Swagger.generate_doc(requests, config)
     end
   end
 
-  defp generate_docs(error), do: error
+  defp generate_docs({:error, _errs} = error, _config), do: error
 
-  defp write({:error, _msg} = err), do: err
-  defp write(text) when is_binary(text), do: Writter.write(text)
+  defp write(text, config) when is_binary(text), do: Writter.write(text, config)
+  defp write({:error, _msg} = err, _config), do: err
 end

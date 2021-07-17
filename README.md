@@ -21,7 +21,7 @@ mix.exs
 ```elixir
 def deps do
   [
-    {:xcribe, "~> 0.7.11"}
+    {:xcribe, "~> 1.0.0"}
   ]
 end
 ```
@@ -54,7 +54,7 @@ Add a new configuration with the created module
 config/test.exs
 
 ```elixir
-  config :xcribe, information_source: YourAppWeb.Support.DocInformation
+  config :xcribe, YourAppWeb.Endpoint, information_source: YourAppWeb.Support.DocInformation
 ```
 
 Next, in your `test/test_helper.exs` you should configure ExUnit to use Xcribe
@@ -149,18 +149,16 @@ You can add this configurations to your `config/test.ex`
 - information_source: the module with doc information
 - output: a custom name to the output file
 - format: ApiBlueprint or Swagger formats
-- env_var: a custom name to the env to active Xcribe.Formatter
 - json_library: The library to be used for json decode/encode.
 - serve: Enables Xcribe serve mode. See more in `Serving doc` session.
 
 Example
 
 ```elixir
-config :xcribe, [
+config :xcribe, YourAppWeb.Endpoint, [
   information_source: YourAppWeb.Information,
   output: "API-DOCUMENTATION.apib",
   format: :api_blueprint # or :swagger,
-  env_var: "DOC_API",
   json_library: Jason
 ]
 ```

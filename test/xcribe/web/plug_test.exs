@@ -6,27 +6,42 @@ defmodule Xcribe.Web.PlugTest do
 
   setup do
     on_exit(fn ->
-      Application.delete_env(:xcribe, :output)
-      Application.delete_env(:xcribe, :format)
-      Application.delete_env(:xcribe, :serve)
+      :xcribe
+      |> Application.get_all_env()
+      |> Keyword.keys()
+      |> Enum.each(&Application.delete_env(:xcribe, &1))
     end)
-
-    :ok
   end
 
   describe "init/1" do
-    test "return file name" do
-      Application.put_env(:xcribe, :output, "specificy_name_file.json")
-      assert [{:file, "specificy_name_file.json"}] = Plug.init([])
+    test "return file name and serving config" do
+      Application.put_env(:xcribe, Xcribe.Endpoint,
+        output: "specificy_name_file.json",
+        serve: true
+      )
+
+      assert Plug.init(endpoint: Xcribe.Endpoint) == [
+               file: "specificy_name_file.json",
+               serving?: true
+             ]
+    end
+
+    test "serving false" do
+      assert Plug.init(endpoint: Xcribe.Endpoint) == [file: "openapi.json", serving?: false]
+    end
+
+    test "trim priv namespace" do
+      Application.put_env(:xcribe, Xcribe.Endpoint, output: "priv/static/doc.json")
+
+      assert Plug.init(endpoint: Xcribe.Endpoint) == [file: "/doc.json", serving?: false]
     end
   end
 
   describe "call/2" do
     test "return doc" do
-      Application.put_env(:xcribe, :serve, true)
       conn = Test.conn(:get, "/")
 
-      response = Plug.call(conn, file: "file.json")
+      response = Plug.call(conn, file: "file.json", serving?: true)
 
       assert {200, _headers, body} = Test.sent_resp(response)
 
@@ -57,18 +72,16 @@ defmodule Xcribe.Web.PlugTest do
     end
 
     test "not found route" do
-      Application.put_env(:xcribe, :serve, true)
       conn = Test.conn(:get, "/invalid_route")
-      response = Plug.call(conn, file: "")
+      response = Plug.call(conn, file: "file", serving?: true)
 
       assert {404, _headers, "not found"} = Test.sent_resp(response)
     end
 
     test "return not found when serving is disabled" do
-      Application.put_env(:xcribe, :serve, false)
       conn = Test.conn(:get, "/")
 
-      response = Plug.call(conn, file: "")
+      response = Plug.call(conn, file: "file", serving?: false)
 
       assert {404, _headers, "not found"} = Test.sent_resp(response)
     end

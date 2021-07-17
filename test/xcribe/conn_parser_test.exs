@@ -1,14 +1,8 @@
 defmodule Xcribe.ConnParserTest do
-  use Xcribe.ConnCase, async: false
+  use Xcribe.ConnCase, async: true
 
   alias Plug.Conn
   alias Xcribe.{ConnParser, Request, Request.Error}
-
-  setup do
-    Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
-
-    :ok
-  end
 
   describe "execute/2" do
     test "extract request data from an index request", %{conn: conn} do
@@ -28,7 +22,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{},
                query_params: %{},
                request_body: %{},
-               resource: "users",
+               resource: ["users"],
                resource_group: :api,
                resp_body: "[{\"id\":1,\"name\":\"user 1\"},{\"id\":2,\"name\":\"user 2\"}]",
                resp_headers: [
@@ -59,7 +53,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{},
                query_params: %{},
                request_body: %{},
-               resource: "users",
+               resource: ["users"],
                resource_group: :api,
                resp_body: "[{\"id\":1,\"name\":\"user 1\"},{\"id\":2,\"name\":\"user 2\"}]",
                resp_headers: [
@@ -88,7 +82,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{"users_id" => "1"},
                query_params: %{},
                request_body: %{},
-               resource: "users_cancel",
+               resource: ["users", "cancel"],
                resource_group: :api,
                resp_body: "",
                resp_headers: [
@@ -116,7 +110,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{"id" => "1"},
                query_params: %{},
                request_body: %{},
-               resource: "users",
+               resource: ["users"],
                resource_group: :api,
                resp_body: "{\"id\":1,\"name\":\"user 1\"}",
                resp_headers: [
@@ -148,7 +142,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{},
                query_params: %{},
                request_body: %{"age" => 5, "name" => "teste"},
-               resource: "users",
+               resource: ["users"],
                resource_group: :api,
                resp_body: "{\"age\":5,\"name\":\"teste\"}",
                resp_headers: [
@@ -180,7 +174,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{"id" => "1"},
                query_params: %{},
                request_body: %{"age" => 5, "name" => "teste"},
-               resource: "users",
+               resource: ["users"],
                resource_group: :api,
                resp_body: "{\"age\":5,\"name\":\"teste\"}",
                resp_headers: [
@@ -212,7 +206,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{"id" => "1"},
                query_params: %{},
                request_body: %{"age" => 5, "name" => "teste"},
-               resource: "users",
+               resource: ["users"],
                resource_group: :api,
                resp_body: "{\"age\":5,\"name\":\"teste\"}",
                resp_headers: [
@@ -241,7 +235,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{"id" => "1"},
                query_params: %{},
                request_body: %{},
-               resource: "users",
+               resource: ["users"],
                resource_group: :api,
                resp_body: "",
                resp_headers: [{"cache-control", "max-age=0, private, must-revalidate"}],
@@ -267,7 +261,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{"users_id" => "1"},
                query_params: %{},
                request_body: %{},
-               resource: "users_posts",
+               resource: ["users", "posts"],
                resource_group: :api,
                resp_body: "[{\"id\":1,\"title\":\"user 1\"},{\"id\":2,\"title\":\"user 2\"}]",
                resp_headers: [
@@ -299,7 +293,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{"users_id" => "1"},
                query_params: %{},
                request_body: %{"title" => "test"},
-               resource: "users_posts",
+               resource: ["users", "posts"],
                resource_group: :api,
                resp_body: "{\"title\":\"test\",\"users_id\":\"1\"}",
                resp_headers: [
@@ -331,7 +325,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{"id" => "2", "users_id" => "1"},
                query_params: %{},
                request_body: %{"title" => "test"},
-               resource: "users_posts",
+               resource: ["users", "posts"],
                resource_group: :api,
                resp_body: "{\"title\":\"test\",\"users_id\":\"1\"}",
                resp_headers: [
@@ -363,7 +357,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{"id" => "2", "users_id" => "1"},
                query_params: %{},
                request_body: %{"title" => "test"},
-               resource: "users_posts",
+               resource: ["users", "posts"],
                resource_group: :api,
                resp_body: "{\"title\":\"test\",\"users_id\":\"1\"}",
                resp_headers: [
@@ -373,12 +367,6 @@ defmodule Xcribe.ConnParserTest do
                status_code: 200,
                verb: "put"
              }
-    end
-
-    test "ignore configured namespaces", %{conn: conn} do
-      conn = get(conn, notes_path(conn, :index))
-
-      assert %Request{resource: "notes"} = ConnParser.execute(conn)
     end
 
     test "conn is halted before match route", %{conn: conn} do
@@ -398,7 +386,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{},
                query_params: %{},
                request_body: %{},
-               resource: "authenticated_users",
+               resource: ["authenticated", "users"],
                resource_group: :authenticated,
                resp_body: "{\"message\":\"not authorized\"}",
                resp_headers: [
@@ -424,7 +412,7 @@ defmodule Xcribe.ConnParserTest do
                path_params: %{},
                query_params: %{},
                request_body: %{},
-               resource: "nopipe_users",
+               resource: ["nopipe", "users"],
                resource_group: nil,
                resp_body: "[{\"id\":1,\"name\":\"user 1\"},{\"id\":2,\"name\":\"user 2\"}]",
                resp_headers: [

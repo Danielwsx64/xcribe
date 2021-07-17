@@ -57,15 +57,23 @@ defmodule Xcribe.Swagger.Formatter do
   Return a Request Body Object from given request
   """
   def request_body_object_from_request(%Request{header_params: headers, request_body: body}) do
-    media_type_object(headers, body)
+    headers
+    |> content_type()
+    |> media_type_object(body)
   end
 
   @doc """
   Return a Response Object from given request
   """
-  def response_object_from_request(%Request{resp_headers: headers, resp_body: body}) do
-    headers
-    |> media_type_object(body)
+  def response_object_from_request(%Request{
+        __meta__: meta,
+        resp_headers: headers,
+        resp_body: body
+      }) do
+    content_type = content_type(headers)
+
+    content_type
+    |> media_type_object(response_content(body, content_type, meta.config))
     |> response_object_add_headers(headers)
   end
 
@@ -182,20 +190,25 @@ defmodule Xcribe.Swagger.Formatter do
     %{status => response_object_from_request(request)}
   end
 
-  defp format_tags_from_resource(resource), do: [String.replace(resource, "_", " ")]
+  defp format_tags_from_resource(resource), do: [Enum.join(resource, "\s")]
 
-  defp media_type_object(_headers, ""), do: %{description: ""}
+  defp media_type_object(_media_type, ""), do: %{description: ""}
 
-  defp media_type_object(headers, content) do
-    media_type = content_type(headers)
-
+  defp media_type_object(media_type, content) do
     media_type_schema =
       %{}
-      |> Map.put(:schema, build_schema_for_media(content, media_type))
+      |> Map.put(:schema, JsonSchema.schema_for(content, title: false, example: true))
       |> add_enconding_if_needed(content)
 
     %{description: "", content: %{media_type => media_type_schema}}
   end
+
+  defp response_content("", _content_type, _config), do: ""
+
+  defp response_content(body, "application/json", config) when is_binary(body),
+    do: ContentDecoder.decode!(body, "application/json", config)
+
+  defp response_content(body, _content_type, _config), do: body
 
   defp add_enconding_if_needed(schema, content) when is_map(content) do
     content
@@ -212,15 +225,6 @@ defmodule Xcribe.Swagger.Formatter do
   end
 
   defp enconding_for(_value, schema, _property), do: schema
-
-  defp build_schema_for_media(content, content_type) when is_binary(content) do
-    content
-    |> ContentDecoder.decode!(content_type)
-    |> build_schema_for_media(content_type)
-  end
-
-  defp build_schema_for_media(content, _),
-    do: JsonSchema.schema_for(content, title: false, example: true)
 
   defp response_object_add_headers(response_object, headers) do
     Map.put(

@@ -22,7 +22,7 @@ defmodule Xcribe.RecorderTest do
       Recorder.add(request_error)
 
       assert :sys.get_state(Recorder) == %{
-               :error => [request_error],
+               :errors => [request_error],
                "first_endpoint" => [request_two, request_one],
                "second_endpoint" => [request_three]
              }
@@ -40,11 +40,11 @@ defmodule Xcribe.RecorderTest do
       Recorder.add(request_error)
 
       assert Recorder.pop_all() == %{
-               :error => [request_error],
+               :errors => [request_error],
                "endpoint" => [request_two, request_one]
              }
 
-      assert :sys.get_state(Recorder) == %{}
+      assert :sys.get_state(Recorder) == %{errors: []}
     end
   end
 end

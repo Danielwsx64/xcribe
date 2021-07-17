@@ -3,15 +3,13 @@ defmodule Xcribe.Application do
 
   use Application
 
-  alias Xcribe.CLI.Output
-  alias Xcribe.Config
+  alias Xcribe.{CLI.Output, Config}
 
   @doc false
   def start(_type, opts) do
-    case Config.check_configurations([:serving?]) do
-      {:error, errors} -> Output.print_configuration_errors(errors)
-      :ok -> :ok
-    end
+    Config.all_endpoints()
+    |> Enum.map(&Config.fetch_config(&1))
+    |> Enum.each(&check_configuration/1)
 
     opts
     |> Keyword.get(:children, [])
@@ -20,9 +18,13 @@ defmodule Xcribe.Application do
   end
 
   defp xcribe_children do
-    [
-      {Xcribe.Config, []},
-      {Xcribe.Recorder, []}
-    ]
+    [{Xcribe.Recorder, []}]
+  end
+
+  defp check_configuration(%{serve: true} = config) do
+    case Config.check_configurations(config, [:serve]) do
+      {:error, errors} -> Output.print_configuration_errors(errors)
+      _success -> :ok
+    end
   end
 end

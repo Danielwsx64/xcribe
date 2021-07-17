@@ -6,12 +6,12 @@ defmodule Xcribe.DocumentTest do
   import Xcribe.Document
 
   setup do
-    Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
-    Application.put_env(:xcribe, :env_var, "PWD")
-
+    System.put_env("XCRIBE_ENV", "true")
     Recorder.pop_all()
 
-    :ok
+    on_exit(fn ->
+      System.delete_env("XCRIBE_ENV")
+    end)
   end
 
   describe "document/1" do
@@ -36,7 +36,7 @@ defmodule Xcribe.DocumentTest do
           }
         })
 
-      assert Recorder.pop_all() == %{Xcribe.Endpoint => [parsed_request_with_meta]}
+      assert Recorder.pop_all() == %{:errors => [], Xcribe.Endpoint => [parsed_request_with_meta]}
     end
 
     test "parse conn and save it whith custom description", %{conn: conn} do
@@ -62,7 +62,7 @@ defmodule Xcribe.DocumentTest do
           }
         })
 
-      assert Recorder.pop_all() == %{Xcribe.Endpoint => [parsed_request_with_meta]}
+      assert Recorder.pop_all() == %{:errors => [], Xcribe.Endpoint => [parsed_request_with_meta]}
     end
 
     test "handle parse errors" do
@@ -81,18 +81,18 @@ defmodule Xcribe.DocumentTest do
           }
         })
 
-      assert Recorder.pop_all() == %{error: [parsed_request_with_meta]}
+      assert Recorder.pop_all() == %{errors: [parsed_request_with_meta]}
     end
 
     test "dont document when env var is not defined", %{conn: conn} do
-      Application.put_env(:xcribe, :env_var, "NOT_DEFINED_ENV_VAR_TEST")
+      System.delete_env("XCRIBE_ENV")
 
       conn
       |> put_req_header("authorization", "token")
       |> get(users_path(conn, :index))
       |> document()
 
-      assert Recorder.pop_all() == %{}
+      assert Recorder.pop_all() == %{errors: []}
     end
   end
 end

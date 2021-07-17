@@ -21,8 +21,8 @@ defmodule Xcribe.ApiBlueprint.APIB do
 
   @tab_size 4
 
-  def encode(%{groups: groups} = struct) do
-    metadata(struct) <> groups(groups)
+  def encode(%{groups: groups} = struct, config) do
+    metadata(struct) <> groups(groups, config)
   end
 
   def metadata(%{host: host, description: desc, name: name}) do
@@ -34,40 +34,44 @@ defmodule Xcribe.ApiBlueprint.APIB do
     )
   end
 
-  def groups(struct) do
+  def groups(struct, config) do
     Enum.reduce(struct, "", fn {name, %{resources: resources}}, acc ->
-      acc <> group(String.trim(name)) <> reduce_group_resources(resources)
+      acc <> group(String.trim(name)) <> reduce_group_resources(resources, config)
     end)
   end
 
-  def full_resource(uri, %{name: name, parameters: params, actions: actions}) do
-    resource(name, uri) <> parameters(params) <> reduce_resource_actions(actions)
+  def full_resource(uri, %{name: name, parameters: params, actions: actions}, config) do
+    resource(name, uri) <> parameters(params) <> reduce_resource_actions(actions, config)
   end
 
-  def full_action(uri, %{
-        name: name,
-        parameters: params,
-        query_parameters: query_parameters,
-        requests: requests
-      }) do
+  def full_action(
+        uri,
+        %{
+          name: name,
+          parameters: params,
+          query_parameters: query_parameters,
+          requests: requests
+        },
+        config
+      ) do
     action(name, action_uri(uri, query_parameters)) <>
-      parameters(Map.merge(params, query_parameters)) <> reduce_action_requests(requests)
+      parameters(Map.merge(params, query_parameters)) <> reduce_action_requests(requests, config)
   end
 
-  def full_request(name, request) do
+  def full_request(name, request, config) do
     request(name, request.content_type) <>
       headers(request.headers) <>
-      body(request.body) <>
-      schema(request.schema) <> full_response(request.response)
+      body(request.body, config) <>
+      schema(request.schema, config) <> full_response(request.response, config)
   end
 
-  def full_response(%{status: 204} = response) do
+  def full_response(%{status: 204} = response, _config) do
     response(response.status, response.content_type) <> headers(response.headers)
   end
 
-  def full_response(%{} = response) do
+  def full_response(%{} = response, config) do
     response(response.status, response.content_type) <>
-      headers(response.headers) <> body(response.body) <> schema(response.schema)
+      headers(response.headers) <> body(response.body, config) <> schema(response.schema, config)
   end
 
   def group(""), do: ""
@@ -97,28 +101,28 @@ defmodule Xcribe.ApiBlueprint.APIB do
         media_type: media_type || "text/plain"
       )
 
-  def schema(schema) when schema == %{}, do: ""
+  def schema(schema, _config) when schema == %{}, do: ""
 
-  def schema(schema) do
+  def schema(schema, config) do
     apply_template(
       @schema_template,
-      schema: schema |> JSON.encode!(pretty: true) |> apply_tab(3)
+      schema: schema |> JSON.encode!([pretty: true], config) |> apply_tab(3)
     )
   end
 
-  def body(%Multipart{} = multipart) do
+  def body(%Multipart{} = multipart, _config) do
     apply_template(
       @body_template,
       body: build_multipart_body(multipart)
     )
   end
 
-  def body(body) when body == %{}, do: ""
+  def body(body, _config) when body == %{}, do: ""
 
-  def body(body) do
+  def body(body, config) do
     apply_template(
       @body_template,
-      body: body |> JSON.encode!(pretty: true) |> apply_tab(3)
+      body: body |> JSON.encode!([pretty: true], config) |> apply_tab(3)
     )
   end
 
@@ -143,16 +147,16 @@ defmodule Xcribe.ApiBlueprint.APIB do
 
   defp add_query_parameter({param, _value}, uri), do: uri <> "{?#{param}}"
 
-  defp reduce_group_resources(resources) do
-    Enum.reduce(resources, "", fn {name, res}, acc -> acc <> full_resource(name, res) end)
+  defp reduce_group_resources(resources, config) do
+    Enum.reduce(resources, "", fn {name, res}, acc -> acc <> full_resource(name, res, config) end)
   end
 
-  defp reduce_resource_actions(actions) do
-    Enum.reduce(actions, "", fn {name, act}, acc -> acc <> full_action(name, act) end)
+  defp reduce_resource_actions(actions, config) do
+    Enum.reduce(actions, "", fn {name, act}, acc -> acc <> full_action(name, act, config) end)
   end
 
-  defp reduce_action_requests(requests) do
-    Enum.reduce(requests, "", fn {name, req}, acc -> acc <> full_request(name, req) end)
+  defp reduce_action_requests(requests, config) do
+    Enum.reduce(requests, "", fn {name, req}, acc -> acc <> full_request(name, req, config) end)
   end
 
   defp reduce_parameters_items(parameters),
