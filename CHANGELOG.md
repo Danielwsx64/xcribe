@@ -84,7 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.7.1] - 2020-06-09
 
-### Enhancements
+### Fixed
 
 - Improve internal modules naming and location.
 
@@ -106,7 +106,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.6.1] - 2020-06-08
 
-## Enhancements
+### Enhancements
 
 Improve CI/CD flow:
 

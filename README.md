@@ -173,6 +173,10 @@ See `Xcribe` to more configuration options.
 
 [Contributing Guide](CONTRIBUTING.md)
 
+## Changelog
+
+[Changelog](CHANGELOG.md)
+
 ## License
 
 [Apache License, Version 2.0](LICENSE) © [brainn.co](https://github.com/brainnco)

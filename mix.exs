@@ -74,6 +74,7 @@ defmodule Xcribe.MixProject do
         "README.md": [title: "Get starting"],
         "documentation/serving_doc.md": [title: "Serving doc"],
         "CONTRIBUTING.md": [title: "Contributing"],
+        "CHANGELOG.md": [title: "Changelog"],
         LICENSE: [title: "License"]
       ],
       groups_for_modules: doc_groups_for_modules()
