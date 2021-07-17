@@ -30,7 +30,7 @@ defmodule Xcribe.Document do
     test_description = __CALLER__.function |> elem(0) |> to_string
     "test " <> suggest_from_test = test_description
 
-    :ok = Module.put_attribute(__CALLER__.module, :tag, :xcribe_document)
+    register_xcribe_tag(__CALLER__)
 
     meta =
       Macro.escape(%{
@@ -49,5 +49,19 @@ defmodule Xcribe.Document do
 
       conn
     end
+  end
+
+  def register_xcribe_tag(%{module: module, function: {function, _arity}}) do
+    module
+    |> Module.delete_attribute(:ex_unit_tests)
+    |> Enum.each(fn test ->
+      to_put = if test.name == function, do: add_xcribe_tag(test), else: test
+
+      Module.put_attribute(module, :ex_unit_tests, to_put)
+    end)
+  end
+
+  defp add_xcribe_tag(%{tags: tags} = test) do
+    %{test | tags: Map.put(tags, :xcribe_document, true)}
   end
 end
