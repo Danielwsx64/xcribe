@@ -14,12 +14,10 @@ defmodule Xcribe.ConfigTest do
 
   describe "all_endpoints/0" do
     test "return all configured endpoints" do
-      Application.put_env(:xcribe, App.Endpoint, format: :api_blueprint)
-      Application.put_env(:xcribe, App.OtherEndpoint, format: :api_blueprint)
+      Application.put_env(:xcribe, Xcribe.Endpoint, format: :api_blueprint)
+      Application.put_env(:xcribe, NotValidEndpoint, format: :api_blueprint)
 
-      result = Config.all_endpoints()
-
-      assert Enum.sort(result) == Enum.sort([App.Endpoint, App.OtherEndpoint])
+      assert Config.all_endpoints() == [Xcribe.Endpoint]
     end
   end
 

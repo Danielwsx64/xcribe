@@ -7,9 +7,11 @@ defmodule Xcribe.Application do
 
   @doc false
   def start(_type, opts) do
-    Config.all_endpoints()
-    |> Enum.map(&Config.fetch_config(&1))
-    |> Enum.each(&check_configuration/1)
+    unless Keyword.get(opts, :test, false) do
+      Config.all_endpoints()
+      |> Enum.map(&Config.fetch_config(&1))
+      |> Enum.each(&check_configuration/1)
+    end
 
     opts
     |> Keyword.get(:children, [])

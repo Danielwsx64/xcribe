@@ -38,7 +38,10 @@ defmodule Xcribe.MixProject do
     ]
   end
 
-  defp application_mod(:test), do: {Xcribe.Application, children: [{Xcribe.Endpoint, []}]}
+  defp application_mod(:test) do
+    {Xcribe.Application, test: true, children: [{Xcribe.Endpoint, []}]}
+  end
+
   defp application_mod(_), do: {Xcribe.Application, []}
 
   defp deps do

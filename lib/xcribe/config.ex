@@ -15,6 +15,7 @@ defmodule Xcribe.Config do
     :xcribe
     |> Application.get_all_env()
     |> Keyword.keys()
+    |> Enum.filter(&valid_endpoint/1)
   end
 
   @default_keys_to_validate [:format, :information_source, :json_library, :serve]
@@ -137,5 +138,9 @@ defmodule Xcribe.Config do
       :swagger -> "openapi.json"
       _ -> ""
     end
+  end
+
+  defp valid_endpoint(module) do
+    function_exported?(module, :config, 1) and module.config(:endpoint_id)
   end
 end
