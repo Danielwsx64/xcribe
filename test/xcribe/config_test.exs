@@ -85,7 +85,7 @@ defmodule Xcribe.ConfigTest do
                    "Try configure Xcribe with Jason or Poison `config :xcribe, Endpoint, json_library: Jason`"},
                   {:information_source, FakeInfo,
                    "The configured module as information source is not using Xcribe macros",
-                   "Add `use Xcribe, :information` on top of your module"},
+                   "Add `use Xcribe.Information` on top of your module"},
                   {:format, :invalid,
                    "Xcribe doesn't support the configured documentation format",
                    "Xcribe supports Swagger and Blueprint, configure as: `config :xcribe, Endpoint, format: :swagger`"}
@@ -109,6 +109,18 @@ defmodule Xcribe.ConfigTest do
                    "You must configure output as: `config :xcribe, Endpoint, output: \"priv/static/doc.json\"`"},
                   {:format, :invalid, "When serve config is true you must use swagger format",
                    "You must use Swagger format: `config :xcribe, Endpoint, format: :swagger`"}
+                ]}
+    end
+
+    test "when information source not configured" do
+      config = %{information_source: nil}
+
+      assert Config.check_configurations(config, [:information_source]) ==
+               {:error,
+                [
+                  {:information_source, "not configured",
+                   "You must add a config to the information source module",
+                   "Add to your config file `config: :xcribe, Endpoint, information_source: YourCustomModule`"}
                 ]}
     end
   end

@@ -38,8 +38,20 @@ defmodule Xcribe.Config do
     end
   end
 
+  @info_source_nil_message "You must add a config to the information source module"
+  @info_source_nil_instructions "Add to your config file `config: :xcribe, Endpoint, information_source: YourCustomModule`"
+  defp validate_config(:information_source, {_errors, %{information_source: nil}} = results) do
+    add_error(
+      results,
+      :information_source,
+      "not configured",
+      @info_source_nil_message,
+      @info_source_nil_instructions
+    )
+  end
+
   @info_source_message "The configured module as information source is not using Xcribe macros"
-  @info_source_instructions "Add `use Xcribe, :information` on top of your module"
+  @info_source_instructions "Add `use Xcribe.Information` on top of your module"
   defp validate_config(:information_source, {_errors, config} = results) do
     module = Map.fetch!(config, :information_source)
 

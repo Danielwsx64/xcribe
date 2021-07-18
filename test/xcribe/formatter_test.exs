@@ -63,7 +63,7 @@ defmodule Xcribe.FormatterTest do
     test "Output config errors" do
       status = [active?: true]
 
-      Application.delete_env(:xcribe, Xcribe.Endpoint)
+      Application.put_env(:xcribe, Xcribe.Endpoint, information_source: Fake)
 
       Recorder.add(RequestsGenerator.users_index())
 
