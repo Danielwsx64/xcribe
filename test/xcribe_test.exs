@@ -115,6 +115,33 @@ defmodule XcribeTest do
              end) == ""
     end
 
+    test "handle multiple validation errors" do
+      invalid_request = %Request{
+        request_body: %{date: ~D[2021-01-01]},
+        __meta__: %{
+          call: %{
+            description: "test name",
+            file: File.cwd!() <> "/test/xcribe_test.exs",
+            line: 1
+          }
+        }
+      }
+
+      valid_request = RequestsGenerator.users_index([:basic_auth])
+
+      expected_error = %Error{
+        __meta__: invalid_request.__meta__,
+        type: :validation,
+        message: "The Plug.Conn params must be valid HTTP params. A struct Date was found!"
+      }
+
+      records = [invalid_request, valid_request, invalid_request]
+
+      assert capture_io(fn ->
+               assert Xcribe.document(records, %{}) == {:error, [expected_error, expected_error]}
+             end) == ""
+    end
+
     test "handle document exceptions" do
       request_with_error = %Request{
         __meta__: %{

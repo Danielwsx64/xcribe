@@ -35,8 +35,6 @@ defmodule Xcribe.Swagger do
 
   defp merge_security_schemas(request, schemas) do
     Map.merge(schemas, Formatter.security_scheme_object_from_request(request))
-  rescue
-    exception -> raise DocException, {request, exception, __STACKTRACE__}
   end
 
   defp build_paths_object(requests, config),

@@ -9,6 +9,7 @@ defmodule Xcribe.FormatterTest do
 
   setup do
     Recorder.pop_all()
+    Recorder.set_active(false)
 
     Application.put_env(
       :xcribe,

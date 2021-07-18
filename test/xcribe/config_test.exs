@@ -63,6 +63,18 @@ defmodule Xcribe.ConfigTest do
       assert Config.check_configurations(config) == {:ok, config}
     end
 
+    test "validate serve config" do
+      config = %{
+        format: :swagger,
+        information_source: nil,
+        json_library: Jason,
+        output: "priv/static/openapi.json",
+        serve: true
+      }
+
+      assert Config.check_configurations(config, [:serve]) == {:ok, config}
+    end
+
     test "return error for invalid configurations" do
       config = %{
         format: :invalid,

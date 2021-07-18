@@ -424,6 +424,46 @@ defmodule Xcribe.ConnParserTest do
              }
     end
 
+    test "Old Phoenix router support", %{conn: conn} do
+      defmodule OldRouter do
+        def __match_route__(_method, _uri, _host) do
+          {%{
+             path_params: %{},
+             pipe_through: [:api],
+             plug: Xcribe.UsersController,
+             opts: :index,
+             route: "/users"
+           }, nil, nil, nil}
+        end
+      end
+
+      conn = get(conn, users_path(conn, :index))
+
+      conn = %{conn | private: Map.put(conn.private, :phoenix_router, OldRouter)}
+
+      assert ConnParser.execute(conn) == %Request{
+               action: "index",
+               controller: Elixir.Xcribe.UsersController,
+               description: "",
+               endpoint: Xcribe.Endpoint,
+               header_params: [],
+               params: %{},
+               path: "/users",
+               path_params: %{},
+               query_params: %{},
+               request_body: %{},
+               resource: ["users"],
+               resource_group: :api,
+               resp_body: "[{\"id\":1,\"name\":\"user 1\"},{\"id\":2,\"name\":\"user 2\"}]",
+               resp_headers: [
+                 {"content-type", "application/json; charset=utf-8"},
+                 {"cache-control", "max-age=0, private, must-revalidate"}
+               ],
+               status_code: 200,
+               verb: "get"
+             }
+    end
+
     test "not found route" do
       conn = %Conn{
         host: "www.example.com",

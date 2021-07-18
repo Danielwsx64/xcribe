@@ -28,20 +28,3 @@ defmodule Xcribe.DocException do
     }
   end
 end
-
-defmodule Xcribe.MissingInformationSource do
-  @moduledoc false
-
-  @help_information ~S"""
-  You must create a module to implement `Xcribe.Information` and configure it:
-
-  config: :xcribe, :information_source, YourInformationModule
-
-  """
-
-  defexception [:message]
-
-  def exception(_) do
-    %__MODULE__{message: "Information Source module not configured. \n#{@help_information}"}
-  end
-end
