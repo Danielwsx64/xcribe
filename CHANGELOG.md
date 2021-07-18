@@ -9,11 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2021-07-17
 
+## Added
+
+- Mix task xcribe.doc
+- Allow multiple endpoints config
+
 ### Changed
 
-- Now Xcribe configuration is scoped by application endpoint module
-- Now to foward the documentation route to Xcribe.Web.Plug you must provide the
-  application endpoint when you configured the Xcribe
+- Xcribe configuration is scoped by application endpoint module
+- Documentation route foward to Xcribe.Web.Plug you must provide the application
+  endpoint.
 
 ### Removed
 
