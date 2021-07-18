@@ -85,6 +85,7 @@ defmodule Xcribe do
     DocException,
     Recorder,
     Request,
+    Request.Error,
     Request.Validator,
     Swagger,
     Writter
@@ -176,7 +177,7 @@ defmodule Xcribe do
     :error
   end
 
-  defp handle_result({:error, [error | _t] = errors}) when is_struct(error) do
+  defp handle_result({:error, [%Error{} | _t] = errors}) do
     Output.print_request_errors(errors)
 
     :error

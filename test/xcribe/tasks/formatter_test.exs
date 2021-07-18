@@ -27,16 +27,12 @@ defmodule Xcribe.Tasks.FormatterTest do
         slowest: 0
       ]
 
-      assert Formatter.init(ex_unit_opts) ==
-               {:ok,
+      capture_io(fn ->
+        result = Formatter.init(ex_unit_opts)
+
+        assert {:ok,
                 %{
-                  colors: [
-                    enabled: true,
-                    diff_delete: :red,
-                    diff_delete_whitespace: "\e[48;5;88m",
-                    diff_insert: :green,
-                    diff_insert_whitespace: "\e[48;5;28m"
-                  ],
+                  colors: _any,
                   excluded_counter: 0,
                   failure_counter: 0,
                   invalid_counter: 0,
@@ -46,8 +42,9 @@ defmodule Xcribe.Tasks.FormatterTest do
                   test_counter: %{},
                   test_timings: [],
                   trace: false,
-                  width: 272
-                }}
+                  width: 80
+                }} = result
+      end)
     end
   end
 
