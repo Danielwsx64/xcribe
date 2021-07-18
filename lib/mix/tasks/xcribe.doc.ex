@@ -26,7 +26,9 @@ defmodule Mix.Tasks.Xcribe.Doc do
     IO.puts("\n")
     Output.print_message("Xcribe Task - starting doc generation")
 
-    case Xcribe.document_all_records() do
+    override_configs = if Mix.Project.umbrella?(), do: &override_configs_func/2, else: nil
+
+    case Xcribe.document_all_records(override_configs) do
       :ok ->
         Output.print_message("Xcribe Task - finished")
         :ok
@@ -34,6 +36,16 @@ defmodule Mix.Tasks.Xcribe.Doc do
       :error ->
         Output.print_message("Xcribe Task - aborted", :error)
         exit({:shutdown, 1})
+    end
+  end
+
+  @doc false
+  defp override_configs_func(endpoint, configs) do
+    app_name = endpoint.config(:otp_app)
+
+    case Mix.Project.deps_paths()[app_name] do
+      nil -> configs
+      path -> %{configs | output: Path.join(path, configs.output)}
     end
   end
 end
