@@ -244,4 +244,57 @@ defmodule Xcribe.CLI.OutputTest do
              end) == expected_output
     end
   end
+
+  describe "print_message/1" do
+    test "print success message" do
+      expected_output = "\e[36m >>> ok <<<\e[0m\n"
+
+      assert capture_io(fn ->
+               assert Output.print_message("ok") == :ok
+             end) == expected_output
+    end
+
+    test "print error message" do
+      expected_output = "\e[31m >>> error <<<\e[0m\n"
+
+      assert capture_io(fn ->
+               assert Output.print_message("error", :error) == :ok
+             end) == expected_output
+    end
+  end
+
+  describe "print_captured_test/1" do
+    test "print test info" do
+      test_struct = %{name: :"test success", time: 11_111}
+
+      expected_output = "\e[32m┃\e[0m success - 0.01s\n"
+
+      assert capture_io(fn ->
+               assert Output.print_captured_test(test_struct) == :ok
+             end) == expected_output
+    end
+
+    test "a large time" do
+      test_struct = %{name: :"test success", time: 1_111_111}
+
+      expected_output = "\e[32m┃\e[0m success - 1.1s\n"
+
+      assert capture_io(fn ->
+               assert Output.print_captured_test(test_struct) == :ok
+             end) == expected_output
+    end
+  end
+
+  describe "print_capture_error/1" do
+    test "print test error" do
+      test_struct = %{name: :"test success"}
+
+      expected_output =
+        "\e[31m┃\e[0m Test error: success\n\e[41m\e[37m  [ Xcribe ] doc tasks was aborted                                                               \e[0m\n"
+
+      assert capture_io(fn ->
+               assert Output.print_captured_error(test_struct) == :ok
+             end) == expected_output
+    end
+  end
 end

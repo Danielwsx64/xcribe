@@ -1,10 +1,12 @@
 defmodule Xcribe.CLI.Output do
   @moduledoc false
 
-  @blue IO.ANSI.blue()
   @bg_blue IO.ANSI.blue_background()
   @bg_green IO.ANSI.green_background()
   @bg_red IO.ANSI.red_background()
+
+  @cyan IO.ANSI.cyan()
+  @blue IO.ANSI.blue()
   @dark_blue IO.ANSI.color(25)
   @dark_green IO.ANSI.color(100)
   @dark_red IO.ANSI.color(88)
@@ -14,11 +16,32 @@ defmodule Xcribe.CLI.Output do
   @red IO.ANSI.red()
   @white IO.ANSI.white()
   @yellow IO.ANSI.yellow()
+
   @reset IO.ANSI.reset()
 
   @bar_size 95
 
   alias Xcribe.DocException
+
+  def print_message(message, type \\ :ok) when is_binary(message) do
+    color = if type == :error, do: @red, else: @cyan
+
+    IO.puts("#{color} >>> #{message} <<<#{@reset}")
+  end
+
+  def print_captured_test(%{name: name_as_atom, time: time}) do
+    "test " <> name = Atom.to_string(name_as_atom)
+
+    IO.puts("#{tab(@green)} #{name} - #{format_us(normalize_us(time))}s")
+  end
+
+  def print_captured_error(%{name: name_as_atom}) do
+    "test " <> name = Atom.to_string(name_as_atom)
+
+    IO.puts("#{tab(@red)} Test error: #{name}")
+
+    print_header_error("[ Xcribe ] doc tasks was aborted", @bg_red)
+  end
 
   def print_request_errors(errors) do
     print_header_error("[ Xcribe ] Parsing and validation errors", @bg_blue)
@@ -135,5 +158,17 @@ defmodule Xcribe.CLI.Output do
     |> Stream.filter(fn {_value, index} -> index == line - 1 end)
     |> Enum.at(0)
     |> (fn {value, _line} -> String.trim(value) end).()
+  end
+
+  defp normalize_us(nil), do: 0
+  defp normalize_us(us), do: div(us, 10_000)
+
+  defp format_us(us) do
+    if us < 10 do
+      "0.0#{us}"
+    else
+      us = div(us, 10)
+      "#{div(us, 10)}.#{rem(us, 10)}"
+    end
   end
 end
