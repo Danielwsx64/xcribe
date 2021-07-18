@@ -80,19 +80,28 @@ defmodule Xcribe do
 
   alias Xcribe.{
     ApiBlueprint,
+    CLI.Output,
+    Config,
     DocException,
+    Recorder,
     Request,
-    Request.Error,
     Request.Validator,
     Swagger,
     Writter
   }
 
   @doc false
-  def generate_doc(%{records: records, errors: errors}, config)
-      when is_list(errors) and is_list(records) do
+  def document_all_records do
+    get_records_with_endpoint()
+    |> fetch_config()
+    |> generate()
+    |> handle_result()
+  end
+
+  @doc false
+  def document(records, config) when is_list(records) do
     records
-    |> validate_records(errors)
+    |> validate_records()
     |> order_by_path()
     |> generate_docs(config)
     |> write(config)
@@ -100,20 +109,46 @@ defmodule Xcribe do
     e in DocException -> {:error, e}
   end
 
-  defp validate_records(records, errors),
-    do: Enum.reduce(records, initial_acc(errors), &validate_request/2)
+  defp get_records_with_endpoint do
+    case Recorder.pop_all() do
+      %{errors: []} = recorded -> {:ok, Map.delete(recorded, :errors)}
+      %{errors: errors} -> {:error, errors}
+    end
+  end
 
-  defp initial_acc([]), do: {:ok, []}
-  defp initial_acc(errors), do: {:error, errors}
+  defp fetch_config({:ok, recorded}) do
+    Enum.reduce_while(recorded, {:ok, []}, fn {endpoint, records}, {:ok, list} ->
+      endpoint
+      |> Config.fetch_config()
+      |> Config.check_configurations()
+      |> case do
+        {:ok, config} -> {:cont, {:ok, [{records, config} | list]}}
+        {:error, _errs} = error -> {:halt, error}
+      end
+    end)
+  end
+
+  defp fetch_config(error), do: error
+
+  defp generate({:ok, recorded_list}) do
+    Enum.reduce_while(recorded_list, :ok, fn {records, config}, :ok ->
+      case document(records, config) do
+        :ok -> {:cont, :ok}
+        error -> {:halt, error}
+      end
+    end)
+  end
+
+  defp generate(error), do: error
+
+  defp validate_records(records),
+    do: Enum.reduce(records, {:ok, []}, &validate_request/2)
 
   defp validate_request(%Request{} = request, acc) do
     request
     |> Validator.validate()
     |> add_result(acc)
   end
-
-  defp validate_request(%Error{} = err, {:ok, _requests}), do: {:error, [err]}
-  defp validate_request(%Error{} = err, {:error, errs}), do: {:error, [err | errs]}
 
   defp add_result({:error, error}, {:error, errs}), do: {:error, [error | errs]}
   defp add_result({:error, error}, {:ok, _requests}), do: {:error, [error]}
@@ -134,4 +169,24 @@ defmodule Xcribe do
 
   defp write(text, config) when is_binary(text), do: Writter.write(text, config)
   defp write({:error, _msg} = err, _config), do: err
+
+  defp handle_result({:error, %DocException{} = e}) do
+    Output.print_doc_exception(e)
+
+    :error
+  end
+
+  defp handle_result({:error, [error | _t] = errors}) when is_struct(error) do
+    Output.print_request_errors(errors)
+
+    :error
+  end
+
+  defp handle_result({:error, errors}) when is_list(errors) do
+    Output.print_configuration_errors(errors)
+
+    :error
+  end
+
+  defp handle_result(:ok), do: :ok
 end

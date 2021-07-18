@@ -104,7 +104,7 @@ defmodule Xcribe.FormatterTest do
     assert output =~ "An exception was raised. Elixir.FunctionClauseError"
   end
 
-  test "output parsing and validation errors" do
+  test "Print only parsing error when has a invalid request too" do
     status = [active?: true]
 
     Recorder.add(%Error{
@@ -137,7 +137,6 @@ defmodule Xcribe.FormatterTest do
       end)
 
     assert output =~ "[ Xcribe ] Parsing and validation errors"
-    assert output =~ "The Plug.Conn params must be valid HTTP params. A struct Date was found!"
     assert output =~ "route not found"
   end
 
