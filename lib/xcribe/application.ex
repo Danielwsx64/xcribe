@@ -29,4 +29,6 @@ defmodule Xcribe.Application do
       _success -> :ok
     end
   end
+
+  defp check_configuration(_config), do: :ok
 end
