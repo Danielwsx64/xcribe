@@ -118,13 +118,13 @@ defmodule Xcribe do
   end
 
   defp fetch_config({:ok, recorded}, override_func) do
-    Enum.reduce_while(recorded, {:ok, []}, fn {endpoint, records}, {:ok, list} ->
+    Enum.reduce_while(recorded, {:ok, []}, fn {endpoint, records}, {:ok, acc} ->
       endpoint
       |> Config.fetch_config()
       |> Config.check_configurations()
       |> apply_override(override_func, endpoint)
       |> case do
-        {:ok, config} -> {:cont, {:ok, [{records, config} | list]}}
+        {:ok, config} -> {:cont, {:ok, [{records, config} | acc]}}
         {:error, _errs} = error -> {:halt, error}
       end
     end)
@@ -132,7 +132,7 @@ defmodule Xcribe do
 
   defp fetch_config(error, _function), do: error
 
-  defp apply_override({:ok, config}, function, endpoint) when is_function(function) do
+  defp apply_override({:ok, config}, function, endpoint) when is_function(function, 2) do
     {:ok, function.(endpoint, config)}
   end
 

@@ -3,7 +3,7 @@ defmodule Xcribe.Config do
 
   @valid_formats [:api_blueprint, :swagger]
 
-  def active?, do: System.get_env("XCRIBE_ENV")
+  def active?, do: System.get_env("XCRIBE_ENV") in ["1", "true", "TRUE"]
 
   def fetch_config(endpoint) when is_atom(endpoint) do
     :xcribe
@@ -15,7 +15,7 @@ defmodule Xcribe.Config do
     :xcribe
     |> Application.get_all_env()
     |> Keyword.keys()
-    |> Enum.filter(&valid_endpoint/1)
+    |> Enum.filter(&valid_endpoint?/1)
   end
 
   @default_keys_to_validate [:format, :information_source, :json_library, :serve]
@@ -152,7 +152,7 @@ defmodule Xcribe.Config do
     end
   end
 
-  defp valid_endpoint(module) do
+  defp valid_endpoint?(module) do
     function_exported?(module, :config, 1) and function_exported?(module, :__compile_config__, 0)
   end
 end

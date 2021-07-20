@@ -9,7 +9,36 @@ defmodule Xcribe.ConfigTest do
       |> Application.get_all_env()
       |> Keyword.keys()
       |> Enum.each(&Application.delete_env(:xcribe, &1))
+
+      System.delete_env("XCRIBE_ENV")
     end)
+  end
+
+  describe "active?/0" do
+    test "return true when env var is 1" do
+      System.put_env("XCRIBE_ENV", "1")
+      assert Config.active?() == true
+    end
+
+    test "return true when env var is true" do
+      System.put_env("XCRIBE_ENV", "1")
+      assert Config.active?() == true
+    end
+
+    test "return true when env var is TRUE" do
+      System.put_env("XCRIBE_ENV", "1")
+      assert Config.active?() == true
+    end
+
+    test "return false when env var is an invalid value" do
+      System.put_env("XCRIBE_ENV", "asdf")
+      assert Config.active?() == false
+    end
+
+    test "return false when env var is not seted" do
+      System.delete_env("XCRIBE_ENV")
+      assert Config.active?() == false
+    end
   end
 
   describe "all_endpoints/0" do

@@ -18,7 +18,7 @@ defmodule Xcribe.RecorderTest do
     end
 
     test "return active true by env var" do
-      System.put_env("XCRIBE_ENV", "asdf")
+      System.put_env("XCRIBE_ENV", "true")
       assert Recorder.init([]) == {:ok, %{active?: true, records: %{errors: []}}}
     end
   end
