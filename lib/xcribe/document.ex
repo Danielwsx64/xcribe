@@ -3,7 +3,7 @@ defmodule Xcribe.Document do
   Exposes document/2 macro to be used in test specs.
   """
 
-  alias Xcribe.{Config, ConnParser, Recorder}
+  alias Xcribe.{ConnParser, Recorder}
 
   @doc """
   Document a request by a given `Plug.Conn`.
@@ -30,6 +30,8 @@ defmodule Xcribe.Document do
     test_description = __CALLER__.function |> elem(0) |> to_string
     "test " <> suggest_from_test = test_description
 
+    register_xcribe_tag(__CALLER__)
+
     meta =
       Macro.escape(%{
         call: %{description: test_description, file: __CALLER__.file, line: __CALLER__.line}
@@ -38,14 +40,28 @@ defmodule Xcribe.Document do
     quote bind_quoted: [conn: conn, opts: opts, suggestion: suggest_from_test, meta: meta] do
       options = Keyword.merge([as: suggestion], opts)
 
-      if Config.active?() do
+      if Recorder.active?() do
         conn
         |> ConnParser.execute(Keyword.fetch!(options, :as))
         |> Map.put(:__meta__, meta)
-        |> Recorder.save()
+        |> Recorder.add()
       end
 
       conn
     end
+  end
+
+  def register_xcribe_tag(%{module: module, function: {function, _arity}}) do
+    module
+    |> Module.delete_attribute(:ex_unit_tests)
+    |> Enum.each(fn test ->
+      to_put = if test.name == function, do: add_xcribe_tag(test), else: test
+
+      Module.put_attribute(module, :ex_unit_tests, to_put)
+    end)
+  end
+
+  defp add_xcribe_tag(%{tags: tags} = test) do
+    %{test | tags: Map.put(tags, :xcribe_document, true)}
   end
 end

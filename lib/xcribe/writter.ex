@@ -2,14 +2,11 @@ defmodule Xcribe.Writter do
   @moduledoc false
 
   alias Xcribe.CLI.Output
-  alias Xcribe.Config
 
   @doc """
   This writes the given text to the configured output file
   """
-  def write(text) do
-    output_file = Config.output_file()
-
+  def write(text, %{output: output_file}) do
     output_file
     |> Path.dirname()
     |> File.mkdir_p!()
@@ -18,9 +15,7 @@ defmodule Xcribe.Writter do
       {:ok, file} ->
         IO.binwrite(file, text)
 
-        IO.puts(
-          "#{IO.ANSI.cyan()}> Xcribe documentation written in #{output_file}#{IO.ANSI.reset()}"
-        )
+        Output.print_message("Xcribe documentation written in #{output_file}")
 
         File.close(file)
 

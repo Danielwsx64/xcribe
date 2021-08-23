@@ -1,7 +1,7 @@
 defmodule Xcribe.MixProject do
   use Mix.Project
 
-  @version "0.7.11"
+  @version "1.0.0"
   @description "A lib to generate API documentation from test specs"
   @links %{"GitHub" => "https://github.com/brainnco/xcribe"}
 
@@ -38,8 +38,11 @@ defmodule Xcribe.MixProject do
     ]
   end
 
-  defp application_mod(:test), do: {Xcribe.Support.Application, []}
-  defp application_mod(_), do: {Xcribe, []}
+  defp application_mod(:test) do
+    {Xcribe.Application, test: true, children: [{Xcribe.Endpoint, []}]}
+  end
+
+  defp application_mod(_), do: {Xcribe.Application, []}
 
   defp deps do
     [
@@ -72,7 +75,10 @@ defmodule Xcribe.MixProject do
       main: "readme",
       extras: [
         "README.md": [title: "Get starting"],
-        "documentation/serving_doc.md": [title: "Serving doc"]
+        "documentation/serving_doc.md": [title: "Serving doc"],
+        "CONTRIBUTING.md": [title: "Contributing"],
+        "CHANGELOG.md": [title: "Changelog"],
+        LICENSE: [title: "License"]
       ],
       groups_for_modules: doc_groups_for_modules()
     ]

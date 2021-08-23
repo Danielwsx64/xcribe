@@ -18,6 +18,7 @@ defmodule Xcribe.Support.RequestsGenerator do
     conn
     |> ConnTest.get(no_pipe_users_path(conn, :index))
     |> ConnParser.execute("show users")
+    |> Map.put(:__meta__, %{})
   end
 
   def users_index(opts \\ []) do
@@ -27,6 +28,7 @@ defmodule Xcribe.Support.RequestsGenerator do
     |> put_needed_headers(opts)
     |> ConnTest.get(users_path(conn, :index))
     |> ConnParser.execute("show users")
+    |> Map.put(:__meta__, %{})
   end
 
   def users_show(opts \\ []) do
@@ -36,6 +38,7 @@ defmodule Xcribe.Support.RequestsGenerator do
     |> put_needed_headers(opts)
     |> ConnTest.get(users_path(conn, :show, 1))
     |> ConnParser.execute("show user info")
+    |> Map.put(:__meta__, %{})
   end
 
   def users_create(opts \\ []) do
@@ -45,6 +48,7 @@ defmodule Xcribe.Support.RequestsGenerator do
     |> put_needed_headers(opts)
     |> ConnTest.post(users_path(conn, :create), %{name: "teste", age: 5})
     |> ConnParser.execute("create user")
+    |> Map.put(:__meta__, %{})
   end
 
   def users_update(opts \\ []) do
@@ -54,6 +58,7 @@ defmodule Xcribe.Support.RequestsGenerator do
     |> put_needed_headers(opts)
     |> ConnTest.put(users_path(conn, :update, 1), %{name: "teste", age: 5})
     |> ConnParser.execute("update user")
+    |> Map.put(:__meta__, %{})
   end
 
   def users_delete(opts \\ []) do
@@ -63,6 +68,7 @@ defmodule Xcribe.Support.RequestsGenerator do
     |> put_needed_headers(opts)
     |> ConnTest.delete(users_path(conn, :delete, 1))
     |> ConnParser.execute("delete user")
+    |> Map.put(:__meta__, %{})
   end
 
   def users_custom_action(opts \\ []) do
@@ -72,6 +78,7 @@ defmodule Xcribe.Support.RequestsGenerator do
     |> put_needed_headers(opts)
     |> ConnTest.post(users_cancel_path(conn, :cancel, 1))
     |> ConnParser.execute("custom action with user")
+    |> Map.put(:__meta__, %{})
   end
 
   def users_posts_index(opts \\ []) do
@@ -81,6 +88,7 @@ defmodule Xcribe.Support.RequestsGenerator do
     |> put_needed_headers(opts)
     |> ConnTest.get(users_posts_path(conn, :index, 1))
     |> ConnParser.execute("show all user posts")
+    |> Map.put(:__meta__, %{})
   end
 
   def users_posts_create(opts \\ []) do
@@ -90,6 +98,7 @@ defmodule Xcribe.Support.RequestsGenerator do
     |> put_needed_headers(opts)
     |> ConnTest.post(users_posts_path(conn, :create, 1), %{title: "test"})
     |> ConnParser.execute("show user post")
+    |> Map.put(:__meta__, %{})
   end
 
   def users_posts_update(opts \\ []) do
@@ -99,6 +108,7 @@ defmodule Xcribe.Support.RequestsGenerator do
     |> put_needed_headers(opts)
     |> ConnTest.patch(users_posts_path(conn, :update, 1, 2), %{title: "test"})
     |> ConnParser.execute("update user post")
+    |> Map.put(:__meta__, %{})
   end
 
   defp put_needed_headers(conn, opts) do

@@ -6,16 +6,16 @@ defmodule Xcribe.DocumentTest do
   import Xcribe.Document
 
   setup do
-    Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
-    Application.put_env(:xcribe, :env_var, "PWD")
+    Recorder.set_active(true)
+    Recorder.pop_all()
 
-    :ok
+    on_exit(fn ->
+      Recorder.set_active(false)
+    end)
   end
 
   describe "document/1" do
     test "parse conn and save it", %{conn: conn} do
-      Recorder.start_link()
-
       conn =
         conn
         |> put_req_header("authorization", "token")
@@ -36,12 +36,10 @@ defmodule Xcribe.DocumentTest do
           }
         })
 
-      assert Recorder.get_all() == [parsed_request_with_meta]
+      assert Recorder.pop_all() == %{:errors => [], Xcribe.Endpoint => [parsed_request_with_meta]}
     end
 
     test "parse conn and save it whith custom description", %{conn: conn} do
-      Recorder.start_link()
-
       request_description = "some description"
 
       conn =
@@ -60,16 +58,14 @@ defmodule Xcribe.DocumentTest do
           call: %{
             description: test_name,
             file: file_name,
-            line: 51
+            line: 49
           }
         })
 
-      assert Recorder.get_all() == [parsed_request_with_meta]
+      assert Recorder.pop_all() == %{:errors => [], Xcribe.Endpoint => [parsed_request_with_meta]}
     end
 
     test "handle parse errors" do
-      Recorder.start_link()
-
       document(%{})
 
       test_name = "test document/1 handle parse errors"
@@ -81,24 +77,22 @@ defmodule Xcribe.DocumentTest do
           call: %{
             description: test_name,
             file: file_name,
-            line: 73
+            line: 69
           }
         })
 
-      assert Recorder.get_all() == [parsed_request_with_meta]
+      assert Recorder.pop_all() == %{errors: [parsed_request_with_meta]}
     end
 
-    test "dont document when env var is not defined", %{conn: conn} do
-      Application.put_env(:xcribe, :env_var, "NOT_DEFINED_ENV_VAR_TEST")
-
-      Recorder.start_link()
+    test "dont document when recorder is not active", %{conn: conn} do
+      Recorder.set_active(false)
 
       conn
       |> put_req_header("authorization", "token")
       |> get(users_path(conn, :index))
       |> document()
 
-      assert Recorder.get_all() == []
+      assert Recorder.pop_all() == %{errors: []}
     end
   end
 end

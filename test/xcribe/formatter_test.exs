@@ -7,199 +7,185 @@ defmodule Xcribe.FormatterTest do
 
   alias Xcribe.Support.RequestsGenerator
 
-  @sample_swagger_output File.read!("test/support/swagger_example.json")
-  @sample_apib_output File.read!("test/support/api_blueprint_example.apib")
-  @output_path "/tmp/test"
-
   setup do
-    Application.put_env(:xcribe, :env_var, "PWD")
-    Application.put_env(:xcribe, :output, @output_path)
-    Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
-    Application.put_env(:xcribe, :format, :swagger)
-    Application.delete_env(:xcribe, :json_library)
+    Recorder.pop_all()
+    Recorder.set_active(false)
 
-    Recorder.start_link()
+    Application.put_env(
+      :xcribe,
+      Xcribe.Endpoint,
+      output: "/tmp/test",
+      information_source: Xcribe.Support.Information,
+      format: :swagger,
+      json_library: Jason
+    )
 
     on_exit(fn ->
-      Application.delete_env(:xcribe, :env_var)
-      Application.delete_env(:xcribe, :output)
-      Application.delete_env(:xcribe, :information_source)
+      :xcribe
+      |> Application.get_all_env()
+      |> Keyword.keys()
+      |> Enum.each(&Application.delete_env(:xcribe, &1))
+
+      Recorder.set_active(false)
     end)
-
-    :ok
   end
 
-  describe "write document" do
-    test "swagger format" do
-      requests = [
-        RequestsGenerator.users_index([:basic_auth]),
-        RequestsGenerator.users_show([:basic_auth]),
-        RequestsGenerator.users_create([:bearer_auth]),
-        RequestsGenerator.users_update([:bearer_auth]),
-        RequestsGenerator.users_delete([:bearer_auth]),
-        RequestsGenerator.users_custom_action([:api_key_auth]),
-        RequestsGenerator.users_posts_index([:api_key_auth]),
-        RequestsGenerator.users_posts_create([:api_key_auth]),
-        RequestsGenerator.users_posts_update([:api_key_auth])
-      ]
+  describe "init/1" do
+    test "return active false when recorder is not active" do
+      assert Formatter.init([]) == {:ok, active?: false}
+    end
 
-      Enum.each(requests, &Recorder.save(&1))
+    test "return active true when recorder is active" do
+      Recorder.set_active(true)
+      assert Formatter.init([]) == {:ok, active?: true}
+    end
+  end
 
-      Application.put_env(:xcribe, :format, :swagger)
+  describe "handle suite_finished callback" do
+    test "write documentation when is active" do
+      status = [active?: true]
 
-      expected_content = String.replace(@sample_swagger_output, ~r/\s/, "")
+      Recorder.add(RequestsGenerator.users_index())
 
       assert capture_io(fn ->
-               assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
-             end) =~ "Xcribe documentation written in"
-
-      assert @output_path |> File.read!() |> String.replace(~r/\s/, "") == expected_content
+               assert Formatter.handle_cast({:suite_finished, 1, 2}, status) == {:noreply, :ok}
+             end) =~ "Xcribe documentation written in /tmp/test"
     end
 
-    test "api_blueprint format" do
-      requests = [
-        RequestsGenerator.users_index([:basic_auth]),
-        RequestsGenerator.users_show([:basic_auth]),
-        RequestsGenerator.users_create([:bearer_auth]),
-        RequestsGenerator.users_update([:bearer_auth]),
-        RequestsGenerator.users_delete([:bearer_auth]),
-        RequestsGenerator.users_custom_action([:api_key_auth]),
-        RequestsGenerator.users_posts_index([:api_key_auth]),
-        RequestsGenerator.users_posts_create([:api_key_auth]),
-        RequestsGenerator.users_posts_update([:api_key_auth])
-      ]
-
-      Enum.each(requests, &Recorder.save(&1))
-
-      Application.put_env(:xcribe, :format, :api_blueprint)
+    test "ignore suite_finished when is not active" do
+      status = [active?: false]
 
       assert capture_io(fn ->
-               assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
-             end) =~ "Xcribe documentation written in"
+               assert Formatter.handle_cast({:suite_finished, 1, 2}, status) ==
+                        {:noreply, status}
+             end) == ""
+    end
 
-      assert File.read!(@output_path) == @sample_apib_output
+    test "Output config errors" do
+      status = [active?: true]
+
+      Application.put_env(:xcribe, Xcribe.Endpoint, information_source: Fake)
+
+      Recorder.add(RequestsGenerator.users_index())
+
+      assert capture_io(fn ->
+               assert Formatter.handle_cast({:suite_finished, 1, 2}, status) == {:noreply, :ok}
+             end) =~ "The configured module as information source is not using Xcribe macros"
+    end
+
+    test "ignore when has no records" do
+      status = [active?: true]
+
+      assert capture_io(fn ->
+               assert Formatter.handle_cast({:suite_finished, 1, 2}, status) == {:noreply, :ok}
+             end) == ""
     end
   end
 
-  describe "handling request errors" do
-    test "handle parsing errors" do
-      error = %Error{
-        type: :parsing,
-        message: "route not found",
-        __meta__: %{
-          call: %{
-            description: "test name",
-            file: File.cwd!() <> "/test/xcribe/formatter_test.exs",
-            line: 1
-          }
+  test "output document exceptions" do
+    status = [active?: true]
+
+    Recorder.add(%Request{
+      endpoint: Xcribe.Endpoint,
+      __meta__: %{
+        call: %{
+          description: "conn test",
+          file: File.cwd!() <> "/test/xcribe/cli/output_test.exs",
+          line: 25
         }
       }
+    })
 
-      Recorder.save(%Request{})
-      Recorder.save(error)
+    output =
+      capture_io(fn ->
+        assert Formatter.handle_cast({:suite_finished, 1, 2}, status) == {:noreply, :ok}
+      end)
 
-      output =
-        capture_io(fn ->
-          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
-        end)
-
-      assert output =~ "route not found"
-      assert output =~ "formatter_test.exs"
-    end
-
-    test "handle parsing and validation errors" do
-      parsing_error = %Error{
-        type: :parsing,
-        message: "route not found",
-        __meta__: %{
-          call: %{
-            description: "test name",
-            file: File.cwd!() <> "/test/xcribe/formatter_test.exs",
-            line: 1
-          }
-        }
-      }
-
-      validation_error = %Error{
-        type: :validation,
-        message:
-          "The Plug.Conn params must be valid HTTP params. A struct Elixir.Date was found!",
-        __meta__: %{
-          call: %{
-            description: "test name",
-            file: File.cwd!() <> "/test/xcribe/formatter_test.exs",
-            line: 1
-          }
-        }
-      }
-
-      Recorder.save(%Request{})
-      Recorder.save(parsing_error)
-      Recorder.save(validation_error)
-
-      output =
-        capture_io(fn ->
-          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
-        end)
-
-      assert output =~ "route not found"
-      assert output =~ "formatter_test.exs"
-      assert output =~ "The Plug.Conn params must be valid HTTP params"
-    end
-
-    test "handle invalid configuration" do
-      Application.put_env(:xcribe, :format, :invalid)
-      Application.put_env(:xcribe, :json_library, Fake)
-      Application.put_env(:xcribe, :information_source, Fake)
-
-      output =
-        capture_io(fn ->
-          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
-        end)
-
-      assert output =~ "Config key: json_library"
-      assert output =~ "Config key: format"
-      assert output =~ "Config key: information_source"
-    end
-
-    test "handle document exceptions" do
-      Recorder.save(%Request{
-        __meta__: %{
-          call: %{
-            description: "conn test",
-            file: File.cwd!() <> "/test/xcribe/cli/output_test.exs",
-            line: 25
-          }
-        }
-      })
-
-      Application.put_env(:xcribe, :format, :swagger)
-
-      output =
-        capture_io(fn ->
-          assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
-        end)
-
-      assert output =~ "An exception was raised"
-    end
+    assert output =~ "[ Xcribe ] Exception"
+    assert output =~ "An exception was raised. Elixir.FunctionClauseError"
   end
 
-  describe "Handle events from all ExUnit versions" do
-    test "ExUnit =< 1.11" do
-      capture_io(fn ->
-        assert Formatter.handle_cast({:suite_finished, 1, 2}, nil) == {:noreply, :ok}
-      end)
-    end
+  test "Print only parsing error when has a invalid request too" do
+    status = [active?: true]
 
-    test "ExUnit =~ 1.12" do
-      capture_io(fn ->
-        assert Formatter.handle_cast({:suite_finished, %{run: 1, async: 2, load: 3}}, nil) ==
-                 {:noreply, :ok}
-      end)
-    end
+    Recorder.add(%Error{
+      type: :parsing,
+      message: "route not found",
+      __meta__: %{
+        call: %{
+          description: "test name",
+          file: File.cwd!() <> "/test/xcribe/formatter_test.exs",
+          line: 1
+        }
+      }
+    })
 
-    test "unexpected event" do
-      assert Formatter.handle_cast({:other_event}, nil) == {:noreply, nil}
-    end
+    Recorder.add(%Request{
+      endpoint: Xcribe.Endpoint,
+      request_body: %{date: ~D[2021-01-01]},
+      __meta__: %{
+        call: %{
+          description: "test name",
+          file: File.cwd!() <> "/test/xcribe/formatter_test.exs",
+          line: 1
+        }
+      }
+    })
+
+    output =
+      capture_io(fn ->
+        assert Formatter.handle_cast({:suite_finished, 1, 2}, status) == {:noreply, :ok}
+      end)
+
+    assert output =~ "[ Xcribe ] Parsing and validation errors"
+    assert output =~ "route not found"
+  end
+
+  test "when has only parse errors" do
+    status = [active?: true]
+
+    Recorder.add(%Error{
+      type: :parsing,
+      message: "route not found",
+      __meta__: %{
+        call: %{
+          description: "test name",
+          file: File.cwd!() <> "/test/xcribe/formatter_test.exs",
+          line: 1
+        }
+      }
+    })
+
+    output =
+      capture_io(fn ->
+        assert Formatter.handle_cast({:suite_finished, 1, 2}, status) == {:noreply, :ok}
+      end)
+
+    assert output =~ "[ Xcribe ] Parsing and validation errors"
+    assert output =~ "route not found"
+  end
+
+  test "for ExUnit =< 1.11" do
+    Recorder.add(RequestsGenerator.users_index())
+
+    capture_io(fn ->
+      assert Formatter.handle_cast({:suite_finished, 1, 2}, active?: true) == {:noreply, :ok}
+    end) =~ "Xcribe documentation written in /tmp/test"
+  end
+
+  test "for ExUnit =~ 1.12" do
+    Recorder.add(RequestsGenerator.users_index())
+
+    capture_io(fn ->
+      assert Formatter.handle_cast(
+               {:suite_finished, %{run: 1, async: 2, load: 3}},
+               active?: true
+             ) ==
+               {:noreply, :ok}
+    end) =~ "Xcribe documentation written in /tmp/test"
+  end
+
+  test "unexpected event" do
+    assert Formatter.handle_cast({:other_event}, nil) == {:noreply, nil}
   end
 end

@@ -1,24 +1,20 @@
 defmodule Xcribe.ApiBlueprint.APIBTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   alias Xcribe.ApiBlueprint
   alias Xcribe.ApiBlueprint.{APIB, Formatter, Multipart}
   alias Xcribe.Support.RequestsGenerator
 
   setup do
-    Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
-
-    on_exit(fn ->
-      Application.delete_env(:xcribe, :information_source)
-    end)
+    {:ok, %{config: %{information_source: Xcribe.Support.Information, json_library: Jason}}}
   end
 
-  describe "encode/1" do
-    test "encode apib struct into apib format" do
+  describe "encode/2" do
+    test "encode apib struct into apib format", %{config: config} do
       request = RequestsGenerator.users_posts_create()
-      struct = ApiBlueprint.apib_struct([request])
+      struct = ApiBlueprint.apib_struct([request], config)
 
-      assert APIB.encode(struct) == """
+      assert APIB.encode(struct, config) == """
              FORMAT: 1A
              HOST: http://my-api.com
 
@@ -86,11 +82,11 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
              """
     end
 
-    test "don't print group section when resource group has no name" do
+    test "don't print group section when resource group has no name", %{config: config} do
       request = RequestsGenerator.no_pipe_users_index()
-      struct = ApiBlueprint.apib_struct([request])
+      struct = ApiBlueprint.apib_struct([request], config)
 
-      refute APIB.encode(struct) =~ "# Group"
+      refute APIB.encode(struct, config) =~ "# Group"
     end
   end
 
@@ -171,11 +167,14 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
     end
   end
 
-  describe "schema/1" do
-    test "return schema" do
-      %{schema: schema} = Formatter.response_object(RequestsGenerator.users_posts_create())
+  describe "schema/2" do
+    test "return schema", %{config: config} do
+      %{schema: schema} =
+        RequestsGenerator.users_posts_create()
+        |> Map.put(:__meta__, %{config: config})
+        |> Formatter.response_object()
 
-      assert APIB.schema(schema) == """
+      assert APIB.schema(schema, config) == """
                  + Schema
 
                          {
@@ -195,8 +194,8 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
              """
     end
 
-    test "empty schema" do
-      assert APIB.schema(%{}) == ""
+    test "empty schema", %{config: config} do
+      assert APIB.schema(%{}, config) == ""
     end
   end
 
@@ -225,11 +224,14 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
     end
   end
 
-  describe "body/1" do
-    test "return body" do
-      %{body: body} = Formatter.response_object(RequestsGenerator.users_posts_create())
+  describe "body/2" do
+    test "return body", %{config: config} do
+      %{body: body} =
+        RequestsGenerator.users_posts_create()
+        |> Map.put(:__meta__, %{config: config})
+        |> Formatter.response_object()
 
-      assert APIB.body(body) == """
+      assert APIB.body(body, config) == """
                  + Body
 
                          {
@@ -240,11 +242,11 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
              """
     end
 
-    test "empty body" do
-      assert APIB.body(%{}) == ""
+    test "empty body", %{config: config} do
+      assert APIB.body(%{}, config) == ""
     end
 
-    test "multipart body" do
+    test "multipart body", %{config: config} do
       body = %Multipart{
         boundary: "---boundary",
         parts: [
@@ -277,15 +279,18 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
 
       """
 
-      assert APIB.body(body) == expected
+      assert APIB.body(body, config) == expected
     end
   end
 
-  describe "full_response/1" do
-    test "return full response" do
-      response = Formatter.response_object(RequestsGenerator.users_posts_create())
+  describe "full_response/2" do
+    test "return full response", %{config: config} do
+      response =
+        RequestsGenerator.users_posts_create()
+        |> Map.put(:__meta__, %{config: config})
+        |> Formatter.response_object()
 
-      assert APIB.full_response(response) == """
+      assert APIB.full_response(response, config) == """
              + Response 201 (application/json)
                  + Headers
 
@@ -317,10 +322,13 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
              """
     end
 
-    test "when status code is 204" do
-      response = Formatter.response_object(RequestsGenerator.users_posts_create())
+    test "when status code is 204", %{config: config} do
+      response =
+        RequestsGenerator.users_posts_create()
+        |> Map.put(:__meta__, %{config: config})
+        |> Formatter.response_object()
 
-      assert APIB.full_response(%{response | status: 204}) == """
+      assert APIB.full_response(%{response | status: 204}, config) == """
              + Response 204 (application/json)
                  + Headers
 
@@ -330,14 +338,15 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
     end
   end
 
-  describe "full_request/1" do
-    test "return full request" do
+  describe "full_request/2" do
+    test "return full request", %{config: config} do
       [{name, request}] =
         RequestsGenerator.users_posts_create()
+        |> Map.put(:__meta__, %{config: config})
         |> Formatter.request_object()
         |> Map.to_list()
 
-      assert APIB.full_request(name, request) == """
+      assert APIB.full_request(name, request, config) == """
              + Request show user post (application/json)
                  + Body
 
@@ -389,14 +398,15 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
     end
   end
 
-  describe "full_action/2" do
-    test "return full action" do
+  describe "full_action/3" do
+    test "return full action", %{config: config} do
       [{key, action}] =
         RequestsGenerator.users_posts_create()
+        |> Map.put(:__meta__, %{config: config})
         |> Formatter.action_object()
         |> Map.to_list()
 
-      assert APIB.full_action(key, action) == """
+      assert APIB.full_action(key, action, config) == """
              ### Users Posts create [POST /users/{usersId}/posts]
              + Parameters
 
@@ -452,14 +462,15 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
              """
     end
 
-    test "action with query parameters" do
+    test "action with query parameters", %{config: config} do
       [{key, action}] =
         RequestsGenerator.users_index()
+        |> Map.put(:__meta__, %{config: config})
         |> Map.put(:query_params, %{"limit" => "6"})
         |> Formatter.action_object()
         |> Map.to_list()
 
-      assert APIB.full_action(key, action) == """
+      assert APIB.full_action(key, action, config) == """
              ### Users index [GET /users{?limit}]
              + Parameters
 
@@ -508,14 +519,15 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
     end
   end
 
-  describe "full_resource/2" do
-    test "return full action" do
+  describe "full_resource/3" do
+    test "return full action", %{config: config} do
       [{key, resource}] =
         RequestsGenerator.users_posts_create()
+        |> Map.put(:__meta__, %{config: config})
         |> Formatter.resource_object()
         |> Map.to_list()
 
-      assert APIB.full_resource(key, resource) == """
+      assert APIB.full_resource(key, resource, config) == """
              ## Users Posts [/users/{usersId}/posts]
              + Parameters
 
@@ -577,11 +589,14 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
     end
   end
 
-  describe "groups/1" do
-    test "return groups" do
-      request = Formatter.full_request_object(RequestsGenerator.users_posts_create())
+  describe "groups/2" do
+    test "return groups", %{config: config} do
+      request =
+        RequestsGenerator.users_posts_create()
+        |> Map.put(:__meta__, %{config: config})
+        |> Formatter.full_request_object()
 
-      assert APIB.groups(request) == """
+      assert APIB.groups(request, config) == """
              ## Group Api
              ## Users Posts [/users/{usersId}/posts]
              + Parameters

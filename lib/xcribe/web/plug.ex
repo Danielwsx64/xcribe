@@ -6,7 +6,7 @@ defmodule Xcribe.Web.Plug do
 
   ```
         scope "doc/swagger" do
-          forward "/", Xcribe.Web.Plug
+          forward "/", Xcribe.Web.Plug, endpoint: YourApp.Endpoint
         end
 
   ```
@@ -31,7 +31,7 @@ defmodule Xcribe.Web.Plug do
   )
 
   get "/" do
-    if Config.serving?() do
+    if conn.assigns.serving? do
       uri =
         URI.to_string(%URI{
           host: conn.host,
@@ -49,16 +49,21 @@ defmodule Xcribe.Web.Plug do
   match(_, do: not_found(conn))
 
   @doc false
-  def init(_opts) do
-    file = String.replace_prefix(Config.output_file(), "priv/static", "")
+  def init(opts) do
+    endpoint = Keyword.fetch!(opts, :endpoint)
 
-    [file: file]
+    config = Config.fetch_config(endpoint)
+
+    file = String.replace_prefix(config.output, "priv/static", "")
+
+    [file: file, serving?: config.serve]
   end
 
   @doc false
-  def call(conn, file: file) do
+  def call(conn, file: file, serving?: serving) do
     conn
     |> Conn.assign(:file, file)
+    |> Conn.assign(:serving?, serving)
     |> super([])
   end
 

@@ -6,6 +6,7 @@ defmodule Xcribe.Request do
     :action,
     :controller,
     :description,
+    :endpoint,
     :path,
     :request_body,
     :resource,

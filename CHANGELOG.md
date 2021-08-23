@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2021-07-17
+
+## Added
+
+- Mix task xcribe.doc
+- Allow multiple endpoints config
+
+### Changed
+
+- Xcribe configuration is scoped by application endpoint module
+- Documentation route foward to Xcribe.Web.Plug you must provide the application
+  endpoint.
+
+### Removed
+
+- The env var config was removed. Now you must use `XCRIBE_ENV` to active xcribe
+  when running `mix test`
+
 ## [0.7.11] - 2021-05-29
 
 ### Fixed
@@ -71,7 +89,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.7.1] - 2020-06-09
 
-### Enhancements
+### Fixed
 
 - Improve internal modules naming and location.
 
@@ -93,7 +111,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.6.1] - 2020-06-08
 
-## Enhancements
+### Enhancements
 
 Improve CI/CD flow:
 
@@ -132,6 +150,7 @@ Improve CI/CD flow:
 - Add changelog and Makefile.
 
 [unreleased]: https://github.com/brainnco/xcribe/compare/v0.7.9...master
+[1.0.0]: https://github.com/brainnco/xcribe/compare/v0.7.11...v1.0.0
 [0.7.11]: https://github.com/brainnco/xcribe/compare/v0.7.10...v0.7.11
 [0.7.9]: https://github.com/brainnco/xcribe/compare/v0.7.8...v0.7.9
 [0.7.8]: https://github.com/brainnco/xcribe/compare/v0.7.7...v0.7.8

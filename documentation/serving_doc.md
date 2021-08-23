@@ -9,8 +9,8 @@ For serving with `Xcribe` you must configure doc format as `:swagger` the output
 must be `priv/static` and you must enable `serve` config.
 
 ```
-      config :xcribe,
-        information_source: YourApp.YouModuleInformation,
+      config :xcribe, YourAppWeb.Endpoint,
+        information_source: YourAppWeb.YouModuleInformation,
         format: :swagger,
         output: "priv/static/my_doc.json",
         serve: true
@@ -23,7 +23,7 @@ Add a doc scope to your router, and forward all requests to `Xcribe.Web.Plug`
 
 ```
       scope "doc/swagger" do
-        forward "/", Xcribe.Web.Plug
+        forward "/", Xcribe.Web.Plug, endpoint: YourAppWeb.Endpoint
       end
 
 ```

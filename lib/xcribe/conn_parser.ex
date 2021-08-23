@@ -2,7 +2,7 @@ defmodule Xcribe.ConnParser do
   @moduledoc false
 
   alias Plug.Conn
-  alias Xcribe.{Config, Request, Request.Error}
+  alias Xcribe.{Request, Request.Error}
 
   @error_struct %Error{type: :parsing}
 
@@ -33,12 +33,13 @@ defmodule Xcribe.ConnParser do
       header_params: conn.req_headers,
       controller: controller_module(route),
       description: description,
+      endpoint: Map.fetch!(conn.private, :phoenix_endpoint),
       params: conn.params,
       path: path,
       path_params: conn.path_params,
       query_params: conn.query_params,
       request_body: conn.body_params,
-      resource: resource_name(path, fetch_namespaces()),
+      resource: resource_name(route),
       resource_group: resource_group(route),
       resp_body: conn.resp_body,
       resp_headers: conn.resp_headers,
@@ -74,20 +75,14 @@ defmodule Xcribe.ConnParser do
   defp resource_group(%{pipe_through: [head | _rest]}), do: head
   defp resource_group(%{}), do: nil
 
-  defp resource_name(path, namespaces) do
-    namespaces
-    |> Enum.reduce(path, &remove_namespace/2)
+  defp resource_name(%{route: route}) do
+    route
     |> String.split("/")
     |> Enum.filter(&Regex.match?(~r/^\w+$/, &1))
-    |> Enum.join("_")
   end
-
-  defp remove_namespace(namespace, path), do: String.replace(path, ~r/^#{namespace}/, "")
 
   defp format_path(path, params),
     do: params |> Map.keys() |> Enum.reduce(path, &transform_param/2)
 
   defp transform_param(param, path), do: String.replace(path, ":#{param}", "{#{param}}")
-
-  defp fetch_namespaces, do: apply(Config.xcribe_information_source!(), :namespaces, [])
 end

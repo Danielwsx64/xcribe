@@ -1,5 +1,5 @@
 defmodule Xcribe.SwaggerTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   alias Xcribe.Support.RequestsGenerator
   alias Xcribe.{DocException, Request, Swagger}
@@ -7,13 +7,11 @@ defmodule Xcribe.SwaggerTest do
   @sample_swagger_output File.read!("test/support/swagger_example.json")
 
   setup do
-    Application.put_env(:xcribe, :information_source, Xcribe.Support.Information)
-
-    :ok
+    {:ok, %{config: %{information_source: Xcribe.Support.Information, json_library: Jason}}}
   end
 
   describe "generate_doc/1" do
-    test "parse requests do string" do
+    test "parse requests do string", %{config: config} do
       requests = [
         RequestsGenerator.users_index([:basic_auth]),
         RequestsGenerator.users_show([:basic_auth]),
@@ -28,14 +26,15 @@ defmodule Xcribe.SwaggerTest do
 
       expected = Jason.decode!(@sample_swagger_output)
 
-      response = Swagger.generate_doc(requests)
+      response = Swagger.generate_doc(requests, config)
 
       assert Jason.decode!(response) == expected
     end
 
-    test "when there is no security schema" do
+    test "when there is no security schema", %{config: config} do
       requests = [
         %Request{
+          __meta__: %{},
           action: "index",
           controller: Elixir.Xcribe.ProtocolsController,
           description: "",
@@ -45,7 +44,7 @@ defmodule Xcribe.SwaggerTest do
           path_params: %{},
           query_params: %{},
           request_body: %{},
-          resource: "protocols",
+          resource: ["protocols"],
           resource_group: :api,
           resp_body: "[{\"id\":2,\"name\":\"user 2\"}]",
           resp_headers: [
@@ -98,10 +97,12 @@ defmodule Xcribe.SwaggerTest do
         }
       }
 
-      assert Jason.decode!(Swagger.generate_doc(requests)) == expected
+      assert result = Swagger.generate_doc(requests, config)
+
+      assert Jason.decode!(result) == expected
     end
 
-    test "handle excptions into Request Error structs" do
+    test "handle excptions into Request Error structs", %{config: config} do
       request =
         [:basic_auth]
         |> RequestsGenerator.users_index()
@@ -115,7 +116,7 @@ defmodule Xcribe.SwaggerTest do
         })
 
       assert_raise DocException, "An exception was raised. Elixir.Protocol.UndefinedError", fn ->
-        Swagger.generate_doc([request])
+        Swagger.generate_doc([request], config)
       end
     end
   end

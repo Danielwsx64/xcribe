@@ -21,7 +21,7 @@ mix.exs
 ```elixir
 def deps do
   [
-    {:xcribe, "~> 0.7.11"}
+    {:xcribe, "~> 1.0.0"}
   ]
 end
 ```
@@ -31,6 +31,8 @@ Update deps
 ```sh
 mix deps.get
 ```
+
+To run `mix xcribe.doc` you must configure `preferred_cli_env: ["xcribe.doc": :test]` on your mix.ex file.
 
 Xcribe requires that you create an "Information Module". This module defines
 the custom information about your API documentation.
@@ -54,20 +56,7 @@ Add a new configuration with the created module
 config/test.exs
 
 ```elixir
-  config :xcribe,
-    information_source: YourAppWeb.Support.DocInformation,
-    format: :swagger,
-    output: "app_doc.json"
-```
-
-Next, in your `test/test_helper.exs` you should configure ExUnit to use Xcribe
-formatter. You would probably like to keep the default ExUnit.CLIFormatter as
-well.
-
-test/test_helper.exs
-
-```elixir
- ExUnit.start(formatters: [ExUnit.CLIFormatter, Xcribe.Formatter])
+  config :xcribe, YourAppWeb.Endpoint, information_source: YourAppWeb.Support.DocInformation
 ```
 
 ## Usage
@@ -130,13 +119,30 @@ test "get posts", %{conn: conn} do
 end
 ```
 
-To generate the doc file run `mix test` with an env var `XCRIBE_ENV=true`
+### Generating documetation file
+
+By Xcribe task:
+
+```sh
+mix xcribe.doc
+```
+
+A file will be created with the documentation on configured format and output path.
+
+You also can generate documentation while running `mix test`. To do that you
+must configure `ExUnit` to use`Xcribe.Formatter`.
+
+test/test_helper.exs
+
+```elixir
+ ExUnit.start(formatters: [ExUnit.CLIFormatter, Xcribe.Formatter])
+```
+
+Then you must run the test task with an env var `XCRIBE_ENV=true`
 
 ```sh
 XCRIBE_ENV=true mix test
 ```
-
-A file `api_doc.apib` will be created with the documentation if ApiBlueprint is configured. If Swagger format is chosen, then `openapi.json` file will be created.
 
 ### Rendering HTML
 
@@ -152,21 +158,20 @@ You can add this configurations to your `config/test.ex`
 - information_source: the module with doc information
 - output: a custom name to the output file
 - format: ApiBlueprint or Swagger formats
-- env_var: a custom name to the env to active Xcribe.Formatter
 - json_library: The library to be used for json decode/encode.
 - serve: Enables Xcribe serve mode. See more in `Serving doc` session.
 
 Example
 
 ```elixir
-config :xcribe, [
+config :xcribe, YourAppWeb.Endpoint,
   information_source: YourAppWeb.Information,
   output: "API-DOCUMENTATION.apib",
   format: :api_blueprint # or :swagger,
-  env_var: "DOC_API",
   json_library: Jason
-]
 ```
+
+See `Xcribe` to more configuration options.
 
 ### Serve documentation
 
@@ -175,6 +180,10 @@ config :xcribe, [
 ## Contributing
 
 [Contributing Guide](CONTRIBUTING.md)
+
+## Changelog
+
+[Changelog](CHANGELOG.md)
 
 ## License
 

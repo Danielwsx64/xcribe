@@ -12,6 +12,7 @@ defmodule Xcribe.RequestTest do
         action: nil,
         controller: nil,
         description: nil,
+        endpoint: nil,
         header_params: [],
         params: %{},
         path: nil,
