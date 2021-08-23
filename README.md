@@ -138,7 +138,7 @@ test/test_helper.exs
  ExUnit.start(formatters: [ExUnit.CLIFormatter, Xcribe.Formatter])
 ```
 
-Than you must run the test task with an env var `XCRIBE_ENV=true`
+Then you must run the test task with an env var `XCRIBE_ENV=true`
 
 ```sh
 XCRIBE_ENV=true mix test
