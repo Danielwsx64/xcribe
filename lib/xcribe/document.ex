@@ -25,19 +25,44 @@ defmodule Xcribe.Document do
       end
 
   If no description is given the current test description will be used.
+
+  You can specify custom groups tags by passing the option `tags` to `document/2`
+
+      test "test name", %{conn: conn} do
+        ...
+
+        document(conn, as: "description here", tags: ["User endpoints"])
+
+        ...
+      end
+
+  You also can use a module attribute `@xcribe_tags` to define the groups tags 
+  inside a test file.
+
+      Module YourAppTest do
+        use ExUnit.Case
+
+        @xcribe_tags ["Authenticated API"]
+
+        test "test name", %{conn: conn} do
+          ...
+
+          document(conn)
+
+          ...
+        end
+      end
   """
   defmacro document(conn, opts \\ []) do
     register_xcribe_tag(__CALLER__)
-
-    test_description = __CALLER__.function |> elem(0) |> to_string
-    "test " <> description = test_description
+    test_description = __CALLER__.function |> elem(0) |> to_string()
 
     meta =
       Macro.escape(%{
         call: %{description: test_description, file: __CALLER__.file, line: __CALLER__.line}
       })
 
-    options = [description: Keyword.get(opts, :as, description)]
+    options = build_opts(opts, test_description, __CALLER__)
 
     quote bind_quoted: [conn: conn, options: options, meta: meta] do
       if Recorder.active?() do
@@ -51,7 +76,7 @@ defmodule Xcribe.Document do
     end
   end
 
-  def register_xcribe_tag(%{module: module, function: {function, _arity}}) do
+  defp register_xcribe_tag(%{module: module, function: {function, _arity}}) do
     module
     |> Module.delete_attribute(:ex_unit_tests)
     |> Enum.each(fn test ->
@@ -59,6 +84,20 @@ defmodule Xcribe.Document do
 
       Module.put_attribute(module, :ex_unit_tests, to_put)
     end)
+  end
+
+  defp build_opts(opts, "test " <> desc, %{module: module}) do
+    description = Keyword.get(opts, :as, desc)
+
+    groups_tags =
+      opts
+      |> Keyword.get(:tags, Module.get_attribute(module, :xcribe_tags, []))
+      |> List.wrap()
+
+    [
+      description: description,
+      groups_tags: groups_tags
+    ]
   end
 
   defp add_xcribe_tag(%{tags: tags} = test) do

@@ -55,6 +55,58 @@ defmodule Xcribe.DocumentTest do
                Recorder.pop_all()
     end
 
+    test "parse conn and save it whith custom groups tags", %{conn: conn} do
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document(tags: ["Users", "Default"])
+
+      assert %{:errors => [], Xcribe.Endpoint => [%{groups_tags: ["Users", "Default"]}]} =
+               Recorder.pop_all()
+    end
+
+    test "wrap groups into list", %{conn: conn} do
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document(tags: "Users")
+
+      assert %{:errors => [], Xcribe.Endpoint => [%{groups_tags: ["Users"]}]} = Recorder.pop_all()
+    end
+
+    @xcribe_tags ["Custom Tag"]
+    test "use module attribute to set groups tags", %{conn: conn} do
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document()
+
+      assert %{:errors => [], Xcribe.Endpoint => [%{groups_tags: ["Custom Tag"]}]} =
+               Recorder.pop_all()
+    end
+
+    @xcribe_tags "Other Custom Tag"
+    test "wrap module attribute into list", %{conn: conn} do
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document()
+
+      assert %{:errors => [], Xcribe.Endpoint => [%{groups_tags: ["Other Custom Tag"]}]} =
+               Recorder.pop_all()
+    end
+
+    @xcribe_tags ["Custom Tag"]
+    test "override module attribute with custom opts", %{conn: conn} do
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document(tags: "Over Tag")
+
+      assert %{:errors => [], Xcribe.Endpoint => [%{groups_tags: ["Over Tag"]}]} =
+               Recorder.pop_all()
+    end
+
     test "handle parse errors" do
       document(%{})
 
@@ -68,7 +120,7 @@ defmodule Xcribe.DocumentTest do
           call: %{
             description: test_name,
             file: file_name,
-            line: 59
+            line: __ENV__.line - 12
           }
         }
       }
