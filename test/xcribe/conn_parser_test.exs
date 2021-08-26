@@ -94,6 +94,35 @@ defmodule Xcribe.ConnParserTest do
              }
     end
 
+    test "ignore an empty request group tags option", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("authorization", "token")
+        |> get(users_path(conn, :index))
+
+      assert ConnParser.execute(conn, groups_tags: []) == %Request{
+               action: "index",
+               controller: Elixir.Xcribe.UsersController,
+               description: "",
+               endpoint: Xcribe.Endpoint,
+               header_params: [{"authorization", "token"}],
+               groups_tags: ["Users"],
+               params: %{},
+               path: "/users",
+               path_params: %{},
+               query_params: %{},
+               request_body: %{},
+               resource: "Users",
+               resp_body: "[{\"id\":1,\"name\":\"user 1\"},{\"id\":2,\"name\":\"user 2\"}]",
+               resp_headers: [
+                 {"content-type", "application/json; charset=utf-8"},
+                 {"cache-control", "max-age=0, private, must-revalidate"}
+               ],
+               status_code: 200,
+               verb: "get"
+             }
+    end
+
     test "route out of standard REST", %{conn: conn} do
       conn =
         conn

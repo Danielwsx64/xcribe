@@ -24,10 +24,6 @@ defmodule Xcribe.ConnParser do
     %{@error_struct | message: "A Plug.Conn must be given"}
   end
 
-  defp build_opts(opts) do
-    Keyword.put_new(opts, :description, "")
-  end
-
   defp parse_conn(%Error{} = error, _conn, _description), do: error
 
   defp parse_conn(route, conn, opts) do
@@ -51,9 +47,11 @@ defmodule Xcribe.ConnParser do
       resp_headers: conn.resp_headers,
       status_code: conn.status,
       verb: String.downcase(conn.method),
-      groups_tags: Keyword.get(opts, :groups_tags, [resource])
+      groups_tags: opts |> Keyword.get(:groups_tags) |> build_groups_tags(resource)
     }
   end
+
+  defp build_opts(opts), do: Keyword.put_new(opts, :description, "")
 
   defp identify_route(%{method: method, host: host, path_info: path} = conn) do
     conn
@@ -87,8 +85,12 @@ defmodule Xcribe.ConnParser do
     |> Enum.join("\s")
   end
 
-  defp format_path(path, params),
-    do: params |> Map.keys() |> Enum.reduce(path, &transform_param/2)
+  defp build_groups_tags(tags, _resource) when is_list(tags) and tags != [], do: tags
+  defp build_groups_tags(_tags, resource), do: [resource]
+
+  defp format_path(path, params) do
+    params |> Map.keys() |> Enum.reduce(path, &transform_param/2)
+  end
 
   defp transform_param(param, path), do: String.replace(path, ":#{param}", "{#{param}}")
 end
