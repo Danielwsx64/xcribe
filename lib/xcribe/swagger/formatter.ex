@@ -47,7 +47,7 @@ defmodule Xcribe.Swagger.Formatter do
             responses: responses_object_from_request(request),
             parameters: parameter_objects_from_request(request),
             security: security_requirement_object_by_request(request),
-            tags: format_tags_from_resource(request.resource)
+            tags: request.groups_tags
           }
         )
     }
@@ -189,8 +189,6 @@ defmodule Xcribe.Swagger.Formatter do
   defp responses_object_from_request(%Request{status_code: status} = request) do
     %{status => response_object_from_request(request)}
   end
-
-  defp format_tags_from_resource(resource), do: [Enum.join(resource, "\s")]
 
   defp media_type_object(_media_type, ""), do: %{description: ""}
 

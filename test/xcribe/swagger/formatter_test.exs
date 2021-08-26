@@ -60,6 +60,7 @@ defmodule Xcribe.Swagger.FormatterTest do
           {"authorization", "token"},
           {"content-type", "application/json; charset=utf-8"}
         ],
+        groups_tags: ["Users"],
         path_params: %{},
         request_body: %{},
         resp_body: "[{\"id\":1,\"name\":\"user 1\"},{\"id\":2,\"name\":\"user 2\"}]",
@@ -69,7 +70,7 @@ defmodule Xcribe.Swagger.FormatterTest do
         ],
         status_code: 200,
         verb: "get",
-        resource: ["users"],
+        resource: "Users",
         params: %{
           "fields" => %{"articles" => "title,body", "people" => "name"},
           "include" => "author"
@@ -97,7 +98,7 @@ defmodule Xcribe.Swagger.FormatterTest do
           ],
           security: [%{"api_key" => []}],
           summary: "",
-          tags: ["users"],
+          tags: ["Users"],
           responses: %{
             200 => %{
               description: "",
@@ -128,13 +129,14 @@ defmodule Xcribe.Swagger.FormatterTest do
       request = %Request{
         __meta__: %{config: config},
         header_params: [{"content-type", "application/json; charset=utf-8"}],
+        groups_tags: ["Users"],
         path_params: %{},
         request_body: %{"name" => "Jonny"},
         resp_body: "{\"name\":\"user 1\"}",
         resp_headers: [{"content-type", "application/json; charset=utf-8"}],
         status_code: 201,
         verb: "post",
-        resource: ["users"],
+        resource: "Users",
         params: %{},
         query_params: %{}
       }
@@ -145,7 +147,7 @@ defmodule Xcribe.Swagger.FormatterTest do
           parameters: [],
           security: [],
           summary: "",
-          tags: ["users"],
+          tags: ["Users"],
           requestBody: %{
             description: "",
             content: %{

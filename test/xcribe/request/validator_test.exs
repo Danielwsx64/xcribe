@@ -18,7 +18,6 @@ defmodule Xcribe.Request.ValidatorTest do
         query_params: %{},
         request_body: %{},
         resource: "users",
-        resource_group: :api,
         resp_body: "[{\"id\":1,\"name\":\"user 1\"},{\"id\":2,\"name\":\"user 2\"}]",
         resp_headers: [
           {"content-type", "application/json; charset=utf-8"},

@@ -10,8 +10,34 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
     {:ok, %{config: %{json_library: Jason}}}
   end
 
-  describe "merge_request/2" do
-    test "merge two request objects", %{config: config} do
+  describe "put_object_into_groups/2" do
+    test "add request object", %{config: config} do
+      request = put_in(RequestsGenerator.users_index().__meta__, %{config: config})
+
+      [group_name] = request.groups_tags
+
+      request_object = Formatter.full_request_object(request)
+
+      assert Formatter.put_object_into_groups(%{}, request_object) == %{
+               group_name => request_object
+             }
+    end
+
+    test "request with multiple groups", %{config: config} do
+      groups_tags = ["Users", "Public API"]
+
+      request =
+        put_in(RequestsGenerator.users_index(groups_tags: groups_tags).__meta__, %{config: config})
+
+      request_object = Formatter.full_request_object(request)
+
+      assert Formatter.put_object_into_groups(%{}, request_object) == %{
+               "Users" => request_object,
+               "Public API" => request_object
+             }
+    end
+
+    test "same request twice merge data", %{config: config} do
       base_request = put_in(RequestsGenerator.users_index().__meta__, %{config: config})
 
       request_one = %{
@@ -26,12 +52,17 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
           query_params: %{"limit" => "5"}
       }
 
+      [group_name] = base_request.groups_tags
+
       full_request_one = Formatter.full_request_object(request_one)
       full_request_two = Formatter.full_request_object(request_two)
 
-      assert Formatter.merge_request(full_request_one, full_request_two) == %{
-               "Api " => %{
+      assert %{}
+             |> Formatter.put_object_into_groups(full_request_one)
+             |> Formatter.put_object_into_groups(full_request_two) == %{
+               group_name => %{
                  summary: "",
+                 groups: ["Users"],
                  description: "",
                  resources: %{
                    "/users" => %{
@@ -122,13 +153,13 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         controller: Elixir.Xcribe.PostsController,
         description: "get all user posts",
         header_params: [{"content-type", "application/json"}],
+        groups_tags: ["Users"],
         params: %{},
         path: "/users",
         path_params: %{},
         query_params: %{},
         request_body: %{},
-        resource: ["users"],
-        resource_group: :api,
+        resource: "Users",
         resp_body: "{\"id\":1,\"title\":\"user 1\"}",
         resp_headers: [{"content-type", "application/json"}],
         status_code: 200,
@@ -136,39 +167,38 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       }
 
       assert Formatter.full_request_object(struct) == %{
-               "Api " => %{
-                 description: "",
-                 summary: "",
-                 resources: %{
-                   "/users" => %{
-                     name: "Users",
-                     description: "",
-                     summary: "",
-                     parameters: %{},
-                     actions: %{
-                       "GET /users" => %{
-                         name: "Users show",
-                         description: "",
-                         summary: "",
-                         parameters: %{},
-                         query_parameters: %{},
-                         requests: %{
-                           "get all user posts" => %{
+               groups: ["Users"],
+               description: "",
+               summary: "",
+               resources: %{
+                 "/users" => %{
+                   name: "Users",
+                   description: "",
+                   summary: "",
+                   parameters: %{},
+                   actions: %{
+                     "GET /users" => %{
+                       name: "Users show",
+                       description: "",
+                       summary: "",
+                       parameters: %{},
+                       query_parameters: %{},
+                       requests: %{
+                         "get all user posts" => %{
+                           content_type: "application/json",
+                           headers: %{},
+                           body: %{},
+                           schema: %{},
+                           response: %{
+                             status: 200,
                              content_type: "application/json",
                              headers: %{},
-                             body: %{},
-                             schema: %{},
-                             response: %{
-                               status: 200,
-                               content_type: "application/json",
-                               headers: %{},
-                               body: %{"id" => 1, "title" => "user 1"},
-                               schema: %{
-                                 type: "object",
-                                 properties: %{
-                                   "id" => %{example: 1, format: "int32", type: "number"},
-                                   "title" => %{example: "user 1", type: "string"}
-                                 }
+                             body: %{"id" => 1, "title" => "user 1"},
+                             schema: %{
+                               type: "object",
+                               properties: %{
+                                 "id" => %{example: 1, format: "int32", type: "number"},
+                                 "title" => %{example: "user 1", type: "string"}
                                }
                              }
                            }
@@ -179,29 +209,6 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
                  }
                }
              }
-    end
-
-    test "return group with resource group nil", %{config: config} do
-      struct = %Request{
-        __meta__: %{config: config},
-        action: "show",
-        controller: Elixir.Xcribe.PostsController,
-        description: "get all user posts",
-        header_params: [{"content-type", "application/json"}],
-        params: %{},
-        path: "/users",
-        path_params: %{},
-        query_params: %{},
-        request_body: %{},
-        resource: ["users"],
-        resource_group: nil,
-        resp_body: "{\"id\":1,\"title\":\"user 1\"}",
-        resp_headers: [{"content-type", "application/json"}],
-        status_code: 200,
-        verb: "get"
-      }
-
-      assert %{"" => _group_struct} = Formatter.full_request_object(struct)
     end
   end
 
@@ -221,8 +228,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         path_params: %{"users_id" => "1", "id" => "2"},
         query_params: %{"user_age" => "34"},
         request_body: %{},
-        resource: ["users", "posts"],
-        resource_group: :api,
+        resource: "Users Posts",
         resp_body: "{\"id\":1,\"title\":\"user 1\"}",
         resp_headers: [
           {"content-type", "application/json; charset=utf-8"},
@@ -292,8 +298,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
         path_params: %{"users_id" => "1", "id" => "2"},
         query_params: %{"user_age" => "16"},
         request_body: %{},
-        resource: ["users", "posts"],
-        resource_group: :api,
+        resource: "Users Posts",
         resp_body: "{\"id\":1,\"title\":\"user 1\"}",
         resp_headers: [
           {"content-type", "application/json; charset=utf-8"},
@@ -651,7 +656,7 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
   describe "action_name/1" do
     test "return formatted action name" do
       struct = %Request{
-        resource: ["users", "posts"],
+        resource: "Users Posts",
         action: "show"
       }
 
@@ -666,16 +671,6 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
 
       assert Formatter.resource_key(struct_one) == "/users/{usersId}/posts"
       assert Formatter.resource_key(struct_two) == "/users/{usersId}/posts"
-    end
-  end
-
-  describe "resource_name/1" do
-    test "return formatted resource name" do
-      struct_one = %Request{resource: ["users", "posts"]}
-      struct_two = %Request{resource: ["users"]}
-
-      assert Formatter.resource_name(struct_one) == "Users Posts"
-      assert Formatter.resource_name(struct_two) == "Users"
     end
   end
 

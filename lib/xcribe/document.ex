@@ -27,22 +27,22 @@ defmodule Xcribe.Document do
   If no description is given the current test description will be used.
   """
   defmacro document(conn, opts \\ []) do
-    test_description = __CALLER__.function |> elem(0) |> to_string
-    "test " <> suggest_from_test = test_description
-
     register_xcribe_tag(__CALLER__)
+
+    test_description = __CALLER__.function |> elem(0) |> to_string
+    "test " <> description = test_description
 
     meta =
       Macro.escape(%{
         call: %{description: test_description, file: __CALLER__.file, line: __CALLER__.line}
       })
 
-    quote bind_quoted: [conn: conn, opts: opts, suggestion: suggest_from_test, meta: meta] do
-      options = Keyword.merge([as: suggestion], opts)
+    options = [description: Keyword.get(opts, :as, description)]
 
+    quote bind_quoted: [conn: conn, options: options, meta: meta] do
       if Recorder.active?() do
         conn
-        |> ConnParser.execute(Keyword.fetch!(options, :as))
+        |> ConnParser.execute(options)
         |> Map.put(:__meta__, meta)
         |> Recorder.add()
       end

@@ -7,31 +7,30 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   import Xcribe.Helpers.Formatter
 
-  def merge_request(requests, new_request) do
-    group_key = object_key(new_request)
-
-    Map.update(
-      requests,
-      group_key,
-      new_request[group_key],
-      &merge_group(&1, new_request[group_key])
-    )
+  def put_object_into_groups(requests_map, request) do
+    Enum.reduce(request.groups, requests_map, fn group, requests ->
+      Map.update(
+        requests,
+        group,
+        request,
+        &merge_group(&1, request)
+      )
+    end)
   end
 
-  def full_request_object(%Request{resource_group: group} = request) do
+  def full_request_object(%Request{} = request) do
     %{
-      capitalize_all_words(to_string(group)) => %{
-        summary: "",
-        description: "",
-        resources: resource_object(request)
-      }
+      summary: "",
+      description: "",
+      groups: request.groups_tags,
+      resources: resource_object(request)
     }
   end
 
-  def resource_object(%Request{} = request) do
+  def resource_object(%Request{resource: resource} = request) do
     %{
       resource_key(request) => %{
-        name: resource_name(request),
+        name: resource,
         summary: "",
         description: "",
         parameters: resource_parameters(request),
@@ -118,8 +117,8 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     |> body_data_for(headers, body)
   end
 
-  def action_name(%Request{action: action} = request) do
-    "#{resource_name(request)} #{action}"
+  def action_name(%Request{action: action, resource: resource}) do
+    "#{resource} #{action}"
   end
 
   def action_key(%Request{path: path, verb: verb}) do
@@ -130,12 +129,6 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     )
   end
 
-  def resource_name(%{resource: resource}) do
-    resource
-    |> Enum.map(&String.capitalize(&1))
-    |> Enum.join("\s")
-  end
-
   def resource_key(%Request{path: path}) do
     Enum.reduce(
       url_params(path),
@@ -144,8 +137,9 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     )
   end
 
-  defp merge_group(group, new_request),
-    do: %{group | resources: merge_group_resources(group.resources, new_request.resources)}
+  defp merge_group(group, new_request) do
+    %{group | resources: merge_group_resources(group.resources, new_request.resources)}
+  end
 
   defp merge_group_resources(resources, new_request) do
     resource_key = object_key(new_request)
@@ -192,11 +186,6 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     |> Regex.run(path, capture: :all_but_first)
     |> List.last()
   end
-
-  defp capitalize_all_words(""), do: ""
-
-  defp capitalize_all_words(string),
-    do: Enum.reduce(String.split(string, "_"), "", &"#{&2}#{String.capitalize(&1)} ")
 
   defp json_schema_for("application/json", body) when is_map(body) or is_list(body),
     do: JsonSchema.schema_for(body)
