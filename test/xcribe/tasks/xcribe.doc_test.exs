@@ -5,6 +5,7 @@ defmodule Tasks.Xcribe.DocTest do
 
   alias Mix.Tasks.Xcribe.Doc
   alias Xcribe.Recorder
+  alias Xcribe.Request.Error
   alias Xcribe.Support.RequestsGenerator
 
   @mix_test_default_opts [
@@ -37,6 +38,16 @@ defmodule Tasks.Xcribe.DocTest do
     def umbrella?, do: false
   end
 
+  describe "run/1" do
+    test "run task" do
+      io_output = capture_io(fn -> Doc.run([]) end)
+
+      assert io_output =~ "starting capture requests"
+      assert io_output =~ "starting doc generation"
+      assert io_output =~ "Xcribe Task - finished"
+    end
+  end
+
   describe "run task" do
     setup do
       Recorder.pop_all()
@@ -65,12 +76,12 @@ defmodule Tasks.Xcribe.DocTest do
         })
       end
 
-      output = capture_io(fn -> Doc.run_task([], mix_test_fun, FakeProjectNonUmbrella) end)
+      io_output = capture_io(fn -> Doc.run_task([], mix_test_fun, FakeProjectNonUmbrella) end)
 
-      assert output =~ "starting capture requests"
-      assert output =~ "starting doc generation"
-      assert output =~ "documentation written in /tmp/task_tests.doc"
-      assert output =~ "Xcribe Task - finished"
+      assert io_output =~ "starting capture requests"
+      assert io_output =~ "starting doc generation"
+      assert io_output =~ "documentation written in /tmp/task_tests.doc"
+      assert io_output =~ "Xcribe Task - finished"
       assert File.exists?("/tmp/task_tests.doc")
       assert Recorder.pop_all() == %{errors: []}
     end
@@ -85,7 +96,7 @@ defmodule Tasks.Xcribe.DocTest do
         })
       end
 
-      output =
+      io_output =
         capture_io(fn ->
           Doc.run_task(
             ["--format", "api_blueprint", "--output", "/tmp/custom_output_task_test.doc"],
@@ -94,7 +105,7 @@ defmodule Tasks.Xcribe.DocTest do
           )
         end)
 
-      assert output =~ "documentation written in /tmp/custom_output_task_test.doc"
+      assert io_output =~ "documentation written in /tmp/custom_output_task_test.doc"
       assert File.read!("/tmp/custom_output_task_test.doc") =~ "FORMAT: 1A"
       assert File.rm!("/tmp/custom_output_task_test.doc")
       assert Recorder.pop_all() == %{errors: []}
@@ -110,11 +121,38 @@ defmodule Tasks.Xcribe.DocTest do
         })
       end
 
-      output = capture_io(fn -> Doc.run_task([], mix_test_fun, FakeProject) end)
+      io_output = capture_io(fn -> Doc.run_task([], mix_test_fun, FakeProject) end)
 
-      assert output =~ "documentation written in /tmp/fake_app/tmp/task_tests.doc"
+      assert io_output =~ "documentation written in /tmp/fake_app/tmp/task_tests.doc"
       assert File.read!("/tmp/fake_app/tmp/task_tests.doc") =~ "securitySchemes"
       assert File.rm!("/tmp/fake_app/tmp/task_tests.doc")
+      assert Recorder.pop_all() == %{errors: []}
+    end
+
+    test "keep path when cant find deps path for umbrella app" do
+      output = "/tmp/task_tests.doc"
+
+      Application.put_env(:xcribe, Tasks.Xcribe.DocTest.FailFakeEndpoint,
+        information_source: Tasks.Xcribe.DocTest.FakeInformation,
+        output: output
+      )
+
+      mix_test_fun = fn opts ->
+        assert opts == @mix_test_default_opts
+
+        Recorder.add(%{
+          RequestsGenerator.users_index()
+          | endpoint: Tasks.Xcribe.DocTest.FailFakeEndpoint
+        })
+      end
+
+      io_output = capture_io(fn -> Doc.run_task([], mix_test_fun, FakeProject) end)
+
+      Application.delete_env(:xcribe, Tasks.Xcribe.DocTest.FailFakeEndpoint)
+
+      assert io_output =~ "documentation written in #{output}"
+      assert File.read!(output) =~ "securitySchemes"
+      assert File.rm!(output)
       assert Recorder.pop_all() == %{errors: []}
     end
 
@@ -128,7 +166,7 @@ defmodule Tasks.Xcribe.DocTest do
         })
       end
 
-      output =
+      io_output =
         capture_io(fn ->
           Doc.run_task(
             ["--endpoint", "Tasks.Xcribe.DocTest.FakeEndpoint"],
@@ -137,9 +175,43 @@ defmodule Tasks.Xcribe.DocTest do
           )
         end)
 
-      assert output =~ "documentation written in /tmp/fake_app/tmp/task_tests.doc"
+      assert io_output =~ "documentation written in /tmp/fake_app/tmp/task_tests.doc"
       assert File.read!("/tmp/fake_app/tmp/task_tests.doc") =~ "securitySchemes"
       assert File.rm!("/tmp/fake_app/tmp/task_tests.doc")
+      assert Recorder.pop_all() == %{errors: []}
+    end
+
+    test "exit with error when fail to generate doc" do
+      mix_test_fun = fn opts ->
+        assert opts == @mix_test_default_opts
+
+        Recorder.add(%Error{
+          type: :parsing,
+          message: "route not found",
+          __meta__: %{
+            call: %{
+              description: "test name",
+              file: __ENV__.file,
+              line: __ENV__.line
+            }
+          }
+        })
+      end
+
+      io_output =
+        capture_io(fn ->
+          try do
+            Doc.run_task([], mix_test_fun, FakeProjectNonUmbrella)
+          catch
+            :exit, message -> assert message == {:shutdown, 1}
+          end
+        end)
+
+      assert io_output =~ "starting capture requests"
+      assert io_output =~ "starting doc generation"
+      assert io_output =~ "Parsing and validation errors"
+      assert io_output =~ "Xcribe Task - aborted"
+      refute File.exists?("/tmp/task_tests.doc")
       assert Recorder.pop_all() == %{errors: []}
     end
 
@@ -148,40 +220,52 @@ defmodule Tasks.Xcribe.DocTest do
         assert opts == @mix_test_default_opts ++ ["/custom/file/path", "--other", "value"]
       end
 
-      output =
+      io_output =
         capture_io(fn ->
           Doc.run_task(["/custom/file/path", "--other", "value"], mix_test_fun, FakeProject)
         end)
 
-      assert output =~ "Xcribe Task - finished"
+      assert io_output =~ "Xcribe Task - finished"
     end
 
     test "invalid endpoint module" do
       assert capture_io(fn ->
-               Doc.run_task(["--endpoint", "InvalidEndpoint"])
+               try do
+                 Doc.run_task(["--endpoint", "InvalidEndpoint"])
+               catch
+                 :exit, message -> assert message == {:shutdown, 1}
+               end
              end) =~ "Couldn't find a path to endpoint InvalidEndpoint"
-    catch
-      :exit, message -> assert message == {:shutdown, 1}
     end
 
     test "when cant find otp_app path" do
+      Application.put_env(:xcribe, Tasks.Xcribe.DocTest.FailFakeEndpoint,
+        information_source: Tasks.Xcribe.DocTest.FakeInformation
+      )
+
       assert capture_io(fn ->
-               Doc.run_task(
-                 ["--endpoint", "Tasks.Xcribe.DocTest.FailFakeEndpoint"],
-                 nil,
-                 FakeProject
-               )
-             end) =~ "Couldn't find a path to endpoint InvalidEndpoint"
-    catch
-      :exit, message -> assert message == {:shutdown, 1}
+               try do
+                 Doc.run_task(
+                   ["--endpoint", "Tasks.Xcribe.DocTest.FailFakeEndpoint"],
+                   nil,
+                   FakeProject
+                 )
+               catch
+                 :exit, message ->
+                   Application.delete_env(:xcribe, Tasks.Xcribe.DocTest.FailFakeEndpoint)
+                   assert message == {:shutdown, 1}
+               end
+             end) =~ "Couldn't find a path to endpoint Tasks.Xcribe.DocTest.FailFakeEndpoint"
     end
 
     test "invalid format option" do
       assert capture_io(fn ->
-               Doc.run_task(["--format", "invalid"])
+               try do
+                 Doc.run_task(["--format", "invalid"])
+               catch
+                 :exit, message -> assert message == {:shutdown, 1}
+               end
              end) =~ "Xcribe doesn't support the configured documentation format"
-    catch
-      :exit, message -> assert message == {:shutdown, 1}
     end
   end
 end
