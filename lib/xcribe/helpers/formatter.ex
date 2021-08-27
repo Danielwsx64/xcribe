@@ -9,11 +9,13 @@ defmodule Xcribe.Helpers.Formatter do
   ### Options:
     * `default`: a value to be returned when not found content-type header.
   """
-  def content_type(headers, opts \\ []) when is_list(headers) do
+  def content_type(headers) when is_list(headers) do
     headers
-    |> Enum.find_value(Keyword.get(opts, :default), &find_content_type/1)
+    |> Enum.find_value(&find_content_type/1)
     |> handle_regex_match()
   end
+
+  def content_type(_headers), do: nil
 
   @doc """
   return the content type boundary

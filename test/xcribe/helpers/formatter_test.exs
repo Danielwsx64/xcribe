@@ -25,20 +25,8 @@ defmodule Xcribe.Helpers.FormatterTest do
       assert Formatter.content_type(headers) == "application/vnd.api+json"
     end
 
-    test "return default value when not found" do
-      headers_one = [
-        {"content-type", "application/json; charset=utf-8"},
-        {"cache-control", "max-age=0, private, must-revalidate"}
-      ]
-
-      headers_two = [{"content-type", "text/plain"}]
-      headers_three = [{"authorization", "Basic token"}]
-
-      opt = [default: "multipart/mixed"]
-
-      assert Formatter.content_type(headers_one, opt) == "application/json"
-      assert Formatter.content_type(headers_two, opt) == "text/plain"
-      assert Formatter.content_type(headers_three, opt) == "multipart/mixed"
+    test "invalid headers list" do
+      assert Formatter.content_type(%{"content-type" => "application/json"}) == nil
     end
   end
 

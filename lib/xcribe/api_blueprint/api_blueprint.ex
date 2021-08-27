@@ -27,7 +27,7 @@ defmodule Xcribe.ApiBlueprint do
       |> Map.update(:__meta__, %{config: config}, &Map.put(&1, :config, config))
       |> Formatter.full_request_object()
 
-    Formatter.merge_request(acc, item)
+    Formatter.put_object_into_groups(acc, item)
   rescue
     exception -> raise DocException, {request, exception, __STACKTRACE__}
   end

@@ -18,7 +18,6 @@ defmodule Xcribe.Request.ValidatorTest do
         query_params: %{},
         request_body: %{},
         resource: "users",
-        resource_group: :api,
         resp_body: "[{\"id\":1,\"name\":\"user 1\"},{\"id\":2,\"name\":\"user 2\"}]",
         resp_headers: [
           {"content-type", "application/json; charset=utf-8"},
@@ -124,8 +123,27 @@ defmodule Xcribe.Request.ValidatorTest do
                 }}
     end
 
+    test "return error when there's an upload struct and content type isn't multipart" do
+      request = %Request{
+        request_body: %{"file" => %Upload{}, "other" => "value"},
+        header_params: [{"content-type", "application/json"}]
+      }
+
+      assert Validator.validate(request) ==
+               {:error,
+                %Xcribe.Request.Error{
+                  __meta__: nil,
+                  message:
+                    "A Plug.Upload struct found. To document an file upload you must set the content type header to multipart",
+                  type: :validation
+                }}
+    end
+
     test "ignore Plug.Upload struct" do
-      request = %Request{request_body: %{"file" => %Upload{}, "other" => "value"}}
+      request = %Request{
+        request_body: %{"file" => %Upload{}, "other" => "value"},
+        header_params: [{"content-type", "multipart/form-data; boundary=---boundary"}]
+      }
 
       assert Validator.validate(request) == {:ok, request}
     end

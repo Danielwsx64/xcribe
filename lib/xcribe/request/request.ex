@@ -10,7 +10,6 @@ defmodule Xcribe.Request do
     :path,
     :request_body,
     :resource,
-    :resource_group,
     :resp_body,
     :status_code,
     :verb,
@@ -18,6 +17,7 @@ defmodule Xcribe.Request do
     resp_headers: [],
     path_params: %{},
     query_params: %{},
-    params: %{}
+    params: %{},
+    groups_tags: []
   ]
 end

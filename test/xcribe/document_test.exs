@@ -1,7 +1,7 @@
 defmodule Xcribe.DocumentTest do
   use Xcribe.ConnCase, async: false
 
-  alias Xcribe.{ConnParser, Recorder, Request.Error}
+  alias Xcribe.{Recorder, Request.Error}
 
   import Xcribe.Document
 
@@ -15,54 +15,96 @@ defmodule Xcribe.DocumentTest do
   end
 
   describe "document/1" do
-    test "parse conn and save it", %{conn: conn} do
-      conn =
-        conn
-        |> put_req_header("authorization", "token")
-        |> get(users_path(conn, :index))
-        |> document()
+    test "parse conn and save it with meta information", %{conn: conn} do
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document()
 
-      test_name = "document/1 parse conn and save it"
+      test_name = "document/1 parse conn and save it with meta information"
       file_name = File.cwd!() <> "/test/xcribe/document_test.exs"
 
-      parsed_request_with_meta =
-        conn
-        |> ConnParser.execute(test_name)
-        |> Map.put(:__meta__, %{
-          call: %{
-            description: "test #{test_name}",
-            file: file_name,
-            line: 23
-          }
-        })
+      meta = %{
+        call: %{
+          description: "test #{test_name}",
+          file: file_name,
+          line: 22
+        }
+      }
 
-      assert Recorder.pop_all() == %{:errors => [], Xcribe.Endpoint => [parsed_request_with_meta]}
+      assert %{
+               :errors => [],
+               Xcribe.Endpoint => [
+                 %{
+                   description: ^test_name,
+                   __meta__: ^meta
+                 }
+               ]
+             } = Recorder.pop_all()
     end
 
     test "parse conn and save it whith custom description", %{conn: conn} do
       request_description = "some description"
 
-      conn =
-        conn
-        |> put_req_header("authorization", "token")
-        |> get(users_path(conn, :index))
-        |> document(as: request_description)
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document(as: request_description)
 
-      test_name = "test document/1 parse conn and save it whith custom description"
-      file_name = File.cwd!() <> "/test/xcribe/document_test.exs"
+      assert %{:errors => [], Xcribe.Endpoint => [%{description: ^request_description}]} =
+               Recorder.pop_all()
+    end
 
-      parsed_request_with_meta =
-        conn
-        |> ConnParser.execute(request_description)
-        |> Map.put(:__meta__, %{
-          call: %{
-            description: test_name,
-            file: file_name,
-            line: 49
-          }
-        })
+    test "parse conn and save it whith custom groups tags", %{conn: conn} do
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document(tags: ["Users", "Default"])
 
-      assert Recorder.pop_all() == %{:errors => [], Xcribe.Endpoint => [parsed_request_with_meta]}
+      assert %{:errors => [], Xcribe.Endpoint => [%{groups_tags: ["Users", "Default"]}]} =
+               Recorder.pop_all()
+    end
+
+    test "wrap groups into list", %{conn: conn} do
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document(tags: "Users")
+
+      assert %{:errors => [], Xcribe.Endpoint => [%{groups_tags: ["Users"]}]} = Recorder.pop_all()
+    end
+
+    @xcribe_tags ["Custom Tag"]
+    test "use module attribute to set groups tags", %{conn: conn} do
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document()
+
+      assert %{:errors => [], Xcribe.Endpoint => [%{groups_tags: ["Custom Tag"]}]} =
+               Recorder.pop_all()
+    end
+
+    @xcribe_tags "Other Custom Tag"
+    test "wrap module attribute into list", %{conn: conn} do
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document()
+
+      assert %{:errors => [], Xcribe.Endpoint => [%{groups_tags: ["Other Custom Tag"]}]} =
+               Recorder.pop_all()
+    end
+
+    @xcribe_tags ["Custom Tag"]
+    test "override module attribute with custom opts", %{conn: conn} do
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document(tags: "Over Tag")
+
+      assert %{:errors => [], Xcribe.Endpoint => [%{groups_tags: ["Over Tag"]}]} =
+               Recorder.pop_all()
     end
 
     test "handle parse errors" do
@@ -71,15 +113,17 @@ defmodule Xcribe.DocumentTest do
       test_name = "test document/1 handle parse errors"
       file_name = File.cwd!() <> "/test/xcribe/document_test.exs"
 
-      parsed_request_with_meta =
-        %Error{message: "A Plug.Conn must be given", type: :parsing}
-        |> Map.put(:__meta__, %{
+      parsed_request_with_meta = %Error{
+        message: "A Plug.Conn must be given",
+        type: :parsing,
+        __meta__: %{
           call: %{
             description: test_name,
             file: file_name,
-            line: 69
+            line: __ENV__.line - 12
           }
-        })
+        }
+      }
 
       assert Recorder.pop_all() == %{errors: [parsed_request_with_meta]}
     end

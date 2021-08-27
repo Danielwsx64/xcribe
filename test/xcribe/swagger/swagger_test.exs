@@ -45,7 +45,6 @@ defmodule Xcribe.SwaggerTest do
           query_params: %{},
           request_body: %{},
           resource: ["protocols"],
-          resource_group: :api,
           resp_body: "[{\"id\":2,\"name\":\"user 2\"}]",
           resp_headers: [
             {"content-type", "application/json"}
@@ -71,7 +70,7 @@ defmodule Xcribe.SwaggerTest do
               "parameters" => [],
               "security" => [],
               "summary" => "",
-              "tags" => ["protocols"],
+              "tags" => [],
               "responses" => %{
                 "200" => %{
                   "description" => "",

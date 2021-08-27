@@ -21,7 +21,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
              # Basic API
              The description of the API
 
-             ## Group Api
+             ## Group Users Posts
              ## Users Posts [/users/{usersId}/posts]
              + Parameters
 
@@ -80,13 +80,6 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          }
 
              """
-    end
-
-    test "don't print group section when resource group has no name", %{config: config} do
-      request = RequestsGenerator.no_pipe_users_index()
-      struct = ApiBlueprint.apib_struct([request], config)
-
-      refute APIB.encode(struct, config) =~ "# Group"
     end
   end
 
@@ -591,13 +584,15 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
 
   describe "groups/2" do
     test "return groups", %{config: config} do
-      request =
+      request_object =
         RequestsGenerator.users_posts_create()
         |> Map.put(:__meta__, %{config: config})
         |> Formatter.full_request_object()
 
-      assert APIB.groups(request, config) == """
-             ## Group Api
+      requests = Formatter.put_object_into_groups(%{}, request_object)
+
+      assert APIB.groups(requests, config) == """
+             ## Group Users Posts
              ## Users Posts [/users/{usersId}/posts]
              + Parameters
 

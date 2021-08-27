@@ -62,11 +62,13 @@
             }
           }
         },
-        "security": [{
-          "basic": []
-        }],
+        "security": [
+          {
+            "basic": []
+          }
+        ],
         "summary": "",
-        "tags": ["users"]
+        "tags": ["Users"]
       },
       "post": {
         "description": "",
@@ -123,25 +125,29 @@
             }
           }
         },
-        "security": [{
-          "bearer": []
-        }],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "",
-        "tags": ["users"]
+        "tags": ["Users"]
       }
     },
     "/users/{id}": {
       "delete": {
         "description": "",
-        "parameters": [{
-          "example": "1",
-          "in": "path",
-          "name": "id",
-          "required": true,
-          "schema": {
-            "type": "string"
+        "parameters": [
+          {
+            "example": "1",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
-        }],
+        ],
         "responses": {
           "204": {
             "description": "",
@@ -155,23 +161,27 @@
             }
           }
         },
-        "security": [{
-          "bearer": []
-        }],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "",
-        "tags": ["users"]
+        "tags": ["Users"]
       },
       "get": {
         "description": "",
-        "parameters": [{
-          "example": "1",
-          "in": "path",
-          "name": "id",
-          "required": true,
-          "schema": {
-            "type": "string"
+        "parameters": [
+          {
+            "example": "1",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
-        }],
+        ],
         "responses": {
           "200": {
             "content": {
@@ -203,23 +213,27 @@
             }
           }
         },
-        "security": [{
-          "basic": []
-        }],
+        "security": [
+          {
+            "basic": []
+          }
+        ],
         "summary": "",
-        "tags": ["users"]
+        "tags": ["Users"]
       },
       "put": {
         "description": "",
-        "parameters": [{
-          "example": "1",
-          "in": "path",
-          "name": "id",
-          "required": true,
-          "schema": {
-            "type": "string"
+        "parameters": [
+          {
+            "example": "1",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
-        }],
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -272,25 +286,29 @@
             }
           }
         },
-        "security": [{
-          "bearer": []
-        }],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "",
-        "tags": ["users"]
+        "tags": ["Users"]
       }
     },
     "/users/{users_id}/cancel": {
       "post": {
         "description": "",
-        "parameters": [{
-          "example": "1",
-          "in": "path",
-          "name": "users_id",
-          "required": true,
-          "schema": {
-            "type": "string"
+        "parameters": [
+          {
+            "example": "1",
+            "in": "path",
+            "name": "users_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
-        }],
+        ],
         "responses": {
           "204": {
             "description": "",
@@ -304,25 +322,29 @@
             }
           }
         },
-        "security": [{
-          "api_key": []
-        }],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "summary": "",
-        "tags": ["users cancel"]
+        "tags": ["Users"]
       }
     },
     "/users/{users_id}/posts": {
       "get": {
         "description": "",
-        "parameters": [{
-          "example": "1",
-          "in": "path",
-          "name": "users_id",
-          "required": true,
-          "schema": {
-            "type": "string"
+        "parameters": [
+          {
+            "example": "1",
+            "in": "path",
+            "name": "users_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
-        }],
+        ],
         "responses": {
           "200": {
             "content": {
@@ -357,23 +379,27 @@
             }
           }
         },
-        "security": [{
-          "api_key": []
-        }],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "summary": "",
-        "tags": ["users posts"]
+        "tags": ["Users Posts"]
       },
       "post": {
         "description": "",
-        "parameters": [{
-          "example": "1",
-          "in": "path",
-          "name": "users_id",
-          "required": true,
-          "schema": {
-            "type": "string"
+        "parameters": [
+          {
+            "example": "1",
+            "in": "path",
+            "name": "users_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
-        }],
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -420,17 +446,20 @@
             }
           }
         },
-        "security": [{
-          "api_key": []
-        }],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "summary": "",
-        "tags": ["users posts"]
+        "tags": ["Users Posts"]
       }
     },
     "/users/{users_id}/posts/{id}": {
       "patch": {
         "description": "",
-        "parameters": [{
+        "parameters": [
+          {
             "example": "2",
             "in": "path",
             "name": "id",
@@ -495,16 +524,20 @@
             }
           }
         },
-        "security": [{
-          "api_key": []
-        }],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "summary": "",
-        "tags": ["users posts"]
+        "tags": ["Users Posts"]
       }
     }
   },
-  "servers": [{
-    "description": "",
-    "url": "http://my-api.com"
-  }]
+  "servers": [
+    {
+      "description": "",
+      "url": "http://my-api.com"
+    }
+  ]
 }

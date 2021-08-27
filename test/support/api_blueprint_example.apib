@@ -4,7 +4,7 @@ HOST: http://my-api.com
 # Basic API
 The description of the API
 
-## Group Api
+## Group Users
 ## Users [/users]
 ### Users delete [DELETE /users/{id}]
 + Parameters
@@ -226,12 +226,12 @@ The description of the API
               "type": "object"
             }
 
-## Users Cancel [/users/{usersId}/cancel]
+## Users [/users/{usersId}/cancel]
 + Parameters
 
     + usersId: `1` (string)
 
-### Users Cancel cancel [POST /users/{usersId}/cancel]
+### Users cancel [POST /users/{usersId}/cancel]
 + Parameters
 
     + usersId: `1` (string)
@@ -246,6 +246,7 @@ The description of the API
 
             cache-control: max-age=0, private, must-revalidate
 
+## Group Users Posts
 ## Users Posts [/users/{usersId}/posts]
 + Parameters
 
