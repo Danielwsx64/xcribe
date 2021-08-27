@@ -123,7 +123,7 @@ defmodule Xcribe.Request.ValidatorTest do
                 }}
     end
 
-    test "return error when has an upload struct and content type inst multipart" do
+    test "return error when there's an upload struct and content type isn't multipart" do
       request = %Request{
         request_body: %{"file" => %Upload{}, "other" => "value"},
         header_params: [{"content-type", "application/json"}]
