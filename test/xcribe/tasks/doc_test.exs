@@ -1,4 +1,4 @@
-defmodule Tasks.Xcribe.DocTest do
+defmodule Xcribe.Tasks.DocTest do
   use ExUnit.Case, async: false
 
   import ExUnit.CaptureIO
@@ -54,15 +54,15 @@ defmodule Tasks.Xcribe.DocTest do
 
       output = "/tmp/task_tests.doc"
 
-      Application.put_env(:xcribe, Tasks.Xcribe.DocTest.FakeEndpoint,
-        information_source: Tasks.Xcribe.DocTest.FakeInformation,
+      Application.put_env(:xcribe, Xcribe.Tasks.DocTest.FakeEndpoint,
+        information_source: Xcribe.Tasks.DocTest.FakeInformation,
         output: output
       )
 
       File.rm(output)
 
       on_exit(fn ->
-        Application.delete_env(:xcribe, Tasks.Xcribe.DocTest.FakeEndpoint)
+        Application.delete_env(:xcribe, Xcribe.Tasks.DocTest.FakeEndpoint)
       end)
     end
 
@@ -72,7 +72,7 @@ defmodule Tasks.Xcribe.DocTest do
 
         Recorder.add(%{
           RequestsGenerator.users_index()
-          | endpoint: Tasks.Xcribe.DocTest.FakeEndpoint
+          | endpoint: Xcribe.Tasks.DocTest.FakeEndpoint
         })
       end
 
@@ -92,7 +92,7 @@ defmodule Tasks.Xcribe.DocTest do
 
         Recorder.add(%{
           RequestsGenerator.users_index()
-          | endpoint: Tasks.Xcribe.DocTest.FakeEndpoint
+          | endpoint: Xcribe.Tasks.DocTest.FakeEndpoint
         })
       end
 
@@ -117,7 +117,7 @@ defmodule Tasks.Xcribe.DocTest do
 
         Recorder.add(%{
           RequestsGenerator.users_index()
-          | endpoint: Tasks.Xcribe.DocTest.FakeEndpoint
+          | endpoint: Xcribe.Tasks.DocTest.FakeEndpoint
         })
       end
 
@@ -132,8 +132,8 @@ defmodule Tasks.Xcribe.DocTest do
     test "keep path when cant find deps path for umbrella app" do
       output = "/tmp/task_tests.doc"
 
-      Application.put_env(:xcribe, Tasks.Xcribe.DocTest.FailFakeEndpoint,
-        information_source: Tasks.Xcribe.DocTest.FakeInformation,
+      Application.put_env(:xcribe, Xcribe.Tasks.DocTest.FailFakeEndpoint,
+        information_source: Xcribe.Tasks.DocTest.FakeInformation,
         output: output
       )
 
@@ -142,13 +142,13 @@ defmodule Tasks.Xcribe.DocTest do
 
         Recorder.add(%{
           RequestsGenerator.users_index()
-          | endpoint: Tasks.Xcribe.DocTest.FailFakeEndpoint
+          | endpoint: Xcribe.Tasks.DocTest.FailFakeEndpoint
         })
       end
 
       io_output = capture_io(fn -> Doc.run_task([], mix_test_fun, FakeProject) end)
 
-      Application.delete_env(:xcribe, Tasks.Xcribe.DocTest.FailFakeEndpoint)
+      Application.delete_env(:xcribe, Xcribe.Tasks.DocTest.FailFakeEndpoint)
 
       assert io_output =~ "documentation written in #{output}"
       assert File.read!(output) =~ "securitySchemes"
@@ -162,14 +162,14 @@ defmodule Tasks.Xcribe.DocTest do
 
         Recorder.add(%{
           RequestsGenerator.users_index()
-          | endpoint: Tasks.Xcribe.DocTest.FakeEndpoint
+          | endpoint: Xcribe.Tasks.DocTest.FakeEndpoint
         })
       end
 
       io_output =
         capture_io(fn ->
           Doc.run_task(
-            ["--endpoint", "Tasks.Xcribe.DocTest.FakeEndpoint"],
+            ["--endpoint", "Xcribe.Tasks.DocTest.FakeEndpoint"],
             mix_test_fun,
             FakeProject
           )
@@ -239,23 +239,23 @@ defmodule Tasks.Xcribe.DocTest do
     end
 
     test "when cant find otp_app path" do
-      Application.put_env(:xcribe, Tasks.Xcribe.DocTest.FailFakeEndpoint,
-        information_source: Tasks.Xcribe.DocTest.FakeInformation
+      Application.put_env(:xcribe, Xcribe.Tasks.DocTest.FailFakeEndpoint,
+        information_source: Xcribe.Tasks.DocTest.FakeInformation
       )
 
       assert capture_io(fn ->
                try do
                  Doc.run_task(
-                   ["--endpoint", "Tasks.Xcribe.DocTest.FailFakeEndpoint"],
+                   ["--endpoint", "Xcribe.Tasks.DocTest.FailFakeEndpoint"],
                    nil,
                    FakeProject
                  )
                catch
                  :exit, message ->
-                   Application.delete_env(:xcribe, Tasks.Xcribe.DocTest.FailFakeEndpoint)
+                   Application.delete_env(:xcribe, Xcribe.Tasks.DocTest.FailFakeEndpoint)
                    assert message == {:shutdown, 1}
                end
-             end) =~ "Couldn't find a path to endpoint Tasks.Xcribe.DocTest.FailFakeEndpoint"
+             end) =~ "Couldn't find a path to endpoint Xcribe.Tasks.DocTest.FailFakeEndpoint"
     end
 
     test "invalid format option" do
