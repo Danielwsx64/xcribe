@@ -127,6 +127,8 @@ By Xcribe task:
 mix xcribe.doc
 ```
 
+See `Mix.Tasks.Xcribe.Doc`
+
 A file will be created with the documentation on configured format and output path.
 
 You also can generate documentation while running `mix test`. To do that you
