@@ -9,7 +9,7 @@ on:
 jobs:
   mix_format:
     name: mix format (Elixir 1.12.1 OTP 24.0.1)
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: erlef/setup-beam@v1
@@ -22,7 +22,7 @@ jobs:
         run: mix format --check-formatted
   mix_credo:
     name: mix credo (Elixir 1.12.1 OTP 24.0.1)
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: erlef/setup-beam@v1
@@ -47,7 +47,7 @@ jobs:
             otp: "22.3"
           - elixir: "1.12.1"
             otp: "24.0.1"
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: erlef/setup-beam@v1
@@ -60,7 +60,7 @@ jobs:
         run: mix test
   coverage:
     name: Check coverage
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     needs: [mix_format, mix_credo, mix_test]
     steps:
       - uses: actions/checkout@v1
@@ -78,7 +78,7 @@ jobs:
         run: bash <(curl -s https://codecov.io/bash)
   mix_check_version:
     name: Check version (Elixir 1.12.1 OTP 24.0.1)
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     needs: [mix_format, mix_credo, mix_test]
     if: github.ref != 'refs/heads/master' && github.event_name == 'pull_request' && github.base_ref == 'master'
     steps:
@@ -95,7 +95,7 @@ jobs:
         run: mix run bin/check_version.exs
   mix_publish:
     name: Publish (Elixir 1.12.1 OTP 24.0.1)
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     needs: [mix_format, mix_credo, mix_test]
     outputs:
       version: ${{ steps.output_version.outputs.version }}
@@ -117,7 +117,7 @@ jobs:
         id: output_version
   github_release:
     name: Create release
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     needs: [mix_publish]
     if: github.ref == 'refs/heads/master'
     steps:
