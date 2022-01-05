@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.12] - 2022-01-05
+
+### Changed
+
+- Repository migrated to finbits organization.
+
 ## [0.7.11] - 2021-05-29
 
 ### Fixed
@@ -131,7 +137,8 @@ Improve CI/CD flow:
 - New "tags" parameter to operations object in Swagger format.
 - Add changelog and Makefile.
 
-[unreleased]: https://github.com/Finbits/xcribe/compare/v0.7.11...master
+[unreleased]: https://github.com/Finbits/xcribe/compare/v0.7.12...master
+[0.7.12]: https://github.com/Finbits/xcribe/compare/v0.7.11...v0.7.12
 [0.7.11]: https://github.com/Finbits/xcribe/compare/v0.7.10...v0.7.11
 [0.7.10]: https://github.com/Finbits/xcribe/compare/v0.7.9...v0.7.10
 [0.7.9]: https://github.com/Finbits/xcribe/compare/v0.7.8...v0.7.9
