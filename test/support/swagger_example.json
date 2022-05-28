@@ -20,7 +20,7 @@
   "info": {
     "description": "The description of the API",
     "title": "Basic API",
-    "version": "1"
+    "version": "1.0.0"
   },
   "openapi": "3.0.3",
   "paths": {
@@ -536,7 +536,6 @@
   },
   "servers": [
     {
-      "description": "",
       "url": "http://my-api.com"
     }
   ]

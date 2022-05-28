@@ -1,8 +1,10 @@
 defmodule Xcribe.ApiBlueprint do
   @moduledoc false
 
-  alias Xcribe.ApiBlueprint.{APIB, Formatter}
+  alias Xcribe.ApiBlueprint.APIB
+  alias Xcribe.ApiBlueprint.Formatter
   alias Xcribe.DocException
+  alias Xcribe.Specification
 
   def generate_doc(requests, config) do
     requests
@@ -10,12 +12,15 @@ defmodule Xcribe.ApiBlueprint do
     |> APIB.encode(config)
   end
 
-  def apib_struct(requests, %{information_source: information_source} = config) do
-    Map.put(
-      xcribe_info(information_source),
-      :groups,
-      reduce_groups(requests, config)
-    )
+  def apib_struct(requests, config) do
+    specifications = Specification.api_specification(config)
+
+    %{
+      host: List.first(specifications.servers).url,
+      description: specifications.description,
+      name: specifications.name,
+      groups: reduce_groups(requests, config)
+    }
   end
 
   defp reduce_groups(requests, config),
@@ -31,6 +36,4 @@ defmodule Xcribe.ApiBlueprint do
   rescue
     exception -> raise DocException, {request, exception, __STACKTRACE__}
   end
-
-  defp xcribe_info(information_source), do: apply(information_source, :api_info, [])
 end

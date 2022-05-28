@@ -17,10 +17,6 @@ defmodule Xcribe.Tasks.DocTest do
     "1"
   ]
 
-  defmodule FakeInformation do
-    use Xcribe.Information
-  end
-
   defmodule FakeEndpoint do
     def config(:otp_app), do: "fake_app"
   end
@@ -55,7 +51,7 @@ defmodule Xcribe.Tasks.DocTest do
       output = "/tmp/task_tests.doc"
 
       Application.put_env(:xcribe, Xcribe.Tasks.DocTest.FakeEndpoint,
-        information_source: Xcribe.Tasks.DocTest.FakeInformation,
+        specification_source: "test/support/.xcribe.exs",
         output: output
       )
 
@@ -133,7 +129,7 @@ defmodule Xcribe.Tasks.DocTest do
       output = "/tmp/task_tests.doc"
 
       Application.put_env(:xcribe, Xcribe.Tasks.DocTest.FailFakeEndpoint,
-        information_source: Xcribe.Tasks.DocTest.FakeInformation,
+        specification_source: "test/support/.xcribe.exs",
         output: output
       )
 
@@ -240,7 +236,7 @@ defmodule Xcribe.Tasks.DocTest do
 
     test "when cant find otp_app path" do
       Application.put_env(:xcribe, Xcribe.Tasks.DocTest.FailFakeEndpoint,
-        information_source: Xcribe.Tasks.DocTest.FakeInformation
+        specification_source: "test/support/.xcribe.exs"
       )
 
       assert capture_io(fn ->

@@ -3,50 +3,31 @@ defmodule Xcribe.Swagger.FormatterTest do
 
   alias Plug.Upload
   alias Xcribe.Request
-  alias Xcribe.Support.Information, as: ExampleInformation
   alias Xcribe.Support.Samples.SwaggerFormater.PathItemObject, as: Samples
   alias Xcribe.Swagger.Formatter
 
   setup do
-    {:ok, %{config: %{information_source: Xcribe.Support.Information, json_library: Jason}}}
+    {:ok, %{config: %{specification_source: "test/support/.xcribe.exs", json_library: Jason}}}
   end
 
-  describe "raw_openapi_object/0" do
-    test "return an empty OpenAPI object" do
-      expected = %{
-        openapi: "3.0.3",
-        info: nil,
-        servers: nil,
-        paths: nil,
-        components: nil
+  describe "openapi_object/1" do
+    test "return an OpenAPI object with specifications" do
+      specifications = %{
+        name: "Xcribe API",
+        description: "Cool api",
+        version: "1.0.0",
+        servers: [%{url: "https://sandbox.xcribe.com/v1", description: "sandbox endpoint"}],
+        paths: %{},
+        schemas: %{}
       }
 
-      assert Formatter.raw_openapi_object() == expected
-    end
-  end
-
-  describe "info_object/1" do
-    test "return the info object by xcribe information" do
-      api_info = ExampleInformation.api_info()
-
-      assert Formatter.info_object(api_info) == %{
-               title: api_info.name,
-               description: api_info.description,
-               version: "1"
+      assert Formatter.openapi_object(specifications) == %{
+               openapi: "3.0.3",
+               info: %{description: "Cool api", title: "Xcribe API", version: "1.0.0"},
+               servers: [%{description: "sandbox endpoint", url: "https://sandbox.xcribe.com/v1"}],
+               components: nil,
+               paths: nil
              }
-    end
-  end
-
-  describe "server_object/1" do
-    test "return the server object by xcribe information" do
-      api_info = ExampleInformation.api_info()
-
-      assert Formatter.server_object(api_info) == [
-               %{
-                 url: api_info.host,
-                 description: ""
-               }
-             ]
     end
   end
 

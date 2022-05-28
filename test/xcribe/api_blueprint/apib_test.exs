@@ -6,7 +6,8 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
   alias Xcribe.Support.RequestsGenerator
 
   setup do
-    {:ok, %{config: %{information_source: Xcribe.Support.Information, json_library: Jason}}}
+    {:ok,
+     %{config: %{specification_source: "test/support/.simple_example.exs", json_library: Jason}}}
   end
 
   describe "encode/2" do

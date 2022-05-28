@@ -9,28 +9,18 @@ defmodule Xcribe.Swagger.Formatter do
   @doc """
   Return an empty struct of an OpenAPI Object.
   """
-  def raw_openapi_object do
+  def openapi_object(specifications) do
     %{
       openapi: "3.0.3",
-      info: nil,
-      servers: nil,
+      info: %{
+        title: specifications.name,
+        description: specifications.description,
+        version: specifications.version
+      },
+      servers: specifications.servers,
       paths: nil,
       components: nil
     }
-  end
-
-  @doc """
-  Return an Info Object builded from the api_info suplied by the `Xcribe.Information`.
-  """
-  def info_object(api_info) do
-    %{title: api_info.name, description: api_info.description, version: "1"}
-  end
-
-  @doc """
-  Return a Server Object builded from the api_info suplied by the `Xcribe.Information`.
-  """
-  def server_object(api_info) do
-    [%{url: api_info.host, description: ""}]
   end
 
   @doc """

@@ -18,7 +18,7 @@ defmodule Xcribe.Config do
     |> Enum.filter(&valid_endpoint?/1)
   end
 
-  @default_keys_to_validate [:format, :information_source, :json_library, :serve]
+  @default_keys_to_validate [:format, :specification_source, :json_library, :serve]
   def check_configurations(config, keys \\ @default_keys_to_validate) do
     case Enum.reduce(keys, {:ok, config}, &validate_config/2) do
       {:ok, config} -> {:ok, config}
@@ -38,34 +38,9 @@ defmodule Xcribe.Config do
     end
   end
 
-  @info_source_nil_message "You must add a config to the information source module"
-  @info_source_nil_instructions "Add to your config file `config: :xcribe, Endpoint, information_source: YourCustomModule`"
-  defp validate_config(:information_source, {_errors, %{information_source: nil}} = results) do
-    add_error(
-      results,
-      :information_source,
-      "not configured",
-      @info_source_nil_message,
-      @info_source_nil_instructions
-    )
-  end
-
-  @info_source_message "The configured module as information source is not using Xcribe macros"
-  @info_source_instructions "Add `use Xcribe.Information` on top of your module"
-  defp validate_config(:information_source, {_errors, config} = results) do
-    module = Map.fetch!(config, :information_source)
-
-    if {:api_info, 0} in module_functions(module) do
-      results
-    else
-      add_error(
-        results,
-        :information_source,
-        module,
-        @info_source_message,
-        @info_source_instructions
-      )
-    end
+  defp validate_config(:specification_source, {_errors, _config} = results) do
+    # TODO: verify if file exists
+    results
   end
 
   @json_lib_message "The configured json library doesn't implement the needed functions"
@@ -107,17 +82,11 @@ defmodule Xcribe.Config do
   defp validate_serve_output({_errors, config} = results) do
     output = Map.fetch!(config, :output)
 
-    if Regex.match?(~r/^priv\/static\/.*/, output) do
+    if Regex.match?(~r'priv\/static\/[\.\w-]+$', output) do
       results
     else
       add_error(results, :output, output, @serve_output_message, @serve_output_instructions)
     end
-  end
-
-  defp module_functions(module) do
-    apply(module, :__info__, [:functions])
-  rescue
-    UndefinedFunctionError -> []
   end
 
   defp add_error({:ok, config}, key, value, msg, info) do
@@ -133,14 +102,14 @@ defmodule Xcribe.Config do
     json_library = Keyword.get(keyword, :json_library, Jason)
     output = Keyword.get(keyword, :output, default_output(format))
     serve = Keyword.get(keyword, :serve, false)
-    information_source = Keyword.get(keyword, :information_source)
+    specification_source = Keyword.get(keyword, :specification_source, ".xcribe.exs")
 
     %{
       format: format,
       json_library: json_library,
       output: output,
       serve: serve,
-      information_source: information_source
+      specification_source: specification_source
     }
   end
 

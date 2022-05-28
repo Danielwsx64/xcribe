@@ -1,0 +1,42 @@
+defmodule Xcribe.SpecificationTest do
+  use ExUnit.Case, async: true
+
+  alias Xcribe.Specification
+
+  describe "api_specification/1" do
+    test "return specifications defined by the file" do
+      config = %{specification_source: "test/support/.xcribe.exs"}
+
+      assert Specification.api_specification(config) ==
+               %{
+                 description:
+                   "Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet.\nNisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet voluptate voluptate dolor minim nulla est proident.\nNostrud officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat reprehenderit commodo officia dolor Lorem duis laboris cupidatat officia voluptate.\nCulpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia eiusmod. Aliqua reprehenderit commodo ex non excepteur duis sunt velit enim.\nVoluptate laboris sint cupidatat ullamco ut ea consectetur et est culpa et culpa duis.\nLorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.\n",
+                 name: "Xcribe API",
+                 paths: %{},
+                 schemas: %{},
+                 servers: [
+                   %{url: "https://api.xcribe.com/v1"},
+                   %{
+                     description:
+                       "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.\n",
+                     url: "https://sandbox.xcribe.com/v1"
+                   }
+                 ],
+                 version: "1.0.0"
+               }
+    end
+
+    test "use default values for undefined specifications" do
+      config = %{specification_source: "test/support/.empty.exs"}
+
+      assert Specification.api_specification(config) == %{
+               description: "",
+               name: "API Documentation",
+               paths: %{},
+               schemas: %{},
+               servers: [%{url: "https://api.xcribe.com/v1"}],
+               version: "1.0.0"
+             }
+    end
+  end
+end

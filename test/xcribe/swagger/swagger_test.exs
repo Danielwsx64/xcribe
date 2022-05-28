@@ -7,7 +7,8 @@ defmodule Xcribe.SwaggerTest do
   @sample_swagger_output File.read!("test/support/swagger_example.json")
 
   setup do
-    {:ok, %{config: %{information_source: Xcribe.Support.Information, json_library: Jason}}}
+    {:ok,
+     %{config: %{specification_source: "test/support/.simple_example.exs", json_library: Jason}}}
   end
 
   describe "generate_doc/1" do
@@ -59,10 +60,10 @@ defmodule Xcribe.SwaggerTest do
         "info" => %{
           "description" => "The description of the API",
           "title" => "Basic API",
-          "version" => "1"
+          "version" => "1.0.0"
         },
         "openapi" => "3.0.3",
-        "servers" => [%{"description" => "", "url" => "http://my-api.com"}],
+        "servers" => [%{"url" => "http://my-api.com"}],
         "paths" => %{
           "/servers" => %{
             "get" => %{

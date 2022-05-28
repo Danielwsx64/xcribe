@@ -1,28 +1,25 @@
 defmodule Xcribe.Swagger do
   @moduledoc false
 
-  alias Xcribe.{DocException, JSON, Request}
+  alias Xcribe.DocException
+  alias Xcribe.Specification
+  alias Xcribe.JSON
+  alias Xcribe.Request
   alias Xcribe.Swagger.Formatter
 
-  import Xcribe.Swagger.Formatter, only: [raw_openapi_object: 0]
-
-  @doc """
-  Return an OpenAPI Document builded from the given requests list
-  """
   def generate_doc(requests, config) do
-    raw_openapi_object()
-    |> mount_data_in_raw_object(requests, config)
+    specification = Specification.api_specification(config)
+
+    specification
+    |> Formatter.openapi_object()
+    |> build_paths_and_components(requests, config)
     |> json_encode!(config)
   end
 
-  defp mount_data_in_raw_object(openapi, requests, config) do
-    xcribe_info = xcribe_info(config.information_source)
-
+  defp build_paths_and_components(openapi, requests, config) do
     %{
       openapi
-      | info: Formatter.info_object(xcribe_info),
-        servers: Formatter.server_object(xcribe_info),
-        paths: build_paths_object(requests, config),
+      | paths: build_paths_object(requests, config),
         components: %{
           securitySchemes: build_security_schemes(requests)
         }
@@ -56,6 +53,5 @@ defmodule Xcribe.Swagger do
     exception -> raise DocException, {request, exception, __STACKTRACE__}
   end
 
-  defp xcribe_info(information_source), do: apply(information_source, :api_info, [])
   defp json_encode!(openapi, config), do: JSON.encode!(openapi, [], config)
 end

@@ -38,7 +38,7 @@ defmodule XcribeTest do
 
       config = %{
         format: :swagger,
-        information_source: Xcribe.Support.Information,
+        specification_source: "test/support/.simple_example.exs",
         json_library: Jason,
         output: output_path
       }
@@ -72,7 +72,7 @@ defmodule XcribeTest do
 
       config = %{
         format: :api_blueprint,
-        information_source: Xcribe.Support.Information,
+        specification_source: "test/support/.simple_example.exs",
         json_library: Jason,
         output: output_path
       }
@@ -157,7 +157,7 @@ defmodule XcribeTest do
 
       config = %{
         format: :swagger,
-        information_source: Xcribe.Support.Information,
+        specification_source: "test/support/.simple_example.exs",
         json_library: Jason
       }
 
