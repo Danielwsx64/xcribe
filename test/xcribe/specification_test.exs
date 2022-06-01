@@ -14,6 +14,7 @@ defmodule Xcribe.SpecificationTest do
                  name: "Xcribe API",
                  paths: %{},
                  schemas: %{},
+                 ignore_namespaces: ["/v1"],
                  servers: [
                    %{url: "https://api.xcribe.com/v1"},
                    %{
@@ -34,9 +35,22 @@ defmodule Xcribe.SpecificationTest do
                name: "API Documentation",
                paths: %{},
                schemas: %{},
+               ignore_namespaces: ["/v1"],
                servers: [%{url: "https://api.xcribe.com/v1"}],
                version: "1.0.0"
              }
+    end
+
+    test "merge specific ignored namespaces with namespaces from servers urls" do
+      config = %{specification_source: "test/support/.name_spaces_example.exs"}
+
+      assert %{
+               ignore_namespaces: ["/v1", "/sandbox/v1", "api", "v1"],
+               servers: [
+                 %{url: "https://api.xcribe.com/v1"},
+                 %{url: "https://sandbox.xcribe.com/sandbox/v1"}
+               ]
+             } = Specification.api_specification(config)
     end
   end
 end
