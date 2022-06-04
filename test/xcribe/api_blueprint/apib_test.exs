@@ -37,7 +37,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test"
+                           "title": "user 1"
                          }
 
                  + Schema
@@ -45,7 +45,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              }
                            },
@@ -60,7 +60,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test",
+                           "title": "user 1",
                            "users_id": "1"
                          }
 
@@ -69,7 +69,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              },
                              "users_id": {
@@ -174,7 +174,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              },
                              "users_id": {
@@ -229,7 +229,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test",
+                           "title": "user 1",
                            "users_id": "1"
                          }
 
@@ -293,7 +293,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test",
+                           "title": "user 1",
                            "users_id": "1"
                          }
 
@@ -302,7 +302,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              },
                              "users_id": {
@@ -345,7 +345,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test"
+                           "title": "user 1"
                          }
 
                  + Schema
@@ -353,7 +353,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              }
                            },
@@ -368,7 +368,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test",
+                           "title": "user 1",
                            "users_id": "1"
                          }
 
@@ -377,7 +377,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              },
                              "users_id": {
@@ -410,7 +410,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test"
+                           "title": "user 1"
                          }
 
                  + Schema
@@ -418,7 +418,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              }
                            },
@@ -433,7 +433,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test",
+                           "title": "user 1",
                            "users_id": "1"
                          }
 
@@ -442,7 +442,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              },
                              "users_id": {
@@ -536,7 +536,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test"
+                           "title": "user 1"
                          }
 
                  + Schema
@@ -544,7 +544,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              }
                            },
@@ -559,7 +559,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test",
+                           "title": "user 1",
                            "users_id": "1"
                          }
 
@@ -568,7 +568,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              },
                              "users_id": {
@@ -608,7 +608,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test"
+                           "title": "user 1"
                          }
 
                  + Schema
@@ -616,7 +616,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              }
                            },
@@ -631,7 +631,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test",
+                           "title": "user 1",
                            "users_id": "1"
                          }
 
@@ -640,7 +640,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              },
                              "users_id": {

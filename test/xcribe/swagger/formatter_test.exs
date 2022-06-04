@@ -3,12 +3,8 @@ defmodule Xcribe.Swagger.FormatterTest do
 
   alias Plug.Upload
   alias Xcribe.Request
-  alias Xcribe.Support.Samples.SwaggerFormater.PathItemObject, as: Samples
+  alias Xcribe.Specification
   alias Xcribe.Swagger.Formatter
-
-  setup do
-    {:ok, %{config: %{specification_source: "test/support/.xcribe.exs", json_library: Jason}}}
-  end
 
   describe "openapi_object/1" do
     test "return an OpenAPI object with specifications" do
@@ -31,16 +27,18 @@ defmodule Xcribe.Swagger.FormatterTest do
     end
   end
 
-  describe "path_item_object_from_request/1" do
-    test "return a basic struch with the path item and parameters from a request", %{
-      config: config
-    } do
+  describe "request_objects/1" do
+    test "request as a fully openapi path specification" do
+      config = %{specification_source: "test/support/.xcribe.exs", json_library: Jason}
+      spec = Specification.api_specification(config)
+
       request = %Request{
-        __meta__: %{config: config},
+        path: "/users",
         header_params: [
           {"authorization", "token"},
           {"content-type", "application/json; charset=utf-8"}
         ],
+        description: "Get users",
         groups_tags: ["Users"],
         path_params: %{},
         request_body: %{},
@@ -62,39 +60,31 @@ defmodule Xcribe.Swagger.FormatterTest do
         }
       }
 
-      expected = %{
-        "get" => %{
-          description: "",
-          parameters: [
-            %{
-              example: %{"articles" => "title,body", "people" => "name"},
-              in: "query",
-              name: "fields",
-              schema: %{
-                properties: %{"articles" => %{type: "string"}, "people" => %{type: "string"}},
-                type: "object"
-              }
-            },
-            %{example: "author", in: "query", name: "include", schema: %{type: "string"}}
-          ],
-          security: [%{"api_key" => []}],
-          summary: "",
-          tags: ["Users"],
-          responses: %{
-            200 => %{
-              description: "",
-              headers: %{"cache-control" => %{description: "", schema: %{type: "string"}}},
-              content: %{
-                "application/json" => %{
-                  schema: %{
-                    type: "array",
-                    items: %{
-                      type: "object",
-                      properties: %{
-                        "id" => %{format: "int32", type: "number", example: 1},
-                        "name" => %{type: "string", example: "user 1"}
-                      }
-                    }
+      path = %{
+        "/users" => %{
+          "get" => %{
+            description: "Get users",
+            parameters: [
+              %{
+                example: %{"articles" => "title,body", "people" => "name"},
+                in: "query",
+                name: "fields",
+                schema: %{
+                  properties: %{"articles" => %{type: "string"}, "people" => %{type: "string"}},
+                  type: "object"
+                }
+              },
+              %{example: "author", in: "query", name: "include", schema: %{type: "string"}}
+            ],
+            security: [%{"api_key" => []}],
+            tags: ["Users"],
+            responses: %{
+              200 => %{
+                description: "",
+                headers: %{"cache-control" => %{schema: %{type: "string"}}},
+                content: %{
+                  "application/json" => %{
+                    schema: %{type: "array", items: %{"$ref" => "#/components/schemas/Users"}}
                   }
                 }
               }
@@ -103,12 +93,34 @@ defmodule Xcribe.Swagger.FormatterTest do
         }
       }
 
-      assert Formatter.path_item_object_from_request(request) == expected
+      schemas = %{
+        "Users" => %{
+          type: "object",
+          properties: %{
+            "id" => %{format: "int32", type: "number", example: 1},
+            "name" => %{type: "string", example: "user 1"}
+          }
+        }
+      }
+
+      security = %{
+        "api_key" => %{"in" => "header", "name" => "authorization", "type" => "apiKey"}
+      }
+
+      assert Formatter.request_objects(request, spec, config) == %{
+               path: path,
+               schemas: schemas,
+               security: security
+             }
     end
 
-    test "with request body", %{config: config} do
+    test "with request body" do
+      config = %{specification_source: "test/support/.xcribe.exs", json_library: Jason}
+      spec = Specification.api_specification(config)
+
       request = %Request{
-        __meta__: %{config: config},
+        path: "/users",
+        description: "",
         header_params: [{"content-type", "application/json; charset=utf-8"}],
         groups_tags: ["Users"],
         path_params: %{},
@@ -122,34 +134,35 @@ defmodule Xcribe.Swagger.FormatterTest do
         query_params: %{}
       }
 
-      expected = %{
-        "post" => %{
-          description: "",
-          parameters: [],
-          security: [],
-          summary: "",
-          tags: ["Users"],
-          requestBody: %{
+      schemas = %{
+        "postUsers" => %{
+          type: "object",
+          properties: %{"name" => %{type: "string", example: "Jonny"}}
+        },
+        "Users" => %{
+          type: "object",
+          properties: %{"name" => %{type: "string", example: "user 1"}}
+        }
+      }
+
+      path = %{
+        "/users" => %{
+          "post" => %{
             description: "",
-            content: %{
-              "application/json" => %{
-                schema: %{
-                  type: "object",
-                  properties: %{"name" => %{type: "string", example: "Jonny"}}
-                }
-              }
-            }
-          },
-          responses: %{
-            201 => %{
-              description: "",
-              headers: %{},
+            parameters: [],
+            security: [],
+            tags: ["Users"],
+            requestBody: %{
               content: %{
-                "application/json" => %{
-                  schema: %{
-                    type: "object",
-                    properties: %{"name" => %{type: "string", example: "user 1"}}
-                  }
+                "application/json" => %{schema: %{"$ref" => "#/components/schemas/postUsers"}}
+              }
+            },
+            responses: %{
+              201 => %{
+                description: "",
+                headers: %{},
+                content: %{
+                  "application/json" => %{schema: %{"$ref" => "#/components/schemas/Users"}}
                 }
               }
             }
@@ -157,46 +170,29 @@ defmodule Xcribe.Swagger.FormatterTest do
         }
       }
 
-      assert Formatter.path_item_object_from_request(request) == expected
+      security = %{}
+
+      assert Formatter.request_objects(request, spec, config) == %{
+               path: path,
+               schemas: schemas,
+               security: security
+             }
     end
-  end
 
-  describe "response_object_from_request/1" do
-    test "return a response object", %{config: config} do
+    test "when has a 204 with no content" do
+      config = %{specification_source: "test/support/.xcribe.exs", json_library: Jason}
+      spec = Specification.api_specification(config)
+
       request = %Request{
-        __meta__: %{config: config},
-        resp_body: "[{\"id\":1,\"name\":\"user 1\"},{\"id\":2,\"name\":\"user 2\"}]",
-        resp_headers: [
-          {"content-type", "application/json; charset=utf-8"},
-          {"cache-control", "max-age=0, private, must-revalidate"}
-        ]
-      }
-
-      expected = %{
+        path: "/users/{id}",
         description: "",
-        headers: %{"cache-control" => %{description: "", schema: %{type: "string"}}},
-        content: %{
-          "application/json" => %{
-            schema: %{
-              type: "array",
-              items: %{
-                type: "object",
-                properties: %{
-                  "id" => %{format: "int32", type: "number", example: 1},
-                  "name" => %{type: "string", example: "user 1"}
-                }
-              }
-            }
-          }
-        }
-      }
-
-      assert Formatter.response_object_from_request(request) == expected
-    end
-
-    test "when has a 204 with no content", %{config: config} do
-      request = %Request{
-        __meta__: %{config: config},
+        header_params: [{"content-type", "application/json; charset=utf-8"}],
+        path_params: %{},
+        query_params: %{"id" => "1"},
+        request_body: %{},
+        resource: "Users",
+        status_code: 204,
+        verb: "delete",
         resp_body: "",
         resp_headers: [
           {"content-type", "application/json; charset=utf-8"},
@@ -204,46 +200,44 @@ defmodule Xcribe.Swagger.FormatterTest do
         ]
       }
 
-      expected = %{
-        description: "",
-        headers: %{"cache-control" => %{description: "", schema: %{type: "string"}}}
-      }
+      schemas = %{}
+      security = %{}
 
-      assert Formatter.response_object_from_request(request) == expected
-    end
-  end
-
-  describe "request_body_object_from_request/1" do
-    test "return a request body " do
-      request = %Request{
-        header_params: [{"content-type", "application/json; boundary=plug_conn_test"}],
-        request_body: %{"authentication" => %{"login" => "userlogin"}, "name" => "some name"}
-      }
-
-      expected = %{
-        description: "",
-        content: %{
-          "application/json" => %{
-            schema: %{
-              type: "object",
-              properties: %{
-                "authentication" => %{
-                  type: "object",
-                  properties: %{"login" => %{type: "string", example: "userlogin"}}
-                },
-                "name" => %{type: "string", example: "some name"}
+      path = %{
+        "/users/{id}" => %{
+          "delete" => %{
+            description: "",
+            parameters: [%{example: "1", in: "query", name: "id", schema: %{type: "string"}}],
+            responses: %{
+              204 => %{
+                description: "",
+                headers: %{"cache-control" => %{schema: %{type: "string"}}}
               }
-            }
+            },
+            security: [],
+            tags: []
           }
         }
       }
 
-      assert Formatter.request_body_object_from_request(request) == expected
+      assert Formatter.request_objects(request, spec, config) == %{
+               path: path,
+               schemas: schemas,
+               security: security
+             }
     end
 
     test "with upload body" do
+      config = %{specification_source: "test/support/.xcribe.exs", json_library: Jason}
+      spec = Specification.api_specification(config)
+
       request = %Request{
+        path: "/users",
+        description: "",
+        groups_tags: ["Users"],
         header_params: [{"content-type", "multipart/form-data; boundary=---boundary"}],
+        path_params: %{},
+        query_params: %{},
         request_body: %{
           "user_id" => "123",
           "file" => %Upload{
@@ -251,242 +245,60 @@ defmodule Xcribe.Swagger.FormatterTest do
             filename: "screenshot.png",
             path: "/tmp/multipart-id"
           }
-        }
+        },
+        status_code: 200,
+        resp_body: "{\"name\":\"user 1\"}",
+        resp_headers: [{"content-type", "application/json; charset=utf-8"}],
+        verb: "put",
+        resource: "Users"
       }
 
-      expected = %{
-        description: "",
-        content: %{
-          "multipart/form-data" => %{
-            schema: %{
-              type: "object",
-              properties: %{
-                "file" => %{format: "binary", type: "string"},
-                "user_id" => %{example: "123", type: "string"}
+      security = %{}
+
+      path = %{
+        "/users" => %{
+          "put" => %{
+            description: "",
+            parameters: [],
+            requestBody: %{
+              content: %{
+                "multipart/form-data" => %{schema: %{"$ref" => "#/components/schemas/putUsers"}}
               }
             },
-            encoding: %{"file" => %{contentType: "image/png"}}
+            responses: %{
+              200 => %{
+                description: "",
+                content: %{
+                  "application/json" => %{schema: %{"$ref" => "#/components/schemas/Users"}}
+                },
+                headers: %{}
+              }
+            },
+            security: [],
+            tags: ["Users"]
           }
         }
       }
 
-      assert Formatter.request_body_object_from_request(request) == expected
-    end
-  end
-
-  describe "security_requirement_object_by_request/1" do
-    test "return security for given request" do
-      request_bearer = %Request{header_params: [{"authorization", "Bearer jwt"}]}
-      request_basic = %Request{header_params: [{"authorization", "Basic base"}]}
-      request_api_key = %Request{header_params: [{"authorization", "key"}]}
-      request_no_auth = %Request{header_params: []}
-
-      assert Formatter.security_requirement_object_by_request(request_no_auth) == []
-      assert Formatter.security_requirement_object_by_request(request_basic) == [%{"basic" => []}]
-
-      assert Formatter.security_requirement_object_by_request(request_bearer) == [
-               %{"bearer" => []}
-             ]
-
-      assert Formatter.security_requirement_object_by_request(request_api_key) == [
-               %{
-                 "api_key" => []
-               }
-             ]
-    end
-  end
-
-  describe "security_scheme_object_from_request/1" do
-    test "return security for jwt token" do
-      request_bearer = %Request{header_params: [{"authorization", "Bearer jwt"}]}
-
-      expected = %{
-        "bearer" => %{
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT"
-        }
-      }
-
-      assert Formatter.security_scheme_object_from_request(request_bearer) == expected
-    end
-
-    test "return the security scheme for basic authentication" do
-      request_basic = %Request{header_params: [{"authorization", "Basic base"}]}
-
-      expected = %{
-        "basic" => %{
-          type: "http",
-          scheme: "basic"
-        }
-      }
-
-      assert Formatter.security_scheme_object_from_request(request_basic) == expected
-    end
-
-    test "return the security scheme for api key authentication" do
-      request_api_key = %Request{header_params: [{"authorization", "key"}]}
-
-      expected = %{
-        "api_key" => %{
-          "type" => "apiKey",
-          "name" => "authorization",
-          "in" => "header"
-        }
-      }
-
-      assert Formatter.security_scheme_object_from_request(request_api_key) == expected
-    end
-
-    test "return empy map when cant identify the security scheme" do
-      request_no_auth = %Request{header_params: []}
-
-      assert Formatter.security_scheme_object_from_request(request_no_auth) == %{}
-    end
-  end
-
-  describe "parameter_objects_from_request/1" do
-    test "return all parameters from a request" do
-      request = %Request{
-        header_params: [{"custom-header-param", "header value"}],
-        path_params: %{"id" => 6, "users_id" => "1"},
-        query_params: %{
-          "fields" => %{"articles" => "title,body", "people" => "name"},
-          "include" => "author",
-          "users" => ["bar", "qux"]
-        }
-      }
-
-      expected = [
-        %{
-          name: "id",
-          in: "path",
-          required: true,
-          schema: %{type: "number", format: "int32"},
-          example: 6
+      schemas = %{
+        "Users" => %{
+          properties: %{"name" => %{example: "user 1", type: "string"}},
+          type: "object"
         },
-        %{name: "users_id", in: "path", required: true, schema: %{type: "string"}, example: "1"},
-        %{
-          name: "custom-header-param",
-          in: "header",
-          schema: %{type: "string"},
-          example: "header value"
-        },
-        %{
-          name: "fields",
-          in: "query",
-          schema: %{
-            type: "object",
-            properties: %{"articles" => %{type: "string"}, "people" => %{type: "string"}}
+        "putUsers" => %{
+          properties: %{
+            "file" => %{format: "binary", type: "string"},
+            "user_id" => %{example: "123", type: "string"}
           },
-          example: %{"articles" => "title,body", "people" => "name"}
-        },
-        %{name: "include", in: "query", schema: %{type: "string"}, example: "author"},
-        %{
-          name: "users",
-          in: "query",
-          schema: %{type: "array", items: %{type: "string"}},
-          example: ["bar", "qux"]
+          type: "object"
         }
-      ]
-
-      assert Formatter.parameter_objects_from_request(request) == expected
-    end
-
-    test "ignore header params authorization, accept and content-type" do
-      request = %Request{
-        header_params: [
-          {"custom-header-param", "header value"},
-          {"content-type", "header value"},
-          {"authorization", "header value"},
-          {"accept", "header value"}
-        ],
-        path_params: %{},
-        query_params: %{}
       }
 
-      expected = [
-        %{
-          name: "custom-header-param",
-          in: "header",
-          schema: %{type: "string"},
-          example: "header value"
-        }
-      ]
-
-      assert Formatter.parameter_objects_from_request(request) == expected
-    end
-  end
-
-  describe "merge_parameter_object_lists/2" do
-    test "keep uniq names and order by name" do
-      parameters = [
-        %{name: "id", in: "path", required: true, schema: %{type: "string"}, example: 6},
-        %{name: "id", in: "header", schema: %{type: "string"}, example: "8"}
-      ]
-
-      new_params = [
-        %{name: "id", in: "path", required: true, schema: %{type: "string"}, example: 9},
-        %{name: "alias", in: "query", schema: %{type: "string"}, example: "jon"},
-        %{name: "id", in: "query", schema: %{type: "string"}, example: "9090"}
-      ]
-
-      expected = [
-        %{name: "alias", in: "query", schema: %{type: "string"}, example: "jon"},
-        %{name: "id", in: "header", schema: %{type: "string"}, example: "8"},
-        %{name: "id", in: "path", required: true, schema: %{type: "string"}, example: 6},
-        %{name: "id", in: "query", schema: %{type: "string"}, example: "9090"}
-      ]
-
-      assert Formatter.merge_parameter_object_lists(parameters, new_params) == expected
-    end
-
-    test "overwrite params with new one" do
-      parameters = [
-        %{
-          name: "id",
-          in: "path",
-          required: true,
-          schema: %{type: "string"},
-          example: "invalid-id"
-        }
-      ]
-
-      new_params = [
-        %{name: "id", in: "path", required: true, schema: %{type: "string"}, example: "valid-id"}
-      ]
-
-      assert Formatter.merge_parameter_object_lists(parameters, new_params, :overwrite) ==
-               new_params
-    end
-  end
-
-  describe "merge_path_item_objects/3" do
-    test "merge objects with diferente responses and choose correct examples" do
-      not_found = Samples.not_found_without_req_body()
-      bad_request = Samples.bad_request_with_req_body()
-      success = Samples.success_with_req_body()
-
-      first_sequence =
-        not_found
-        |> Formatter.merge_path_item_objects(bad_request, "put")
-        |> Formatter.merge_path_item_objects(success, "put")
-
-      second_sequence =
-        success
-        |> Formatter.merge_path_item_objects(not_found, "put")
-        |> Formatter.merge_path_item_objects(bad_request, "put")
-
-      third_sequence =
-        bad_request
-        |> Formatter.merge_path_item_objects(success, "put")
-        |> Formatter.merge_path_item_objects(not_found, "put")
-
-      expected = Samples.all_merged()
-
-      assert first_sequence == expected
-      assert second_sequence == expected
-      assert third_sequence == expected
+      assert Formatter.request_objects(request, spec, config) == %{
+               path: path,
+               schemas: schemas,
+               security: security
+             }
     end
   end
 end

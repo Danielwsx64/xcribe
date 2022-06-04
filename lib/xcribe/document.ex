@@ -89,9 +89,10 @@ defmodule Xcribe.Document do
   defp build_opts(opts, "test " <> desc, %{module: module}) do
     description = Keyword.get(opts, :as, desc)
 
+    # TODO: devolver nil quando não tiver tags definidas
     groups_tags =
       opts
-      |> Keyword.get(:tags, Module.get_attribute(module, :xcribe_tags, []))
+      |> Keyword.get(:tags, Module.get_attribute(module, :xcribe_tags))
       |> List.wrap()
 
     [

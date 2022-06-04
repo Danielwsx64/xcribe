@@ -2,53 +2,52 @@ defmodule Xcribe.Swagger do
   @moduledoc false
 
   alias Xcribe.DocException
-  alias Xcribe.Specification
   alias Xcribe.JSON
-  alias Xcribe.Request
+  alias Xcribe.Schema
+  alias Xcribe.Specification
   alias Xcribe.Swagger.Formatter
+  alias Xcribe.Swagger.Merge
 
   def generate_doc(requests, config) do
     specification = Specification.api_specification(config)
 
-    specification
-    |> Formatter.openapi_object()
-    |> build_paths_and_components(requests, config)
+    requests
+    |> build_paths_and_components(specification, config)
+    |> build_openapi_object(specification)
     |> json_encode!(config)
   end
 
-  defp build_paths_and_components(openapi, requests, config) do
+  defp build_paths_and_components(requests, spec, config) do
+    initial = %{paths: %{}, schemas: spec.schemas, security: %{}}
+
+    Enum.reduce(requests, initial, fn request, acc ->
+      request
+      |> request_objects(spec, config)
+      |> merge_objects(acc, request)
+    end)
+  end
+
+  defp build_openapi_object(%{paths: _, schemas: _, security: _} = params, specification) do
     %{
-      openapi
-      | paths: build_paths_object(requests, config),
-        components: %{
-          securitySchemes: build_security_schemes(requests)
-        }
+      Formatter.openapi_object(specification)
+      | paths: params.paths,
+        components: %{schemas: params.schemas, securitySchemes: params.security}
     }
   end
 
-  defp build_security_schemes(requests) do
-    Enum.reduce(requests, %{}, &merge_security_schemas/2)
+  defp merge_objects(news, acc, request) do
+    %{
+      acc
+      | paths: Merge.paths(acc.paths, news.path),
+        schemas: Schema.merge(acc.schemas, news.schemas),
+        security: Map.merge(acc.security, news.security)
+    }
+  rescue
+    exception -> raise DocException, {request, exception, __STACKTRACE__}
   end
 
-  defp merge_security_schemas(request, schemas) do
-    Map.merge(schemas, Formatter.security_scheme_object_from_request(request))
-  end
-
-  defp build_paths_object(requests, config),
-    do: Enum.reduce(requests, %{}, &paths_object_func(&1, &2, config))
-
-  defp paths_object_func(%Request{path: path, verb: verb} = request, paths, config) do
-    item =
-      request
-      |> Map.update(:__meta__, %{config: config}, &Map.put(&1, :config, config))
-      |> Formatter.path_item_object_from_request()
-
-    Map.update(
-      paths,
-      path,
-      item,
-      &Formatter.merge_path_item_objects(&1, item, verb)
-    )
+  defp request_objects(request, specification, config) do
+    Formatter.request_objects(request, specification, config)
   rescue
     exception -> raise DocException, {request, exception, __STACKTRACE__}
   end
