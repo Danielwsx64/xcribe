@@ -1,4 +1,6 @@
 defmodule Xcribe.Schema do
+  @moduledoc false
+
   def merge(base, new) do
     Enum.reduce(new, base, fn {name, schema}, all ->
       Map.update(all, name, schema, &merge_schema(&1, schema))

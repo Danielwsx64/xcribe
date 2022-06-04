@@ -3,6 +3,7 @@ defmodule Xcribe.Swagger do
 
   alias Xcribe.DocException
   alias Xcribe.JSON
+  alias Xcribe.Request
   alias Xcribe.Schema
   alias Xcribe.Specification
   alias Xcribe.Swagger.Formatter
@@ -47,7 +48,9 @@ defmodule Xcribe.Swagger do
   end
 
   defp request_objects(request, specification, config) do
-    Formatter.request_objects(request, specification, config)
+    request
+    |> Request.remove_ignored_prefixes(specification)
+    |> Formatter.request_objects(specification, config)
   rescue
     exception -> raise DocException, {request, exception, __STACKTRACE__}
   end

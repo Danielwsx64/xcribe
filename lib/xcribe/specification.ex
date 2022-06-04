@@ -1,4 +1,9 @@
 defmodule Xcribe.Specification do
+  @moduledoc """
+  Add this doc
+  """
+
+  @doc false
   def api_specification(%{specification_source: file} = _config) do
     if File.exists?(file) do
       file

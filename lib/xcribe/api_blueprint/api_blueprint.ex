@@ -4,6 +4,7 @@ defmodule Xcribe.ApiBlueprint do
   alias Xcribe.ApiBlueprint.APIB
   alias Xcribe.ApiBlueprint.Formatter
   alias Xcribe.DocException
+  alias Xcribe.Request
   alias Xcribe.Specification
 
   def generate_doc(requests, config) do
@@ -19,16 +20,17 @@ defmodule Xcribe.ApiBlueprint do
       host: List.first(specifications.servers).url,
       description: specifications.description,
       name: specifications.name,
-      groups: reduce_groups(requests, config)
+      groups: reduce_groups(requests, specifications, config)
     }
   end
 
-  defp reduce_groups(requests, config),
-    do: Enum.reduce(requests, %{}, &format_and_merge(&1, &2, config))
+  defp reduce_groups(requests, specifications, config),
+    do: Enum.reduce(requests, %{}, &format_and_merge(&1, &2, specifications, config))
 
-  defp format_and_merge(request, acc, config) do
+  defp format_and_merge(request, acc, specifications, config) do
     item =
       request
+      |> Request.remove_ignored_prefixes(specifications)
       |> Map.update(:__meta__, %{config: config}, &Map.put(&1, :config, config))
       |> Formatter.full_request_object()
 

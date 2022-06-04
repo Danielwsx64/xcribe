@@ -1,4 +1,6 @@
 defmodule Xcribe.Swagger.Merge do
+  @moduledoc false
+
   alias Xcribe.Schema
 
   def paths(base, new) do
@@ -60,6 +62,7 @@ defmodule Xcribe.Swagger.Merge do
   end
 
   defp merge_request_body(base, new) do
+    # credo:disable-for-lines:2
     merged =
       Map.update(base, :requestBody, Map.get(new, :requestBody, %{}), fn requestBody ->
         Map.put(
