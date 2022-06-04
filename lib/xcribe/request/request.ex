@@ -42,7 +42,7 @@ defmodule Xcribe.Request do
 
   defp format(prefix) do
     prefix
-    |> String.split("/")
+    |> String.split(~r"[/_]")
     |> Enum.map(&String.capitalize(&1))
     |> Enum.join("\s")
     |> String.trim()

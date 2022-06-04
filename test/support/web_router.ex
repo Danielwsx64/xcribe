@@ -38,5 +38,9 @@ defmodule Xcribe.WebRouter do
         resources("/comments", PostCommentsController)
       end
     end
+
+    scope "/namespace_with_undescore" do
+      resources("/users", UsersController, as: "namespaced_users")
+    end
   end
 end

@@ -482,6 +482,36 @@ defmodule Xcribe.ConnParserTest do
              }
     end
 
+    test "route with underscore on namespace", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("authorization", "token")
+        |> post(namespaced_users_path(conn, :index))
+
+      assert ConnParser.execute(conn) == %Request{
+               __meta__: nil,
+               action: "create",
+               controller: Xcribe.UsersController,
+               description: "",
+               endpoint: Xcribe.Endpoint,
+               groups_tags: ["Namespace With Undescore Users"],
+               header_params: [{"authorization", "token"}],
+               params: %{},
+               path: "/namespace_with_undescore/users",
+               path_params: %{},
+               query_params: %{},
+               request_body: %{},
+               resource: "Namespace With Undescore Users",
+               resp_body: "{}",
+               resp_headers: [
+                 {"content-type", "application/json; charset=utf-8"},
+                 {"cache-control", "max-age=0, private, must-revalidate"}
+               ],
+               status_code: 201,
+               verb: "post"
+             }
+    end
+
     test "Old Phoenix router support", %{conn: conn} do
       defmodule OldRouter do
         def __match_route__(_method, _uri, _host) do

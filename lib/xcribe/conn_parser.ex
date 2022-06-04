@@ -81,6 +81,8 @@ defmodule Xcribe.ConnParser do
     route
     |> String.split("/")
     |> Enum.filter(&(&1 != action and Regex.match?(~r/^\w+$/, &1)))
+    |> Enum.map(&String.split(&1, "_"))
+    |> List.flatten()
     |> Enum.map(&String.capitalize(&1))
     |> Enum.join("\s")
   end
