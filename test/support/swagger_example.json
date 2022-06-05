@@ -17,26 +17,26 @@
         },
         "type": "object"
       },
-      "patchUsersPosts": {
-        "properties": { "title": { "example": "user 1", "type": "string" } },
-        "type": "object"
-      },
-      "postUsers": {
+      "createUsers": {
         "properties": {
           "age": { "example": 5, "format": "int32", "type": "number" },
           "name": { "example": "user 1", "type": "string" }
         },
         "type": "object"
       },
-      "postUsersPosts": {
+      "createUsersPosts": {
         "properties": { "title": { "example": "user 1", "type": "string" } },
         "type": "object"
       },
-      "putUsers": {
+      "updateUsers": {
         "properties": {
           "age": { "example": 5, "format": "int32", "type": "number" },
           "name": { "example": "user 1", "type": "string" }
         },
+        "type": "object"
+      },
+      "updateUsersPosts": {
+        "properties": { "title": { "example": "user 1", "type": "string" } },
         "type": "object"
       }
     },
@@ -80,7 +80,7 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/postUsers" }
+              "schema": { "$ref": "#/components/schemas/createUsers" }
             }
           }
         },
@@ -159,7 +159,7 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/putUsers" }
+              "schema": { "$ref": "#/components/schemas/updateUsers" }
             }
           }
         },
@@ -243,7 +243,7 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/postUsersPosts" }
+              "schema": { "$ref": "#/components/schemas/createUsersPosts" }
             }
           }
         },
@@ -284,7 +284,7 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/patchUsersPosts" }
+              "schema": { "$ref": "#/components/schemas/updateUsersPosts" }
             }
           }
         },

@@ -1,7 +1,9 @@
 defmodule Xcribe.Swagger.Formatter do
   @moduledoc false
 
-  alias Xcribe.{ContentDecoder, JsonSchema, Request}
+  alias Xcribe.ContentDecoder
+  alias Xcribe.JsonSchema
+  alias Xcribe.Request
 
   import Xcribe.Helpers.Formatter, only: [content_type: 1, authorization: 1]
 
@@ -86,7 +88,10 @@ defmodule Xcribe.Swagger.Formatter do
   defp request_schema(%{request_body: body}) when body == %{}, do: %{}
 
   defp request_schema(%{request_body: %{} = body} = request) do
-    %{request_schema_name(request) => JsonSchema.schema_for(body, title: false, example: true)}
+    %{
+      Request.format_req_schema(request) =>
+        JsonSchema.schema_for(body, title: false, example: true)
+    }
   end
 
   defp response_schema(%{resp_body: ""}, _config), do: %{}
@@ -98,7 +103,7 @@ defmodule Xcribe.Swagger.Formatter do
 
       content ->
         %{
-          response_schema_name(request) =>
+          Request.format_schema(request) =>
             JsonSchema.schema_for(content, title: false, example: true)
         }
     end
@@ -113,14 +118,6 @@ defmodule Xcribe.Swagger.Formatter do
       %{type: "array", items: schema} -> {true, %{name => schema}}
       %{type: "object"} -> {false, schema}
     end
-  end
-
-  defp request_schema_name(%{verb: verb} = request) do
-    "#{verb}#{response_schema_name(request)}"
-  end
-
-  defp response_schema_name(%{resource: resource}) do
-    String.replace(resource, " ", "")
   end
 
   defp schema_name(%{} = schema), do: schema |> Map.keys() |> List.first()

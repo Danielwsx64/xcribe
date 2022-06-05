@@ -552,6 +552,78 @@ defmodule Xcribe.ConnParserTest do
              }
     end
 
+    test "define schemas" do
+      conn = %Plug.Conn{
+        body_params: %{},
+        method: "GET",
+        params: %{},
+        path_info: ["users"],
+        path_params: %{},
+        private: %{
+          Xcribe.WebRouter => {[], %{}},
+          :phoenix_action => :index,
+          :phoenix_controller => Xcribe.UsersController,
+          :phoenix_endpoint => Xcribe.Endpoint,
+          :phoenix_router => Xcribe.WebRouter
+        },
+        query_params: %{},
+        req_headers: [],
+        request_path: "/users",
+        resp_body: "[]",
+        resp_headers: [],
+        status: 200
+      }
+
+      assert %{
+               schema: "CustomSchema",
+               req_schema: "CustomReqSchema"
+             } = ConnParser.execute(conn, schema: "CustomSchema", req_schema: "CustomReqSchema")
+    end
+
+    test "schemas defined by module attributes" do
+      conn = %Plug.Conn{
+        body_params: %{},
+        method: "GET",
+        params: %{},
+        path_info: ["users"],
+        path_params: %{},
+        private: %{
+          Xcribe.WebRouter => {[], %{}},
+          :phoenix_action => :index,
+          :phoenix_controller => Xcribe.UsersController,
+          :phoenix_endpoint => Xcribe.Endpoint,
+          :phoenix_router => Xcribe.WebRouter
+        },
+        query_params: %{},
+        req_headers: [],
+        request_path: "/users",
+        resp_body: "[]",
+        resp_headers: [],
+        status: 200
+      }
+
+      assert %{
+               schema: "CustomSchema",
+               req_schema: "CustomReqSchema"
+             } =
+               ConnParser.execute(conn,
+                 schema: {:module, "CustomSchema"},
+                 req_schema: {:module, "CustomReqSchema"}
+               )
+    end
+
+    test "invalid schema error", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("authorization", "token")
+        |> get(users_path(conn, :index))
+
+      assert ConnParser.execute(conn, schema: 1) == %Error{
+               type: :parsing,
+               message: "An invalid schema name was given. Schema names MUST be an String.t()"
+             }
+    end
+
     test "not found route" do
       conn = %Conn{
         host: "www.example.com",

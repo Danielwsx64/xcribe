@@ -107,6 +107,44 @@ defmodule Xcribe.DocumentTest do
                Recorder.pop_all()
     end
 
+    @xcribe_schema "Custom Schema"
+    @xcribe_req_schema "Custom Req Schema"
+    test "custom schema with module attributes", %{conn: conn} do
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document()
+
+      assert %{
+               :errors => [],
+               Xcribe.Endpoint => [
+                 %{
+                   req_schema: "CustomReqSchema",
+                   schema: "CustomSchema"
+                 }
+               ]
+             } = Recorder.pop_all()
+    end
+
+    @xcribe_schema "Custom Schema"
+    @xcribe_req_schema "Custom Req Schema"
+    test "override schema module attributes", %{conn: conn} do
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document(schema: "ByOpts", req_schema: "reqByOpts")
+
+      assert %{
+               :errors => [],
+               Xcribe.Endpoint => [
+                 %{
+                   req_schema: "reqByOpts",
+                   schema: "ByOpts"
+                 }
+               ]
+             } = Recorder.pop_all()
+    end
+
     test "handle parse errors" do
       document(%{})
 

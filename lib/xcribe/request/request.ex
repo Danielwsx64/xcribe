@@ -13,6 +13,8 @@ defmodule Xcribe.Request do
     :resp_body,
     :status_code,
     :verb,
+    :req_schema,
+    :schema,
     header_params: [],
     resp_headers: [],
     path_params: %{},
@@ -20,6 +22,23 @@ defmodule Xcribe.Request do
     params: %{},
     groups_tags: []
   ]
+
+  def format_schema(%__MODULE__{schema: nil, status_code: status, resource: resource})
+      when status >= 200 and status < 300 do
+    String.replace(resource, " ", "")
+  end
+
+  def format_schema(%__MODULE__{schema: nil, status_code: status, resource: resource}) do
+    String.replace("#{status}_#{resource}", " ", "")
+  end
+
+  def format_schema(%__MODULE__{schema: schema}), do: schema
+
+  def format_req_schema(%__MODULE__{req_schema: nil, action: action, resource: resource}) do
+    String.replace("#{action}#{resource}", " ", "")
+  end
+
+  def format_req_schema(%__MODULE__{req_schema: schema}), do: schema
 
   def remove_ignored_prefixes(%__MODULE__{} = request, %{
         ignore_namespaces: prefixes,

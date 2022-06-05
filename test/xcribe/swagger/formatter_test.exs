@@ -50,6 +50,7 @@ defmodule Xcribe.Swagger.FormatterTest do
         status_code: 200,
         verb: "get",
         resource: "Users",
+        schema: "Users",
         params: %{
           "fields" => %{"articles" => "title,body", "people" => "name"},
           "include" => "author"
@@ -130,12 +131,14 @@ defmodule Xcribe.Swagger.FormatterTest do
         status_code: 201,
         verb: "post",
         resource: "Users",
+        req_schema: "createUsers",
+        schema: "Users",
         params: %{},
         query_params: %{}
       }
 
       schemas = %{
-        "postUsers" => %{
+        "createUsers" => %{
           type: "object",
           properties: %{"name" => %{type: "string", example: "Jonny"}}
         },
@@ -154,7 +157,7 @@ defmodule Xcribe.Swagger.FormatterTest do
             tags: ["Users"],
             requestBody: %{
               content: %{
-                "application/json" => %{schema: %{"$ref" => "#/components/schemas/postUsers"}}
+                "application/json" => %{schema: %{"$ref" => "#/components/schemas/createUsers"}}
               }
             },
             responses: %{
@@ -250,7 +253,9 @@ defmodule Xcribe.Swagger.FormatterTest do
         resp_body: "{\"name\":\"user 1\"}",
         resp_headers: [{"content-type", "application/json; charset=utf-8"}],
         verb: "put",
-        resource: "Users"
+        resource: "Users",
+        schema: "Users",
+        req_schema: "updateUsers"
       }
 
       security = %{}
@@ -262,7 +267,9 @@ defmodule Xcribe.Swagger.FormatterTest do
             parameters: [],
             requestBody: %{
               content: %{
-                "multipart/form-data" => %{schema: %{"$ref" => "#/components/schemas/putUsers"}}
+                "multipart/form-data" => %{
+                  schema: %{"$ref" => "#/components/schemas/updateUsers"}
+                }
               }
             },
             responses: %{
@@ -285,7 +292,7 @@ defmodule Xcribe.Swagger.FormatterTest do
           properties: %{"name" => %{example: "user 1", type: "string"}},
           type: "object"
         },
-        "putUsers" => %{
+        "updateUsers" => %{
           properties: %{
             "file" => %{format: "binary", type: "string"},
             "user_id" => %{example: "123", type: "string"}

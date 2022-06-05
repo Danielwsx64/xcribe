@@ -31,24 +31,37 @@ defmodule Xcribe.ConnParser do
     action = route |> router_options() |> Atom.to_string()
     resource = resource_name(route, action)
 
-    %Request{
-      action: action,
-      header_params: conn.req_headers,
-      controller: controller_module(route),
-      description: Keyword.fetch!(opts, :description),
-      endpoint: Map.fetch!(conn.private, :phoenix_endpoint),
-      params: conn.params,
-      path: path,
-      path_params: conn.path_params,
-      query_params: conn.query_params,
-      request_body: conn.body_params,
-      resource: resource,
-      resp_body: conn.resp_body,
-      resp_headers: conn.resp_headers,
-      status_code: conn.status,
-      verb: String.downcase(conn.method),
-      groups_tags: opts |> Keyword.get(:groups_tags) |> build_groups_tags(resource)
-    }
+    add_schemas(
+      %Request{
+        action: action,
+        header_params: conn.req_headers,
+        controller: controller_module(route),
+        description: Keyword.fetch!(opts, :description),
+        endpoint: Map.fetch!(conn.private, :phoenix_endpoint),
+        params: conn.params,
+        path: path,
+        path_params: conn.path_params,
+        query_params: conn.query_params,
+        request_body: conn.body_params,
+        resource: resource,
+        resp_body: conn.resp_body,
+        resp_headers: conn.resp_headers,
+        status_code: conn.status,
+        verb: String.downcase(conn.method),
+        groups_tags: opts |> Keyword.get(:groups_tags) |> build_groups_tags(resource)
+      },
+      opts
+    )
+  end
+
+  defp add_schemas(request, opts) do
+    %{request | schema: schema_name(opts), req_schema: req_schema_name(opts)}
+  rescue
+    _ ->
+      %{
+        @error_struct
+        | message: "An invalid schema name was given. Schema names MUST be an String.t()"
+      }
   end
 
   defp build_opts(opts), do: Keyword.put_new(opts, :description, "")
@@ -96,4 +109,26 @@ defmodule Xcribe.ConnParser do
   end
 
   defp transform_param(param, path), do: String.replace(path, ":#{param}", "{#{param}}")
+
+  defp schema_name(opts) do
+    opts
+    |> Keyword.get(:schema)
+    |> case do
+      nil -> nil
+      {:module, schema} -> replace_s(schema)
+      schema -> replace_s(schema)
+    end
+  end
+
+  defp req_schema_name(opts) do
+    opts
+    |> Keyword.get(:req_schema)
+    |> case do
+      nil -> nil
+      {:module, schema} -> replace_s(schema)
+      schema -> replace_s(schema)
+    end
+  end
+
+  defp replace_s(string), do: String.replace(string, " ", "")
 end
