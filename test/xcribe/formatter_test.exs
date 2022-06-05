@@ -62,16 +62,15 @@ defmodule Xcribe.FormatterTest do
     end
 
     test "Output config errors" do
-      # TODO: reimplement that
-      # status = [active?: true]
-      #
-      # Application.put_env(:xcribe, Xcribe.Endpoint, specification_source: Fake)
-      #
-      # Recorder.add(RequestsGenerator.users_index())
-      #
-      # assert capture_io(fn ->
-      #          assert Formatter.handle_cast({:suite_finished, 1, 2}, status) == {:noreply, :ok}
-      #        end) =~ "The configured module as information source is not using Xcribe macros"
+      status = [active?: true]
+
+      Application.put_env(:xcribe, Xcribe.Endpoint, serve: true, output: "anywhere")
+
+      Recorder.add(RequestsGenerator.users_index())
+
+      assert capture_io(fn ->
+               assert Formatter.handle_cast({:suite_finished, 1, 2}, status) == {:noreply, :ok}
+             end) =~ "Configuration errors"
     end
 
     test "ignore when has no records" do

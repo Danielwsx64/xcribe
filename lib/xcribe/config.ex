@@ -3,6 +3,7 @@ defmodule Xcribe.Config do
 
   @valid_formats [:api_blueprint, :swagger]
 
+  def default_spec_file, do: ".xcribe.exs"
   def active?, do: System.get_env("XCRIBE_ENV") in ["1", "true", "TRUE"]
 
   def fetch_config(endpoint) when is_atom(endpoint) do
@@ -38,9 +39,16 @@ defmodule Xcribe.Config do
     end
   end
 
-  defp validate_config(:specification_source, {_errors, _config} = results) do
-    # TODO: verify if file exists
-    results
+  @spec_file_message "The configured specification file doesn't exist"
+  @spec_file_instructions "Add a valid spec file path in `config :xcribe, Endpoint, specification_source: \".xcribe.exs\"`"
+  defp validate_config(:specification_source, {_errors, config} = results) do
+    file = Map.fetch!(config, :specification_source)
+
+    if file == default_spec_file() or File.exists?(file) do
+      results
+    else
+      add_error(results, :specification_source, file, @spec_file_message, @spec_file_instructions)
+    end
   end
 
   @json_lib_message "The configured json library doesn't implement the needed functions"
@@ -102,7 +110,7 @@ defmodule Xcribe.Config do
     json_library = Keyword.get(keyword, :json_library, Jason)
     output = Keyword.get(keyword, :output, default_output(format))
     serve = Keyword.get(keyword, :serve, false)
-    specification_source = Keyword.get(keyword, :specification_source, ".xcribe.exs")
+    specification_source = Keyword.get(keyword, :specification_source, default_spec_file())
 
     %{
       format: format,

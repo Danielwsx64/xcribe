@@ -7,6 +7,22 @@ defmodule Xcribe.ContentDecoder.UnknownType do
   end
 end
 
+defmodule Xcribe.SpecificationFile do
+  @moduledoc false
+  defexception [:message]
+
+  def exception({message, exception, stacktrace}) do
+    msg = """
+    #{message}
+    #{Exception.format_banner(:error, exception, stacktrace)}
+    """
+
+    %__MODULE__{message: msg}
+  end
+
+  def exception(message), do: %__MODULE__{message: message}
+end
+
 defmodule Xcribe.DocException do
   @moduledoc false
   defexception [:message, :request_error, :exception, :stacktrace]

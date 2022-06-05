@@ -107,7 +107,7 @@ defmodule Xcribe.ConfigTest do
     test "return error for invalid configurations" do
       config = %{
         format: :invalid,
-        specification_source: ".xcribe.exs",
+        specification_source: ".invalid_one.exs",
         json_library: FakeJson,
         output: "",
         serve: true
@@ -124,6 +124,9 @@ defmodule Xcribe.ConfigTest do
                   {:json_library, FakeJson,
                    "The configured json library doesn't implement the needed functions",
                    "Try configure Xcribe with Jason or Poison `config :xcribe, Endpoint, json_library: Jason`"},
+                  {:specification_source, ".invalid_one.exs",
+                   "The configured specification file doesn't exist",
+                   "Add a valid spec file path in `config :xcribe, Endpoint, specification_source: \".xcribe.exs\"`"},
                   {:format, :invalid,
                    "Xcribe doesn't support the configured documentation format",
                    "Xcribe supports Swagger and Blueprint, configure as: `config :xcribe, Endpoint, format: :swagger`"}
@@ -148,10 +151,6 @@ defmodule Xcribe.ConfigTest do
                   {:format, :invalid, "When serve config is true you must use swagger format",
                    "You must use Swagger format: `config :xcribe, Endpoint, format: :swagger`"}
                 ]}
-    end
-
-    test "when specification file does not exists" do
-      # TODO: implement
     end
   end
 end

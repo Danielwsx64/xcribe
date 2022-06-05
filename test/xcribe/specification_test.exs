@@ -2,6 +2,7 @@ defmodule Xcribe.SpecificationTest do
   use ExUnit.Case, async: true
 
   alias Xcribe.Specification
+  alias Xcribe.SpecificationFile
 
   describe "api_specification/1" do
     test "return specifications defined by the file" do
@@ -53,6 +54,39 @@ defmodule Xcribe.SpecificationTest do
                  %{url: "https://sandbox.xcribe.com/sandbox/v1"}
                ]
              } = Specification.api_specification(config)
+    end
+
+    test "merge empty map when default file does not exist" do
+      config = %{specification_source: ".xcribe.exs"}
+
+      assert Specification.api_specification(config) == %{
+               description: "",
+               ignore_namespaces: ["/v1"],
+               ignore_resources_prefix: [],
+               name: "API Documentation",
+               paths: %{},
+               schemas: %{},
+               servers: [%{url: "https://api.xcribe.com/v1"}],
+               version: "1.0.0"
+             }
+    end
+
+    test "raise error when file has invalid sintax" do
+      config = %{specification_source: "test/support/.invalid_sintax.exs"}
+
+      assert_raise SpecificationFile,
+                   "Specification file has invalid Elixir syntax. Check: test/support/.invalid_sintax.exs\n** (SyntaxError) nofile:3:3: syntax error before: \"missing_comma\"\n",
+                   fn ->
+                     Specification.api_specification(config)
+                   end
+    end
+
+    test "raise error when file does not exist" do
+      config = %{specification_source: "test/support/.not_exists.exs"}
+
+      assert_raise SpecificationFile, "File not found test/support/.not_exists.exs", fn ->
+        Specification.api_specification(config)
+      end
     end
   end
 end
