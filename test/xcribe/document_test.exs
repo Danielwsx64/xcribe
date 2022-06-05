@@ -74,6 +74,15 @@ defmodule Xcribe.DocumentTest do
       assert %{:errors => [], Xcribe.Endpoint => [%{groups_tags: ["Users"]}]} = Recorder.pop_all()
     end
 
+    test "dont use default tags", %{conn: conn} do
+      conn
+      |> put_req_header("authorization", "token")
+      |> get(users_path(conn, :index))
+      |> document(tags: false)
+
+      assert %{:errors => [], Xcribe.Endpoint => [%{groups_tags: []}]} = Recorder.pop_all()
+    end
+
     @xcribe_tags ["Custom Tag"]
     test "use module attribute to set groups tags", %{conn: conn} do
       conn

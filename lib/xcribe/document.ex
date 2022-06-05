@@ -36,6 +36,16 @@ defmodule Xcribe.Document do
         ...
       end
 
+  You can remove default  groups tags by passing the option `tags` with value false
+
+      test "test name", %{conn: conn} do
+        ...
+
+        document(conn, as: "description here", tags: false)
+
+        ...
+      end
+
   You can specify a custom responses schema name by passing the option `schema` to `document/2`
 
       test "test name", %{conn: conn} do
@@ -111,11 +121,15 @@ defmodule Xcribe.Document do
   defp build_opts(opts, "test " <> desc, %{module: module}) do
     description = Keyword.get(opts, :as, desc)
 
-    # TODO: devolver nil quando não tiver tags definidas
     groups_tags =
       opts
       |> Keyword.get(:tags, Module.get_attribute(module, :xcribe_tags))
-      |> List.wrap()
+      |> case do
+        false -> []
+        true -> nil
+        nil -> nil
+        tags -> List.wrap(tags)
+      end
 
     schema =
       opts

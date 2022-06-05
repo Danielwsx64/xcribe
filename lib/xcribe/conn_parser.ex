@@ -100,9 +100,8 @@ defmodule Xcribe.ConnParser do
     |> Enum.join("\s")
   end
 
-  # TODO: permitir passar uma lista vazia em tags
-  defp build_groups_tags(tags, _resource) when is_list(tags) and tags != [], do: tags
-  defp build_groups_tags(_tags, resource), do: [resource]
+  defp build_groups_tags(nil, resource), do: [resource]
+  defp build_groups_tags(tags, _resource) when is_list(tags), do: tags
 
   defp format_path(path, params) do
     params |> Map.keys() |> Enum.reduce(path, &transform_param/2)
