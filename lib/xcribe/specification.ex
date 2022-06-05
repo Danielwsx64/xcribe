@@ -7,7 +7,11 @@ defmodule Xcribe.Specification do
   and define custom Schemas. The specification file follows the struct of the 
   OpenApi v3.0.3 json specification.
 
-  To generate a new specification file use 
+  To generate a new specification file use `Mix.Tasks.Xcribe.Gen.Spec`
+
+  ```sh
+  mix xcribe.gen.spec
+  ```
 
   The specification file has two special parameters you can define.
 
@@ -33,8 +37,6 @@ defmodule Xcribe.Specification do
         schemas: %{}
        }
   """
-
-  # TODO: add doc para mix generate
 
   alias Xcribe.Config
   alias Xcribe.SpecificationFile
