@@ -15,6 +15,7 @@ defmodule Xcribe.SpecificationTest do
                  paths: %{},
                  schemas: %{},
                  ignore_namespaces: ["/v1"],
+                 ignore_resources_prefix: [],
                  servers: [
                    %{url: "https://api.xcribe.com/v1"},
                    %{
@@ -36,6 +37,7 @@ defmodule Xcribe.SpecificationTest do
                paths: %{},
                schemas: %{},
                ignore_namespaces: ["/v1"],
+               ignore_resources_prefix: [],
                servers: [%{url: "https://api.xcribe.com/v1"}],
                version: "1.0.0"
              }

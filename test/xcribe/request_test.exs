@@ -5,7 +5,10 @@ defmodule Xcribe.RequestTest do
 
   describe "remove_ignored_prefixes/2" do
     test "ignore prefixes in specification rules" do
-      specification = %{ignore_namespaces: ["/sandbox", "/api/v1", "/with_underscore"]}
+      specification = %{
+        ignore_namespaces: ["/sandbox", "/api/v1", "/with_underscore"],
+        ignore_resources_prefix: ["Organizations Companies"]
+      }
 
       request_api = %Request{
         groups_tags: ["Api V1 Organizations Companies Contacts"],
@@ -26,9 +29,9 @@ defmodule Xcribe.RequestTest do
       }
 
       expected = %Request{
-        groups_tags: ["Organizations Companies Contacts"],
+        groups_tags: ["Contacts"],
         path: "/organizations/{organization_id}/companies/{company_id}/contacts",
-        resource: "Organizations Companies Contacts"
+        resource: "Contacts"
       }
 
       assert Request.remove_ignored_prefixes(request_api, specification) == expected

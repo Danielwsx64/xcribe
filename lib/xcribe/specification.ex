@@ -25,7 +25,8 @@ defmodule Xcribe.Specification do
       servers: Map.get(specifications, :servers, [%{url: "https://api.xcribe.com/v1"}]),
       paths: Map.get(specifications, :paths, %{}),
       schemas: Map.get(specifications, :schemas, %{}),
-      ignore_namespaces: Map.get(specifications, :ignore_namespaces, [])
+      ignore_namespaces: Map.get(specifications, :ignore_namespaces, []),
+      ignore_resources_prefix: Map.get(specifications, :ignore_resources_prefix, [])
     }
   end
 

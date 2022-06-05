@@ -21,9 +21,14 @@ defmodule Xcribe.Request do
     groups_tags: []
   ]
 
-  def remove_ignored_prefixes(%__MODULE__{} = request, %{ignore_namespaces: prefixes})
+  def remove_ignored_prefixes(%__MODULE__{} = request, %{
+        ignore_namespaces: prefixes,
+        ignore_resources_prefix: resources_prefixes
+      })
       when is_list(prefixes) do
-    Enum.reduce(prefixes, request, &remove_prefix/2)
+    with_out_namespaces = Enum.reduce(prefixes, request, &remove_prefix/2)
+
+    Enum.reduce(resources_prefixes, with_out_namespaces, &remove_resource_prefix/2)
   end
 
   defp remove_prefix(prefix, %{path: path, resource: resource, groups_tags: tags} = request) do
@@ -31,14 +36,28 @@ defmodule Xcribe.Request do
 
     %{
       request
-      | path: String.replace_prefix(path, prefix, ""),
-        resource: String.replace_prefix(resource, formatted_prefix, ""),
+      | path: replace_and_trim(path, prefix),
+        resource: replace_and_trim(resource, formatted_prefix),
         groups_tags: replace_for_tags(tags, formatted_prefix)
     }
   end
 
-  defp replace_for_tags([tag], prefix), do: [String.replace_prefix(tag, prefix, "")]
+  defp remove_resource_prefix(prefix, %{resource: resource, groups_tags: tags} = request) do
+    %{
+      request
+      | resource: replace_and_trim(resource, prefix),
+        groups_tags: replace_for_tags(tags, prefix)
+    }
+  end
+
+  defp replace_for_tags([tag], prefix), do: [replace_and_trim(tag, prefix)]
   defp replace_for_tags(tags, _prefix), do: tags
+
+  defp replace_and_trim(string, pattern) do
+    string
+    |> String.replace_prefix(pattern, "")
+    |> String.trim_leading()
+  end
 
   defp format(prefix) do
     prefix
@@ -46,6 +65,5 @@ defmodule Xcribe.Request do
     |> Enum.map(&String.capitalize(&1))
     |> Enum.join("\s")
     |> String.trim()
-    |> (fn p -> "#{p} " end).()
   end
 end
