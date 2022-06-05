@@ -103,9 +103,6 @@ defmodule Xcribe.CLI.OutputTest do
       errors = [
         {:json_library, FakeJson, "Given json library doesn't implement needed functions",
          "Try configure Xcribe with Jason or Poison `config :xcribe, [json_library: Jason]`"},
-        {:information_source, FakeInfo,
-         "Sees like the given module is not using Xcribe as :information",
-         "Add `use Xcribe, :information` on top of your module"},
         {:format, :invalid, "An unsupported format was configured",
          "Xcribe supports Swagger and Blueprint, configure as: `config :xcribe, [format: :swagger]`"}
       ]
@@ -118,14 +115,6 @@ defmodule Xcribe.CLI.OutputTest do
       \e[38;5;100m┃\e[0m
       \e[38;5;100m┃\e[0m        Given value: \e[38;5;37mFakeJson
       \e[38;5;100m┃\e[0m        \e[38;5;100mTry configure Xcribe with Jason or Poison `config :xcribe, [json_library: Jason]`
-      \e[38;5;100m┃\e[0m
-
-      \e[32m┃\e[0m
-      \e[32m┃\e[0m [C] → \e[34m Sees like the given module is not using Xcribe as :information
-      \e[32m┃\e[0m        \e[38;5;240m> Config key: information_source
-      \e[38;5;100m┃\e[0m
-      \e[38;5;100m┃\e[0m        Given value: \e[38;5;37mFakeInfo
-      \e[38;5;100m┃\e[0m        \e[38;5;100mAdd `use Xcribe, :information` on top of your module
       \e[38;5;100m┃\e[0m
 
       \e[32m┃\e[0m
