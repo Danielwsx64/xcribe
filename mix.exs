@@ -46,7 +46,7 @@ defmodule Xcribe.MixProject do
 
   defp deps do
     [
-      {:phoenix, "~> 1.4"},
+      {:phoenix, "~> 1.5"},
 
       # Dev environment
       {:earmark, "~> 1.2", only: :dev},
