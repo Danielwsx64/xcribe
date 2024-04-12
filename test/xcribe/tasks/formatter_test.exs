@@ -68,7 +68,7 @@ defmodule Xcribe.Tasks.FormatterTest do
               [
                 {TesteApiWeb.PageControllerTest, :"test do something", 1,
                  [
-                   file: 'test/teste_api_web/controllers/page_controller_test.exs',
+                   file: ~c"test/teste_api_web/controllers/page_controller_test.exs",
                    line: 13
                  ]}
               ]}

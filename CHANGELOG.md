@@ -161,14 +161,10 @@ Improve CI/CD flow:
 - New "tags" parameter to operations object in Swagger format.
 - Add changelog and Makefile.
 
-<<<<<<< HEAD
 [unreleased]: https://github.com/brainnco/xcribe/compare/v0.7.9...master
 [1.0.0]: https://github.com/brainnco/xcribe/compare/v0.7.11...v1.0.0
-=======
-[unreleased]: https://github.com/Finbits/xcribe/compare/v0.7.13...master
-[0.7.13]: https://github.com/Finbits/xcribe/compare/v0.7.12...v0.7.13
 [0.8.0]: https://github.com/Finbits/xcribe/compare/v0.7.13...v0.8.0
->>>>>>> d453e1d (chg: updating version)
+[0.7.13]: https://github.com/Finbits/xcribe/compare/v0.7.12...v0.7.13
 [0.7.12]: https://github.com/Finbits/xcribe/compare/v0.7.11...v0.7.12
 [0.7.11]: https://github.com/brainnco/xcribe/compare/v0.7.10...v0.7.11
 [0.7.9]: https://github.com/brainnco/xcribe/compare/v0.7.8...v0.7.9
