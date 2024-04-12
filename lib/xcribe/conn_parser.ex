@@ -56,7 +56,7 @@ defmodule Xcribe.ConnParser do
   defp identify_route(%{method: method, host: host, path_info: path} = conn) do
     conn
     |> router_module()
-    |> apply(:__match_route__, [method, decode_uri(path), host])
+    |> apply(:__match_route__, [decode_uri(path), method, host])
     |> extract_route_info()
   rescue
     _ -> %{@error_struct | message: "An invalid Plug.Conn was given or maybe an invalid Router"}
