@@ -3,7 +3,7 @@ defmodule Xcribe.MixProject do
 
   @version "1.0.0"
   @description "A lib to generate API documentation from test specs"
-  @links %{"GitHub" => "https://github.com/brainnco/xcribe"}
+  @links %{"GitHub" => "https://github.com/Finbits/xcribe"}
 
   def project do
     [
@@ -46,7 +46,7 @@ defmodule Xcribe.MixProject do
 
   defp deps do
     [
-      {:phoenix, "~> 1.4"},
+      {:phoenix, "~> 1.5"},
 
       # Dev environment
       {:earmark, "~> 1.2", only: :dev},

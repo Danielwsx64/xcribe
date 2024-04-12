@@ -15,7 +15,7 @@ README_FILE := README.md
 CHANGELOG_FILE := CHANGELOG.md
 DATE := $(shell date +"%Y-%m-%d")
 REPO_NAME := xcribe
-REPO := https:\/\/github.com\/brainnco\/${REPO_NAME}\/compare
+REPO := https:\/\/github.com\/Finbits\/${REPO_NAME}\/compare
 
 .PHONY: release
 release: ## Bumps the version and creates the new tag

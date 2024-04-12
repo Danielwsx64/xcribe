@@ -56,6 +56,6 @@ defmodule Xcribe.Swagger do
     exception -> raise DocException, {request, exception, __STACKTRACE__}
   end
 
-  defp xcribe_info(information_source), do: apply(information_source, :api_info, [])
+  defp xcribe_info(information_source), do: information_source.api_info()
   defp json_encode!(openapi, config), do: JSON.encode!(openapi, [], config)
 end

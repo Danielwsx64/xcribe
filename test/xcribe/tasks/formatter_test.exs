@@ -58,7 +58,7 @@ defmodule Xcribe.Tasks.FormatterTest do
              end) == "\e[32m┃\e[0m fake - 0.00s\n"
     end
 
-    test "handle teste error finished with ExUnit.CLIFormatter" do
+    test "handle test error finished with ExUnit.CLIFormatter" do
       fake_test = %ExUnit.Test{
         name: :"test do something",
         state:
@@ -68,7 +68,7 @@ defmodule Xcribe.Tasks.FormatterTest do
               [
                 {TesteApiWeb.PageControllerTest, :"test do something", 1,
                  [
-                   file: 'test/teste_api_web/controllers/page_controller_test.exs',
+                   file: ~c"test/teste_api_web/controllers/page_controller_test.exs",
                    line: 13
                  ]}
               ]}
@@ -84,6 +84,7 @@ defmodule Xcribe.Tasks.FormatterTest do
         failure_counter: 0,
         test_counter: %{},
         test_timings: [],
+        slowest: 0,
         trace: false,
         width: 272
       }

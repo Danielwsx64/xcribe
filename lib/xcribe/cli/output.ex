@@ -87,7 +87,7 @@ defmodule Xcribe.CLI.Output do
     #{tab(@dark_red)} #{space(6)} #{@light_green}#{line_call}
     #{tab(@dark_red)} #{space(6)} #{@dark_red}#{pointer_for(line_call)}
     #{tab(@dark_red)}
-      
+
      - Exception stacktrace:
 
     #{stack}
@@ -157,7 +157,7 @@ defmodule Xcribe.CLI.Output do
     |> Stream.with_index()
     |> Stream.filter(fn {_value, index} -> index == line - 1 end)
     |> Enum.at(0)
-    |> (fn {value, _line} -> String.trim(value) end).()
+    |> then(fn {value, _line} -> String.trim(value) end)
   end
 
   defp normalize_us(nil), do: 0

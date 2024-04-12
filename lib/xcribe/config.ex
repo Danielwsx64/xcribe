@@ -115,7 +115,7 @@ defmodule Xcribe.Config do
   end
 
   defp module_functions(module) do
-    apply(module, :__info__, [:functions])
+    module.__info__(:functions)
   rescue
     UndefinedFunctionError -> []
   end
@@ -153,6 +153,6 @@ defmodule Xcribe.Config do
   end
 
   defp valid_endpoint?(module) do
-    function_exported?(module, :config, 1) and function_exported?(module, :__compile_config__, 0)
+    function_exported?(module, :config, 1)
   end
 end
