@@ -115,7 +115,7 @@ defmodule Xcribe.Config do
   end
 
   defp module_functions(module) do
-    apply(module, :__info__, [:functions])
+    module.__info__(:functions)
   rescue
     UndefinedFunctionError -> []
   end

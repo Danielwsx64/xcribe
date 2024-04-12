@@ -23,8 +23,8 @@ defmodule Xcribe.ContentDecoder do
 
   defp define_format(content_type) do
     cond do
-      is_json?(content_type) -> :json
-      is_text_plain?(content_type) -> :string
+      json?(content_type) -> :json
+      text_plain?(content_type) -> :string
       true -> raise UnknownType, content_type
     end
   end
@@ -32,6 +32,6 @@ defmodule Xcribe.ContentDecoder do
   defp decode_for(:json, value, config), do: JSON.decode!(value, [], config)
   defp decode_for(:string, value, _config), do: to_string(value)
 
-  defp is_json?(type), do: Regex.match?(@json_format_regex, type)
-  defp is_text_plain?(type), do: Regex.match?(@text_plain_format_regex, type)
+  defp json?(type), do: Regex.match?(@json_format_regex, type)
+  defp text_plain?(type), do: Regex.match?(@text_plain_format_regex, type)
 end

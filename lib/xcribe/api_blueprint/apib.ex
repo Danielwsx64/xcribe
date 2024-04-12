@@ -188,8 +188,7 @@ defmodule Xcribe.ApiBlueprint.APIB do
   defp apply_tab(text, count) do
     text
     |> String.split("\n")
-    |> Enum.map(&pad_string(&1, @tab_size * count))
-    |> Enum.join("\n")
+    |> Enum.map_join("\n", &pad_string(&1, @tab_size * count))
   end
 
   defp pad_string("", _number), do: ""
