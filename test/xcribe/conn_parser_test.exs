@@ -94,35 +94,6 @@ defmodule Xcribe.ConnParserTest do
              }
     end
 
-    test "ignore an empty request group tags option", %{conn: conn} do
-      conn =
-        conn
-        |> put_req_header("authorization", "token")
-        |> get(users_path(conn, :index))
-
-      assert ConnParser.execute(conn, groups_tags: []) == %Request{
-               action: "index",
-               controller: Elixir.Xcribe.UsersController,
-               description: "",
-               endpoint: Xcribe.Endpoint,
-               header_params: [{"authorization", "token"}],
-               groups_tags: ["Users"],
-               params: %{},
-               path: "/users",
-               path_params: %{},
-               query_params: %{},
-               request_body: %{},
-               resource: "Users",
-               resp_body: "[{\"id\":1,\"name\":\"user 1\"},{\"id\":2,\"name\":\"user 2\"}]",
-               resp_headers: [
-                 {"content-type", "application/json; charset=utf-8"},
-                 {"cache-control", "max-age=0, private, must-revalidate"}
-               ],
-               status_code: 200,
-               verb: "get"
-             }
-    end
-
     test "route out of standard REST", %{conn: conn} do
       conn =
         conn
@@ -482,6 +453,36 @@ defmodule Xcribe.ConnParserTest do
              }
     end
 
+    test "route with underscore on namespace", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("authorization", "token")
+        |> post(namespaced_users_path(conn, :index))
+
+      assert ConnParser.execute(conn) == %Request{
+               __meta__: nil,
+               action: "create",
+               controller: Xcribe.UsersController,
+               description: "",
+               endpoint: Xcribe.Endpoint,
+               groups_tags: ["Namespace With Undescore Users"],
+               header_params: [{"authorization", "token"}],
+               params: %{},
+               path: "/namespace_with_undescore/users",
+               path_params: %{},
+               query_params: %{},
+               request_body: %{},
+               resource: "Namespace With Undescore Users",
+               resp_body: "{}",
+               resp_headers: [
+                 {"content-type", "application/json; charset=utf-8"},
+                 {"cache-control", "max-age=0, private, must-revalidate"}
+               ],
+               status_code: 201,
+               verb: "post"
+             }
+    end
+
     test "Old Phoenix router support", %{conn: conn} do
       defmodule OldRouter do
         def __match_route__(_method, _uri, _host) do
@@ -519,6 +520,78 @@ defmodule Xcribe.ConnParserTest do
                ],
                status_code: 200,
                verb: "get"
+             }
+    end
+
+    test "define schemas" do
+      conn = %Plug.Conn{
+        body_params: %{},
+        method: "GET",
+        params: %{},
+        path_info: ["users"],
+        path_params: %{},
+        private: %{
+          Xcribe.WebRouter => {[], %{}},
+          :phoenix_action => :index,
+          :phoenix_controller => Xcribe.UsersController,
+          :phoenix_endpoint => Xcribe.Endpoint,
+          :phoenix_router => Xcribe.WebRouter
+        },
+        query_params: %{},
+        req_headers: [],
+        request_path: "/users",
+        resp_body: "[]",
+        resp_headers: [],
+        status: 200
+      }
+
+      assert %{
+               schema: "CustomSchema",
+               req_schema: "CustomReqSchema"
+             } = ConnParser.execute(conn, schema: "CustomSchema", req_schema: "CustomReqSchema")
+    end
+
+    test "schemas defined by module attributes" do
+      conn = %Plug.Conn{
+        body_params: %{},
+        method: "GET",
+        params: %{},
+        path_info: ["users"],
+        path_params: %{},
+        private: %{
+          Xcribe.WebRouter => {[], %{}},
+          :phoenix_action => :index,
+          :phoenix_controller => Xcribe.UsersController,
+          :phoenix_endpoint => Xcribe.Endpoint,
+          :phoenix_router => Xcribe.WebRouter
+        },
+        query_params: %{},
+        req_headers: [],
+        request_path: "/users",
+        resp_body: "[]",
+        resp_headers: [],
+        status: 200
+      }
+
+      assert %{
+               schema: "CustomSchema",
+               req_schema: "CustomReqSchema"
+             } =
+               ConnParser.execute(conn,
+                 schema: {:module, "CustomSchema"},
+                 req_schema: {:module, "CustomReqSchema"}
+               )
+    end
+
+    test "invalid schema error", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("authorization", "token")
+        |> get(users_path(conn, :index))
+
+      assert ConnParser.execute(conn, schema: 1) == %Error{
+               type: :parsing,
+               message: "An invalid schema name was given. Schema names MUST be an String.t()"
              }
     end
 

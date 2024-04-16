@@ -36,13 +36,45 @@ defmodule Xcribe.Document do
         ...
       end
 
-  You also can use a module attribute `@xcribe_tags` to define the groups tags 
-  inside a test file.
+  You can remove default  groups tags by passing the option `tags` with value false
+
+      test "test name", %{conn: conn} do
+        ...
+
+        document(conn, as: "description here", tags: false)
+
+        ...
+      end
+
+  You can specify a custom responses schema name by passing the option `schema` to `document/2`
+
+      test "test name", %{conn: conn} do
+        ...
+
+        document(conn, as: "description here", schema: "Users")
+
+        ...
+      end
+
+  You can specify a custom request schema name by passing the option `req_schema` to `document/2`
+
+      test "test name", %{conn: conn} do
+        ...
+
+        document(conn, as: "description here", req_schema: "createUsers")
+
+        ...
+      end
+
+  You also can use module attributes to define tags and schemas insite a test file.
+  It works to single tests, describes and all file
 
       Module YourAppTest do
         use ExUnit.Case
 
         @xcribe_tags ["Authenticated API"]
+        @xcribe_schema "Users"
+        @xcribe_req_schema "createUsers"
 
         test "test name", %{conn: conn} do
           ...
@@ -91,12 +123,35 @@ defmodule Xcribe.Document do
 
     groups_tags =
       opts
-      |> Keyword.get(:tags, Module.get_attribute(module, :xcribe_tags, []))
-      |> List.wrap()
+      |> Keyword.get(:tags, Module.get_attribute(module, :xcribe_tags))
+      |> case do
+        false -> []
+        true -> nil
+        nil -> nil
+        tags -> List.wrap(tags)
+      end
+
+    schema =
+      opts
+      |> Keyword.get(:schema, {:module, Module.get_attribute(module, :xcribe_schema)})
+      |> case do
+        {:module, nil} -> nil
+        other -> other
+      end
+
+    req_schema =
+      opts
+      |> Keyword.get(:req_schema, {:module, Module.get_attribute(module, :xcribe_req_schema)})
+      |> case do
+        {:module, nil} -> nil
+        other -> other
+      end
 
     [
       description: description,
-      groups_tags: groups_tags
+      groups_tags: groups_tags,
+      schema: schema,
+      req_schema: req_schema
     ]
   end
 

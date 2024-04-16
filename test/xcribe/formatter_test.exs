@@ -15,7 +15,7 @@ defmodule Xcribe.FormatterTest do
       :xcribe,
       Xcribe.Endpoint,
       output: "/tmp/test",
-      information_source: Xcribe.Support.Information,
+      specification_source: "test/support/.xcribe.exs",
       format: :swagger,
       json_library: Jason
     )
@@ -64,13 +64,13 @@ defmodule Xcribe.FormatterTest do
     test "Output config errors" do
       status = [active?: true]
 
-      Application.put_env(:xcribe, Xcribe.Endpoint, information_source: Fake)
+      Application.put_env(:xcribe, Xcribe.Endpoint, serve: true, output: "anywhere")
 
       Recorder.add(RequestsGenerator.users_index())
 
       assert capture_io(fn ->
                assert Formatter.handle_cast({:suite_finished, 1, 2}, status) == {:noreply, :ok}
-             end) =~ "The configured module as information source is not using Xcribe macros"
+             end) =~ "Configuration errors"
     end
 
     test "ignore when has no records" do

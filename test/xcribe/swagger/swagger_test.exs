@@ -2,16 +2,14 @@ defmodule Xcribe.SwaggerTest do
   use ExUnit.Case, async: true
 
   alias Xcribe.Support.RequestsGenerator
-  alias Xcribe.{DocException, Request, Swagger}
+  alias Xcribe.{DocException, Swagger}
 
   @sample_swagger_output File.read!("test/support/swagger_example.json")
 
-  setup do
-    {:ok, %{config: %{information_source: Xcribe.Support.Information, json_library: Jason}}}
-  end
-
   describe "generate_doc/1" do
-    test "parse requests do string", %{config: config} do
+    test "parse requests do string" do
+      config = %{specification_source: "test/support/.simple_example.exs", json_library: Jason}
+
       requests = [
         RequestsGenerator.users_index([:basic_auth]),
         RequestsGenerator.users_show([:basic_auth]),
@@ -31,77 +29,9 @@ defmodule Xcribe.SwaggerTest do
       assert Jason.decode!(response) == expected
     end
 
-    test "when there is no security schema", %{config: config} do
-      requests = [
-        %Request{
-          __meta__: %{},
-          action: "index",
-          controller: Elixir.Xcribe.ProtocolsController,
-          description: "",
-          header_params: [],
-          params: %{},
-          path: "/servers",
-          path_params: %{},
-          query_params: %{},
-          request_body: %{},
-          resource: ["protocols"],
-          resp_body: "[{\"id\":2,\"name\":\"user 2\"}]",
-          resp_headers: [
-            {"content-type", "application/json"}
-          ],
-          status_code: 200,
-          verb: "get"
-        }
-      ]
+    test "handle excptions into Request Error structs" do
+      config = %{specification_source: "test/support/.simple_example.exs", json_library: Jason}
 
-      expected = %{
-        "components" => %{"securitySchemes" => %{}},
-        "info" => %{
-          "description" => "The description of the API",
-          "title" => "Basic API",
-          "version" => "1"
-        },
-        "openapi" => "3.0.3",
-        "servers" => [%{"description" => "", "url" => "http://my-api.com"}],
-        "paths" => %{
-          "/servers" => %{
-            "get" => %{
-              "description" => "",
-              "parameters" => [],
-              "security" => [],
-              "summary" => "",
-              "tags" => [],
-              "responses" => %{
-                "200" => %{
-                  "description" => "",
-                  "headers" => %{},
-                  "content" => %{
-                    "application/json" => %{
-                      "schema" => %{
-                        "type" => "array",
-                        "items" => %{
-                          "type" => "object",
-                          "properties" => %{
-                            "id" => %{"format" => "int32", "type" => "number", "example" => 2},
-                            "name" => %{"type" => "string", "example" => "user 2"}
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
-      assert result = Swagger.generate_doc(requests, config)
-
-      assert Jason.decode!(result) == expected
-    end
-
-    test "handle excptions into Request Error structs", %{config: config} do
       request =
         [:basic_auth]
         |> RequestsGenerator.users_index()

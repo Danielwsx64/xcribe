@@ -10,7 +10,6 @@ must be `priv/static` and you must enable `serve` config.
 
 ```
       config :xcribe, YourAppWeb.Endpoint,
-        information_source: YourAppWeb.YouModuleInformation,
         format: :swagger,
         output: "priv/static/my_doc.json",
         serve: true

@@ -1,61 +1,59 @@
 defmodule Xcribe.Swagger do
   @moduledoc false
 
-  alias Xcribe.{DocException, JSON, Request}
+  alias Xcribe.DocException
+  alias Xcribe.JSON
+  alias Xcribe.Request
+  alias Xcribe.Schema
+  alias Xcribe.Specification
   alias Xcribe.Swagger.Formatter
+  alias Xcribe.Swagger.Merge
 
-  import Xcribe.Swagger.Formatter, only: [raw_openapi_object: 0]
-
-  @doc """
-  Return an OpenAPI Document builded from the given requests list
-  """
   def generate_doc(requests, config) do
-    raw_openapi_object()
-    |> mount_data_in_raw_object(requests, config)
+    specification = Specification.api_specification(config)
+
+    requests
+    |> build_paths_and_components(specification, config)
+    |> build_openapi_object(specification)
     |> json_encode!(config)
   end
 
-  defp mount_data_in_raw_object(openapi, requests, config) do
-    xcribe_info = xcribe_info(config.information_source)
+  defp build_paths_and_components(requests, spec, config) do
+    initial = %{paths: %{}, schemas: spec.schemas, security: %{}}
 
+    Enum.reduce(requests, initial, fn request, acc ->
+      request
+      |> request_objects(spec, config)
+      |> merge_objects(acc, request)
+    end)
+  end
+
+  defp build_openapi_object(%{paths: _, schemas: _, security: _} = params, specification) do
     %{
-      openapi
-      | info: Formatter.info_object(xcribe_info),
-        servers: Formatter.server_object(xcribe_info),
-        paths: build_paths_object(requests, config),
-        components: %{
-          securitySchemes: build_security_schemes(requests)
-        }
+      Formatter.openapi_object(specification)
+      | paths: params.paths,
+        components: %{schemas: params.schemas, securitySchemes: params.security}
     }
   end
 
-  defp build_security_schemes(requests) do
-    Enum.reduce(requests, %{}, &merge_security_schemas/2)
-  end
-
-  defp merge_security_schemas(request, schemas) do
-    Map.merge(schemas, Formatter.security_scheme_object_from_request(request))
-  end
-
-  defp build_paths_object(requests, config),
-    do: Enum.reduce(requests, %{}, &paths_object_func(&1, &2, config))
-
-  defp paths_object_func(%Request{path: path, verb: verb} = request, paths, config) do
-    item =
-      request
-      |> Map.update(:__meta__, %{config: config}, &Map.put(&1, :config, config))
-      |> Formatter.path_item_object_from_request()
-
-    Map.update(
-      paths,
-      path,
-      item,
-      &Formatter.merge_path_item_objects(&1, item, verb)
-    )
+  defp merge_objects(news, acc, request) do
+    %{
+      acc
+      | paths: Merge.paths(acc.paths, news.path),
+        schemas: Schema.merge(acc.schemas, news.schemas),
+        security: Map.merge(acc.security, news.security)
+    }
   rescue
     exception -> raise DocException, {request, exception, __STACKTRACE__}
   end
 
-  defp xcribe_info(information_source), do: information_source.api_info()
+  defp request_objects(request, specification, config) do
+    request
+    |> Request.remove_ignored_prefixes(specification)
+    |> Formatter.request_objects(specification, config)
+  rescue
+    exception -> raise DocException, {request, exception, __STACKTRACE__}
+  end
+
   defp json_encode!(openapi, config), do: JSON.encode!(openapi, [], config)
 end

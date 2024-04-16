@@ -16,38 +16,28 @@ defmodule Xcribe do
 
       test "test name", %{conn: conn} do
         ...
-
         document(conn, as: "description here")
-
         ...
       end
 
-  If no description is given the current test description will be used.
+  See more about documentation macro `Xcribe.Document`.
+
+
+  ## Running
+
+  You can run Xcribe by:
+
+  ```sh
+  mix xcribe.doc
+  ```
+
+  see `Mix.Tasks.Xcribe.Doc`
 
   ## API information
 
-  You must provide your API information by creatint a mudule that use
-  `Xcribe.Information` macros.
+  You must provide your API information by creatint a specification file.
 
-  The required info are:
-
-  - `name` - a name for your API.
-  - `description` - a description about your API.
-  - `host` - your API host url
-
-  This information is set by Xcribe macros inside the block `xcribe_info`. eg:
-
-      defmodule YourModuleInformation do
-        use Xcribe.Information
-
-        xcribe_info do
-          name "Your awesome API"
-          description "The best API in the world"
-          host "http://your-api.us"
-        end
-      end
-
-  See `Xcribe.Information` for more details about custom information.
+  See `Xcribe.Specification` for more details.
 
   ## JSON
 
@@ -57,24 +47,17 @@ defmodule Xcribe do
 
   ## Configuration
 
-  You must configure  the `information_source`.
-
-  eg:
-
-      config :xcribe, YourAppWeb.Endpoint, information_source: YourAppWeb.YouModuleInformation
-
   #### Available configurations:
 
-    * `:information_source` - Module that implements `Xcribe.Information` with
-    API information. It's required.
+    * `:format` - Format to generate documentation, allowed `:api_blueprint` and
+    `:swagger`. Default `:swagger`.
     * `:output` - The name of file output with generated configuration. Default
     value changes by the format, 'api_blueprint.apib' for Blueprint and
     'app_doc.json' for swagger.
-    * `:format` - Format to generate documentation, allowed `:api_blueprint` and
-    `:swagger`. Default `:swagger`.
     * `:json_library` - The library to be used for json decode/encode (Jason
     and Poison are supported). The default is the same as `Phoenix` configuration.
     * `:serve` - Enable Xcribe serve mode. Default `false`. See more `Serving doc`
+    * `:specification_source` - A custom specification file path. See `Xcribe.Specification`.
   """
   require Logger
 

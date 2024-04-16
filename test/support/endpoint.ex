@@ -22,6 +22,4 @@ defmodule Xcribe.Endpoint do
   plug(Plug.Head)
 
   plug(Xcribe.WebRouter)
-
-  def init(_key, config), do: {:ok, config}
 end

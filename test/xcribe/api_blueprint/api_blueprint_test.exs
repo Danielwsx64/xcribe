@@ -7,7 +7,8 @@ defmodule Xcribe.ApiBlueprintTest do
   @sample_apib_output File.read!("test/support/api_blueprint_example.apib")
 
   setup do
-    {:ok, %{config: %{information_source: Xcribe.Support.Information, json_library: Jason}}}
+    {:ok,
+     %{config: %{specification_source: "test/support/.simple_example.exs", json_library: Jason}}}
   end
 
   describe "generate_doc/1" do

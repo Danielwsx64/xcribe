@@ -54,7 +54,7 @@ defmodule Xcribe.ConfigTest do
     test "fetch configuration with default values" do
       assert Config.fetch_config(Xcribe.FakeEndPoint) == %{
                format: :swagger,
-               information_source: nil,
+               specification_source: ".xcribe.exs",
                json_library: Jason,
                output: "openapi.json",
                serve: false
@@ -64,7 +64,7 @@ defmodule Xcribe.ConfigTest do
     test "fetch configuration for endpoint" do
       Application.put_env(:xcribe, Xcribe.OtherEndpoint,
         format: :api_blueprint,
-        information_source: Xcribe.Support.Information,
+        specification_source: ".custom.file.exs",
         json_library: Jason,
         output: "api_doc.apib",
         serve: true
@@ -72,7 +72,7 @@ defmodule Xcribe.ConfigTest do
 
       assert Config.fetch_config(Xcribe.OtherEndpoint) == %{
                format: :api_blueprint,
-               information_source: Xcribe.Support.Information,
+               specification_source: ".custom.file.exs",
                json_library: Jason,
                output: "api_doc.apib",
                serve: true
@@ -84,7 +84,7 @@ defmodule Xcribe.ConfigTest do
     test "return ok if has valid configurations" do
       config = %{
         format: :swagger,
-        information_source: Xcribe.Support.Information,
+        specification_source: ".xcribe.exs",
         json_library: Jason,
         serve: false
       }
@@ -95,7 +95,7 @@ defmodule Xcribe.ConfigTest do
     test "validate serve config" do
       config = %{
         format: :swagger,
-        information_source: nil,
+        specification_source: ".xcribe.exs",
         json_library: Jason,
         output: "priv/static/openapi.json",
         serve: true
@@ -107,7 +107,7 @@ defmodule Xcribe.ConfigTest do
     test "return error for invalid configurations" do
       config = %{
         format: :invalid,
-        information_source: FakeInfo,
+        specification_source: ".invalid_one.exs",
         json_library: FakeJson,
         output: "",
         serve: true
@@ -124,9 +124,9 @@ defmodule Xcribe.ConfigTest do
                   {:json_library, FakeJson,
                    "The configured json library doesn't implement the needed functions",
                    "Try configure Xcribe with Jason or Poison `config :xcribe, Endpoint, json_library: Jason`"},
-                  {:information_source, FakeInfo,
-                   "The configured module as information source is not using Xcribe macros",
-                   "Add `use Xcribe.Information` on top of your module"},
+                  {:specification_source, ".invalid_one.exs",
+                   "The configured specification file doesn't exist",
+                   "Add a valid spec file path in `config :xcribe, Endpoint, specification_source: \".xcribe.exs\"`"},
                   {:format, :invalid,
                    "Xcribe doesn't support the configured documentation format",
                    "Xcribe supports Swagger and Blueprint, configure as: `config :xcribe, Endpoint, format: :swagger`"}
@@ -136,7 +136,7 @@ defmodule Xcribe.ConfigTest do
     test "validate only given keys" do
       config = %{
         format: :invalid,
-        information_source: FakeInfo,
+        specification_source: ".xcribe.exs",
         json_library: FakeJson,
         output: "",
         serve: true
@@ -150,18 +150,6 @@ defmodule Xcribe.ConfigTest do
                    "You must configure output as: `config :xcribe, Endpoint, output: \"priv/static/doc.json\"`"},
                   {:format, :invalid, "When serve config is true you must use swagger format",
                    "You must use Swagger format: `config :xcribe, Endpoint, format: :swagger`"}
-                ]}
-    end
-
-    test "when information source not configured" do
-      config = %{information_source: nil}
-
-      assert Config.check_configurations(config, [:information_source]) ==
-               {:error,
-                [
-                  {:information_source, "not configured",
-                   "You must add a config to the information source module",
-                   "Add to your config file `config: :xcribe, Endpoint, information_source: YourCustomModule`"}
                 ]}
     end
   end
