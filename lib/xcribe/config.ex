@@ -107,7 +107,7 @@ defmodule Xcribe.Config do
   defp validate_serve_output({_errors, config} = results) do
     output = Map.fetch!(config, :output)
 
-    if Regex.match?(~r/^priv\/static\/.*/, output) do
+    if Regex.match?(~r/priv\/static\/.*/, output) do
       results
     else
       add_error(results, :output, output, @serve_output_message, @serve_output_instructions)
