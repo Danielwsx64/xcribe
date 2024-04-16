@@ -130,6 +130,6 @@ defmodule Xcribe.Config do
   end
 
   defp valid_endpoint?(module) do
-    function_exported?(module, :config, 1) and function_exported?(module, :__compile_config__, 0)
+    function_exported?(module, :config, 1)
   end
 end

@@ -67,10 +67,10 @@ defmodule Xcribe.ConnParser do
   defp build_opts(opts), do: Keyword.put_new(opts, :description, "")
 
   defp identify_route(%{method: method, host: host, path_info: path} = conn) do
-    conn
-    |> router_module()
-    |> apply(:__match_route__, [method, decode_uri(path), host])
-    |> extract_route_info()
+    module = router_module(conn)
+    route = module.__match_route__(decode_uri(path), method, host)
+
+    extract_route_info(route)
   rescue
     _ -> %{@error_struct | message: "An invalid Plug.Conn was given or maybe an invalid Router"}
   end
@@ -96,8 +96,7 @@ defmodule Xcribe.ConnParser do
     |> Enum.filter(&(&1 != action and Regex.match?(~r/^\w+$/, &1)))
     |> Enum.map(&String.split(&1, "_"))
     |> List.flatten()
-    |> Enum.map(&String.capitalize(&1))
-    |> Enum.join("\s")
+    |> Enum.map_join("\s", &String.capitalize(&1))
   end
 
   defp build_groups_tags(nil, resource), do: [resource]
