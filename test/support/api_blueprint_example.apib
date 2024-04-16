@@ -48,21 +48,21 @@ The description of the API
     + Schema
 
             {
+              "type": "array",
               "items": {
+                "type": "object",
                 "properties": {
                   "id": {
-                    "example": 1,
+                    "type": "number",
                     "format": "int32",
-                    "type": "number"
+                    "example": 1
                   },
                   "name": {
-                    "example": "user 1",
-                    "type": "string"
+                    "type": "string",
+                    "example": "user 1"
                   }
-                },
-                "type": "object"
-              },
-              "type": "array"
+                }
+              }
             }
 
 ### Users show [GET /users/{id}]
@@ -90,18 +90,18 @@ The description of the API
     + Schema
 
             {
+              "type": "object",
               "properties": {
                 "id": {
-                  "example": 1,
+                  "type": "number",
                   "format": "int32",
-                  "type": "number"
+                  "example": 1
                 },
                 "name": {
-                  "example": "user 1",
-                  "type": "string"
+                  "type": "string",
+                  "example": "user 1"
                 }
-              },
-              "type": "object"
+              }
             }
 
 ### Users create [POST /users]
@@ -120,18 +120,18 @@ The description of the API
     + Schema
 
             {
+              "type": "object",
               "properties": {
                 "age": {
-                  "example": 5,
+                  "type": "number",
                   "format": "int32",
-                  "type": "number"
+                  "example": 5
                 },
                 "name": {
-                  "example": "user 1",
-                  "type": "string"
+                  "type": "string",
+                  "example": "user 1"
                 }
-              },
-              "type": "object"
+              }
             }
 
 + Response 201 (application/json)
@@ -149,18 +149,18 @@ The description of the API
     + Schema
 
             {
+              "type": "object",
               "properties": {
                 "age": {
-                  "example": 5,
+                  "type": "number",
                   "format": "int32",
-                  "type": "number"
+                  "example": 5
                 },
                 "name": {
-                  "example": "user 1",
-                  "type": "string"
+                  "type": "string",
+                  "example": "user 1"
                 }
-              },
-              "type": "object"
+              }
             }
 
 ### Users update [PUT /users/{id}]
@@ -183,18 +183,18 @@ The description of the API
     + Schema
 
             {
+              "type": "object",
               "properties": {
                 "age": {
-                  "example": 5,
+                  "type": "number",
                   "format": "int32",
-                  "type": "number"
+                  "example": 5
                 },
                 "name": {
-                  "example": "user 1",
-                  "type": "string"
+                  "type": "string",
+                  "example": "user 1"
                 }
-              },
-              "type": "object"
+              }
             }
 
 + Response 200 (application/json)
@@ -212,18 +212,18 @@ The description of the API
     + Schema
 
             {
+              "type": "object",
               "properties": {
                 "age": {
-                  "example": 5,
+                  "type": "number",
                   "format": "int32",
-                  "type": "number"
+                  "example": 5
                 },
                 "name": {
-                  "example": "user 1",
-                  "type": "string"
+                  "type": "string",
+                  "example": "user 1"
                 }
-              },
-              "type": "object"
+              }
             }
 
 ## Users [/users/{usersId}/cancel]
@@ -283,21 +283,21 @@ The description of the API
     + Schema
 
             {
+              "type": "array",
               "items": {
+                "type": "object",
                 "properties": {
                   "id": {
-                    "example": 1,
+                    "type": "number",
                     "format": "int32",
-                    "type": "number"
+                    "example": 1
                   },
                   "title": {
-                    "example": "user 1",
-                    "type": "string"
+                    "type": "string",
+                    "example": "user 1"
                   }
-                },
-                "type": "object"
-              },
-              "type": "array"
+                }
+              }
             }
 
 ### Users Posts update [PATCH /users/{usersId}/posts/{id}]
@@ -320,13 +320,13 @@ The description of the API
     + Schema
 
             {
+              "type": "object",
               "properties": {
                 "title": {
-                  "example": "user 1",
-                  "type": "string"
+                  "type": "string",
+                  "example": "user 1"
                 }
-              },
-              "type": "object"
+              }
             }
 
 + Response 200 (application/json)
@@ -344,17 +344,17 @@ The description of the API
     + Schema
 
             {
+              "type": "object",
               "properties": {
                 "title": {
-                  "example": "user 1",
-                  "type": "string"
+                  "type": "string",
+                  "example": "user 1"
                 },
                 "users_id": {
-                  "example": "1",
-                  "type": "string"
+                  "type": "string",
+                  "example": "1"
                 }
-              },
-              "type": "object"
+              }
             }
 
 ### Users Posts create [POST /users/{usersId}/posts]
@@ -376,13 +376,13 @@ The description of the API
     + Schema
 
             {
+              "type": "object",
               "properties": {
                 "title": {
-                  "example": "user 1",
-                  "type": "string"
+                  "type": "string",
+                  "example": "user 1"
                 }
-              },
-              "type": "object"
+              }
             }
 
 + Response 201 (application/json)
@@ -400,16 +400,16 @@ The description of the API
     + Schema
 
             {
+              "type": "object",
               "properties": {
                 "title": {
-                  "example": "user 1",
-                  "type": "string"
+                  "type": "string",
+                  "example": "user 1"
                 },
                 "users_id": {
-                  "example": "1",
-                  "type": "string"
+                  "type": "string",
+                  "example": "1"
                 }
-              },
-              "type": "object"
+              }
             }
 

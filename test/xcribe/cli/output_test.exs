@@ -215,7 +215,7 @@ defmodule Xcribe.CLI.OutputTest do
       \e[38;5;88m┃\e[0m        \e[38;5;37m# |> document(as: \"awesome route\")
       \e[38;5;88m┃\e[0m        \e[38;5;88m     ^^^^^^^^                     
       \e[38;5;88m┃\e[0m
-        
+
        - Exception stacktrace:
 
       (xcribe 0.6.0) lib/swagger/swagger.ex:53: Xcribe.Swagger.paths_object_func/2

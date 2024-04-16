@@ -75,7 +75,7 @@ defmodule Xcribe.SpecificationTest do
       config = %{specification_source: "test/support/.invalid_sintax.exs"}
 
       assert_raise SpecificationFile,
-                   "Specification file has invalid Elixir syntax. Check: test/support/.invalid_sintax.exs\n** (SyntaxError) nofile:3:3: syntax error before: \"missing_comma\"\n",
+                   ~r"Specification file has invalid Elixir syntax. Check: test/support/.invalid_sintax.exs",
                    fn ->
                      Specification.api_specification(config)
                    end

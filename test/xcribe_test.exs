@@ -22,6 +22,7 @@ defmodule XcribeTest do
 
   describe "document/2" do
     test "write documentation with swagger format" do
+      # TODO: use exunit temp dir instead of this
       output_path = "/tmp/xcribe_test_#{:rand.uniform()}"
 
       records = [
@@ -43,8 +44,6 @@ defmodule XcribeTest do
         output: output_path
       }
 
-      expected_content = String.replace(@sample_swagger_output, ~r/\s/, "")
-
       io_output =
         capture_io(fn ->
           assert Xcribe.document(records, config) == :ok
@@ -52,7 +51,8 @@ defmodule XcribeTest do
 
       assert io_output =~ "Xcribe documentation written in"
 
-      assert output_path |> File.read!() |> String.replace(~r/\s/, "") == expected_content
+      assert output_path |> File.read!() |> Jason.decode!() ==
+               Jason.decode!(@sample_swagger_output)
     end
 
     test "write documentation with api_blueprint format" do
