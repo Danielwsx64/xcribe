@@ -7,25 +7,7 @@ defmodule Xcribe.Tasks.FormatterTest do
 
   describe "init/1" do
     test "initialize using ExUnit.CLIFormatter" do
-      ex_unit_opts = [
-        include: [:xcribe_document],
-        exclude: [:test],
-        max_cases: 8,
-        seed: 92_619,
-        autorun: false,
-        after_suite: [],
-        capture_log: false,
-        formatters: [Xcribe.Tasks.Formatter],
-        timeout: 60_000,
-        trace: false,
-        failures_manifest_file: "/.mix_test_failures",
-        max_failures: 1,
-        assert_receive_timeout: 100,
-        refute_receive_timeout: 100,
-        colors: [],
-        stacktrace_depth: 20,
-        slowest: 0
-      ]
+      ex_unit_opts = cli_formatter_opts()
 
       capture_io(fn ->
         result = Formatter.init(ex_unit_opts)
@@ -36,7 +18,6 @@ defmodule Xcribe.Tasks.FormatterTest do
                   excluded_counter: 0,
                   failure_counter: 0,
                   invalid_counter: 0,
-                  seed: 92_619,
                   skipped_counter: 0,
                   slowest: 0,
                   test_counter: %{},
@@ -79,15 +60,7 @@ defmodule Xcribe.Tasks.FormatterTest do
         }
       }
 
-      state = %{
-        colors: [enabled: true],
-        failure_counter: 0,
-        test_counter: %{},
-        test_timings: [],
-        slowest: 0,
-        trace: false,
-        width: 272
-      }
+      state = %{cli_formatter_state() | colors: [enabled: true], width: 272}
 
       assert captured =
                capture_io(fn ->
@@ -104,5 +77,39 @@ defmodule Xcribe.Tasks.FormatterTest do
                assert Formatter.handle_cast("fake event", []) == {:noreply, []}
              end) == ""
     end
+  end
+
+  # Derive the state from ExUnit.CLIFormatter itself so keys it adds or drops across
+  # Elixir releases don't break this test.
+  defp cli_formatter_state do
+    parent = self()
+
+    capture_io(fn -> send(parent, ExUnit.CLIFormatter.init(cli_formatter_opts())) end)
+
+    receive do
+      {:ok, state} -> state
+    end
+  end
+
+  defp cli_formatter_opts do
+    [
+      include: [:xcribe_document],
+      exclude: [:test],
+      max_cases: 8,
+      seed: 92_619,
+      autorun: false,
+      after_suite: [],
+      capture_log: false,
+      formatters: [Xcribe.Tasks.Formatter],
+      timeout: 60_000,
+      trace: false,
+      failures_manifest_file: "/.mix_test_failures",
+      max_failures: 1,
+      assert_receive_timeout: 100,
+      refute_receive_timeout: 100,
+      colors: [],
+      stacktrace_depth: 20,
+      slowest: 0
+    ]
   end
 end
