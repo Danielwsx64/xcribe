@@ -75,4 +75,20 @@ defmodule Xcribe.RequestTest do
       assert Request.remove_ignored_prefixes(request_with_underscore, specification) == expected
     end
   end
+
+  describe "document_location/1" do
+    test "return the file and the line of the document call" do
+      meta = %{call: %{description: "test create user", file: "users_test.exs", line: 12}}
+
+      assert Request.document_location(%Request{__meta__: meta}) == {"users_test.exs", 12}
+    end
+
+    test "return an empty call site when the metadata has no call" do
+      assert Request.document_location(%Request{__meta__: %{}}) == {"", 0}
+    end
+
+    test "return an empty call site when the request has no metadata" do
+      assert Request.document_location(%Request{}) == {"", 0}
+    end
+  end
 end

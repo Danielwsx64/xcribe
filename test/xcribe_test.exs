@@ -194,14 +194,16 @@ defmodule XcribeTest do
     end
 
     test "handle document exceptions" do
-      request_with_error = %Request{
-        __meta__: %{
-          call: %{
-            description: "conn test",
-            file: File.cwd!() <> "/test/xcribe/cli/output_test.exs",
-            line: 25
+      request_with_error = %{
+        RequestsGenerator.users_index()
+        | path_params: nil,
+          __meta__: %{
+            call: %{
+              description: "conn test",
+              file: File.cwd!() <> "/test/xcribe/cli/output_test.exs",
+              line: 25
+            }
           }
-        }
       }
 
       records = [request_with_error]

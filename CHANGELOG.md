@@ -53,9 +53,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `plug`, `jason`, `floki`, `ex_doc`, `excoveralls`, `credo` and
   `credo_naming` to current releases; dropped the unused `earmark` dependency.
 - Bundled Swagger UI updated from 3.x to 5.32.14.
+- Both output formats are now generated from one format-agnostic model of the documented API
+  instead of each grouping and merging the recorded requests for itself. Two consequences a
+  consumer can see. The `parameters` list of a Swagger operation is sorted by name even when a
+  single test documented the route, so an operation with a path parameter and a query parameter
+  whose names sort the other way round will reorder once. And a group tag list given as
+  `tags: ["B", "A"]` is emitted sorted, since the order of tags carries no meaning in either
+  format and leaving it to the test made the document depend on the test.
+- An API Blueprint response whose content type Xcribe cannot decode is now documented with the
+  body exactly as the application sent it, instead of failing the whole document generation with
+  an unknown-content-type error. Being unable to derive a schema from a response is no reason to
+  refuse to document the rest of the API.
 
 ### Fixed
 
+- A specification file key of the wrong type — `schemas: []`, `servers: %{}`, `paths: "…"` — now
+  prints an Xcribe error report naming the key, instead of surfacing much later as a raw stacktrace
+  out of whichever format happened to touch it, with nothing pointing at the file.
+- A schema name shared by a response returning a list and a response returning a single object —
+  which is what happens by default, since the name is derived from the resource — kept only
+  whichever of the two was documented last, because merging an array schema into an object schema
+  replaced it. The name now describes the item in both cases and the two responses union their
+  properties, so a `components.schemas` entry is no longer silently truncated by an unrelated
+  test.
+- The parameter example, the operation description and the API Blueprint request block chosen for
+  a route documented by more than one test no longer depend on the order ExUnit happened to run
+  those tests in. Requests are ordered by a key that includes the file and line of the
+  `document/2` call, so the same suite always produces the same document.
 - Requests documented with `tags: false` were silently dropped from the API Blueprint output
   entirely, because the formatter grouped requests by tag and a request with no tags reduced to
   nothing. They are now documented in the unnamed group.

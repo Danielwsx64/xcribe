@@ -40,6 +40,15 @@ defmodule Xcribe.Request do
 
   def format_req_schema(%__MODULE__{req_schema: schema}), do: schema
 
+  @doc """
+  Return the `{file, line}` of the `document/2` call that recorded the given item.
+
+  Accepts anything carrying a `__meta__`, and answers a sortable pair even when the metadata is
+  absent, so it can be used as a deterministic tiebreaker.
+  """
+  def document_location(%{__meta__: %{call: %{file: file, line: line}}}), do: {file, line}
+  def document_location(_item), do: {"", 0}
+
   def remove_ignored_prefixes(%__MODULE__{} = request, %{
         ignore_namespaces: prefixes,
         ignore_resources_prefix: resources_prefixes

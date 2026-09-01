@@ -103,13 +103,29 @@ defmodule Xcribe.Specification do
       name: Map.get(specifications, :name, "API Documentation"),
       description: Map.get(specifications, :description, ""),
       version: Map.get(specifications, :version, "1.0.0"),
-      servers: Map.get(specifications, :servers, [%{url: @default_server_url}]),
-      paths: Map.get(specifications, :paths, %{}),
-      schemas: Map.get(specifications, :schemas, %{}),
-      ignore_namespaces: Map.get(specifications, :ignore_namespaces, []),
-      ignore_resources_prefix: Map.get(specifications, :ignore_resources_prefix, [])
+      servers: fetch_list(specifications, :servers, [%{url: @default_server_url}]),
+      paths: fetch_map(specifications, :paths, %{}),
+      schemas: fetch_map(specifications, :schemas, %{}),
+      ignore_namespaces: fetch_list(specifications, :ignore_namespaces, []),
+      ignore_resources_prefix: fetch_list(specifications, :ignore_resources_prefix, [])
     }
   end
+
+  defp fetch_map(specifications, key, default) do
+    specifications |> Map.get(key, default) |> validate_map(key)
+  end
+
+  defp validate_map(value, _key) when is_map(value), do: value
+  defp validate_map(value, key), do: raise(SpecificationFile, wrong_type(key, "a map", value))
+
+  defp fetch_list(specifications, key, default),
+    do: specifications |> Map.get(key, default) |> validate_list(key)
+
+  defp validate_list(value, _key) when is_list(value), do: value
+  defp validate_list(value, key), do: raise(SpecificationFile, wrong_type(key, "a list", value))
+
+  defp wrong_type(key, expected, value),
+    do: "The `#{key}` key of the specification file must be #{expected}. Got: #{inspect(value)}"
 
   defp include_servers_path_as_ignored_namespaces(specifications) do
     specifications

@@ -13,8 +13,9 @@ The `.apib` / JSON document xcribe writes is part of the public contract
 - **Every collection that reaches the output is explicitly sorted.** The existing sorts are the
   pattern:
 
-      Enum.sort(requests, &(&1.path >= &2.path))   # Xcribe.order_by_path/1
-      Enum.sort(&(&1.name < &2.name))              # Xcribe.Swagger.Formatter, tag objects
+      Enum.sort_by(requests, &request_sort_key/1)  # Xcribe.APIModel, a total key per request
+      Enum.sort_by(key_function)                   # Xcribe.APIModel.Merge.by_key/4, every collection
+      Enum.sort_by(&{&1.name, &1.location})        # Xcribe.Swagger.Formatter, parameter objects
 
   **Never rely on the iteration order of a map, `Enum.group_by/3`, `Map.new/2`, or
   `MapSet`** — and never rely on the order requests were recorded in, which follows ExUnit's

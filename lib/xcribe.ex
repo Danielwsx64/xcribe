@@ -62,6 +62,7 @@ defmodule Xcribe do
   """
   alias Xcribe.{
     ApiBlueprint,
+    APIModel,
     CLI.Output,
     Config,
     DocException,
@@ -69,6 +70,7 @@ defmodule Xcribe do
     Request,
     Request.Error,
     Request.Validator,
+    Specification,
     SpecificationFile,
     Swagger,
     Writter
@@ -86,7 +88,7 @@ defmodule Xcribe do
   def document(records, config) when is_list(records) do
     records
     |> validate_records()
-    |> order_by_path()
+    |> build_api_model(config)
     |> generate_docs(config)
     |> write(config)
   rescue
@@ -146,13 +148,18 @@ defmodule Xcribe do
   defp add_result({:ok, request}, {:ok, requests}), do: {:ok, [request | requests]}
   defp add_result({:ok, _request}, {:error, _errs} = errs), do: errs
 
-  defp order_by_path({:ok, requests}), do: {:ok, Enum.sort(requests, &(&1.path >= &2.path))}
-  defp order_by_path(error), do: error
+  defp build_api_model({:ok, requests}, config) do
+    specification = Specification.api_specification(config)
 
-  defp generate_docs({:ok, requests}, %{format: doc_format} = config) do
+    {:ok, {APIModel.build(requests, specification, config), specification}}
+  end
+
+  defp build_api_model(error, _config), do: error
+
+  defp generate_docs({:ok, {model, specification}}, %{format: doc_format} = config) do
     case doc_format do
-      :api_blueprint -> ApiBlueprint.generate_doc(requests, config)
-      :swagger -> Swagger.generate_doc(requests, config)
+      :api_blueprint -> ApiBlueprint.generate_doc(model, specification, config)
+      :swagger -> Swagger.generate_doc(model, specification, config)
     end
   end
 
