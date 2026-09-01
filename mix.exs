@@ -18,6 +18,7 @@ defmodule Xcribe.MixProject do
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: [tool: ExCoveralls],
+      aliases: aliases(),
       deps: deps()
     ]
   end
@@ -25,6 +26,7 @@ defmodule Xcribe.MixProject do
   def cli do
     [
       preferred_envs: [
+        precommit: :test,
         coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.post": :test,
@@ -49,6 +51,10 @@ defmodule Xcribe.MixProject do
   end
 
   defp application_mod(_), do: {Xcribe.Application, []}
+
+  defp aliases do
+    [precommit: ["compile --warnings-as-errors", "format", "credo", "test"]]
+  end
 
   defp deps do
     [
