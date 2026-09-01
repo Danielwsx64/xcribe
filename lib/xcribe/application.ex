@@ -7,7 +7,7 @@ defmodule Xcribe.Application do
 
   @doc false
   def start(_type, opts) do
-    if !Keyword.get(opts, :test, false) do
+    unless Keyword.get(opts, :test, false) do
       Config.all_endpoints()
       |> Enum.map(&Config.fetch_config(&1))
       |> Enum.each(&check_configuration/1)

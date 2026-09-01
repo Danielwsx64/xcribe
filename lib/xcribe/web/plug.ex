@@ -23,10 +23,12 @@ defmodule Xcribe.Web.Plug do
   plug(:match)
   plug(:dispatch)
 
-  @swagger_ui_template Path.expand("../../../priv/templates/swagger_ui.eex", __DIR__)
-  @external_resource @swagger_ui_template
-
-  EEx.function_from_file(:defp, :swagger_ui, @swagger_ui_template, [:file, :uri])
+  EEx.function_from_file(
+    :defp,
+    :swagger_ui,
+    Path.join([File.cwd!(), "priv", "templates", "swagger_ui.eex"]),
+    [:file, :uri]
+  )
 
   get "/" do
     if conn.assigns.serving? do

@@ -1,8 +1,8 @@
 defmodule Xcribe.ApiBlueprintTest do
   use ExUnit.Case, async: true
 
-  alias Xcribe.{ApiBlueprint, DocException, Request}
   alias Xcribe.Support.RequestsGenerator
+  alias Xcribe.{ApiBlueprint, DocException, Request}
 
   @sample_apib_output File.read!("test/support/api_blueprint_example.apib")
 

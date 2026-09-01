@@ -51,9 +51,9 @@ defmodule Xcribe do
 
   ## JSON
 
-  Xcribe uses Jason to handle json content, and you can configure xcribe to use your
-  preferred library. Poison and Jason are the most popular json libraries common used
-  in Elixir and Xcribe works fine with both.
+  Xcribe uses the same json library configured for Phoenix to handle json content.
+  you can configure xcribe to use your preferred library. Poison and Jason are
+  the most popular json libraries common used in Elixir and Xcribe works fine with both.
 
   ## Configuration
 
@@ -73,9 +73,11 @@ defmodule Xcribe do
     * `:format` - Format to generate documentation, allowed `:api_blueprint` and
     `:swagger`. Default `:swagger`.
     * `:json_library` - The library to be used for json decode/encode (Jason
-    and Poison are supported). Default `Jason`.
+    and Poison are supported). The default is the same as `Phoenix` configuration.
     * `:serve` - Enable Xcribe serve mode. Default `false`. See more `Serving doc`
   """
+  require Logger
+
   alias Xcribe.{
     ApiBlueprint,
     CLI.Output,

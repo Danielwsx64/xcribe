@@ -1,5 +1,5 @@
 defmodule Xcribe.PostsController do
-  use Phoenix.Controller, formats: [:json]
+  use Phoenix.Controller, namespace: Xcribe
 
   def index(conn, _params) do
     conn

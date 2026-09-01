@@ -7,26 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-
-- Route matching against Phoenix 1.8. The private router function xcribe uses to
-  resolve a route swapped its argument order in Phoenix 1.8, which made every
-  request fail to parse. The `rescue` around the call was also narrowed so a future
-  signature change surfaces instead of being reported as a generic parsing error.
-- Generated JSON now has a stable key order. Object keys were inherited from the
-  iteration order of maps with atom keys, which is arbitrary and changes between
-  Elixir/OTP releases.
-
-### Changed
-
-- Requires Elixir 1.18+, Erlang/OTP 27+, Phoenix 1.8.9+ and Plug 1.18.5+. The
-  Phoenix and Plug floors are the first releases without known security advisories.
-- `phoenix` moved to a dev/test-only dependency; it is no longer pulled into
-  consumers' dependency trees.
-- Updated `plug`, `jason`, `floki`, `ex_doc`, `excoveralls`, `credo` and
-  `credo_naming` to current releases; dropped the unused `earmark` dependency.
-- Bundled Swagger UI updated from 3.x to 5.32.14.
-
 ## [1.0.0] - 2021-07-17
 
 ## Added

@@ -1,7 +1,7 @@
 defmodule Xcribe.Plugs.Authentication do
   import Plug.Conn
 
-  use Phoenix.Controller, formats: [:json]
+  use Phoenix.Controller, namespace: Xcribe
 
   def init(_opts), do: []
 
