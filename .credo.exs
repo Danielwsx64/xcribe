@@ -170,7 +170,9 @@
         #
         # Custom checks can be created using `mix credo.gen.check`.
         #
-        {CredoNaming.Check.Consistency.ModuleFilename}
+        # `lib/mix/tasks/xcribe.doc.ex` follows the Mix task naming convention.
+        {CredoNaming.Check.Consistency.ModuleFilename,
+         excluded_paths: ["lib/mix/tasks"]}
       ]
     }
   ]

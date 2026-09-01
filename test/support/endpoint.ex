@@ -1,10 +1,10 @@
 defmodule Xcribe.Endpoint do
-  use Phoenix.Endpoint, otp_app: :xcribe_api
+  use Phoenix.Endpoint, otp_app: :xcribe
 
   plug(
     Plug.Static,
     at: "/",
-    from: :xcribe_api,
+    from: :xcribe,
     gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
   )
@@ -22,6 +22,4 @@ defmodule Xcribe.Endpoint do
   plug(Plug.Head)
 
   plug(Xcribe.WebRouter)
-
-  def init(_key, config), do: {:ok, config}
 end
