@@ -9,3 +9,6 @@ api_bluefy-*.tar
 
 # Visual Studio Code
 /.elixir_ls/
+
+# Claude Code
+/.claude/settings.local.json
