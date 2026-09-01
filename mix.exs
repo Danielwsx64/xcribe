@@ -96,5 +96,12 @@ defmodule Xcribe.MixProject do
     ]
   end
 
-  defp doc_groups_for_modules, do: []
+  defp doc_groups_for_modules do
+    [
+      Documenting: [Xcribe.Document, Xcribe.Formatter],
+      "Describing the API": [Xcribe.Specification],
+      "Mix tasks": [Mix.Tasks.Xcribe.Doc, Mix.Tasks.Xcribe.Gen.Spec],
+      Serving: [Xcribe.Web.Plug]
+    ]
+  end
 end

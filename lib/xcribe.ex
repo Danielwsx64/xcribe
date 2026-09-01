@@ -16,38 +16,29 @@ defmodule Xcribe do
 
       test "test name", %{conn: conn} do
         ...
-
         document(conn, as: "description here")
-
         ...
       end
 
-  If no description is given the current test description will be used.
+  See more about documentation macro `Xcribe.Document`.
+
+
+  ## Running
+
+  You can run Xcribe by:
+
+  ```sh
+  mix xcribe.doc
+  ```
+
+  see `Mix.Tasks.Xcribe.Doc`
 
   ## API information
 
-  You must provide your API information by creatint a mudule that use
-  `Xcribe.Information` macros.
+  The API title, description, version and servers come from a specification file, `.xcribe.exs`.
+  Generate one with `mix xcribe.gen.spec`.
 
-  The required info are:
-
-  - `name` - a name for your API.
-  - `description` - a description about your API.
-  - `host` - your API host url
-
-  This information is set by Xcribe macros inside the block `xcribe_info`. eg:
-
-      defmodule YourModuleInformation do
-        use Xcribe.Information
-
-        xcribe_info do
-          name "Your awesome API"
-          description "The best API in the world"
-          host "http://your-api.us"
-        end
-      end
-
-  See `Xcribe.Information` for more details about custom information.
+  See `Xcribe.Specification` for more details.
 
   ## JSON
 
@@ -57,24 +48,17 @@ defmodule Xcribe do
 
   ## Configuration
 
-  You must configure  the `information_source`.
-
-  eg:
-
-      config :xcribe, YourAppWeb.Endpoint, information_source: YourAppWeb.YouModuleInformation
-
   #### Available configurations:
 
-    * `:information_source` - Module that implements `Xcribe.Information` with
-    API information. It's required.
-    * `:output` - The name of file output with generated configuration. Default
-    value changes by the format, 'api_blueprint.apib' for Blueprint and
-    'app_doc.json' for swagger.
     * `:format` - Format to generate documentation, allowed `:api_blueprint` and
     `:swagger`. Default `:swagger`.
+    * `:output` - The name of the generated documentation file. The default changes
+    with the format: `"api_doc.apib"` for Blueprint and `"openapi.json"` for Swagger.
     * `:json_library` - The library to be used for json decode/encode (Jason
     and Poison are supported). Default `Jason`.
     * `:serve` - Enable Xcribe serve mode. Default `false`. See more `Serving doc`
+    * `:specification_source` - Path to the specification file. Default `".xcribe.exs"`.
+    See `Xcribe.Specification`.
   """
   alias Xcribe.{
     ApiBlueprint,
@@ -85,6 +69,7 @@ defmodule Xcribe do
     Request,
     Request.Error,
     Request.Validator,
+    SpecificationFile,
     Swagger,
     Writter
   }
@@ -105,7 +90,7 @@ defmodule Xcribe do
     |> generate_docs(config)
     |> write(config)
   rescue
-    e in DocException -> {:error, e}
+    e in [DocException, SpecificationFile] -> {:error, e}
   end
 
   defp get_records_with_endpoint do
@@ -176,6 +161,12 @@ defmodule Xcribe do
   defp write(text, config) when is_binary(text), do: Writter.write(text, config)
   defp write({:error, _msg} = err, _config), do: err
 
+  defp handle_result({:error, %SpecificationFile{} = e}) do
+    Output.print_specification_error(e)
+
+    :error
+  end
+
   defp handle_result({:error, %DocException{} = e}) do
     Output.print_doc_exception(e)
 
@@ -193,6 +184,8 @@ defmodule Xcribe do
 
     :error
   end
+
+  defp handle_result(:error), do: :error
 
   defp handle_result(:ok), do: :ok
 end

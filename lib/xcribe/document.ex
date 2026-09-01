@@ -36,13 +36,49 @@ defmodule Xcribe.Document do
         ...
       end
 
-  You also can use a module attribute `@xcribe_tags` to define the groups tags 
-  inside a test file.
+  You can remove the default group tags by passing the option `tags` with value false
 
-      Module YourAppTest do
+      test "test name", %{conn: conn} do
+        ...
+
+        document(conn, as: "description here", tags: false)
+
+        ...
+      end
+
+  You can specify a custom responses schema name by passing the option `schema` to `document/2`
+
+      test "test name", %{conn: conn} do
+        ...
+
+        document(conn, as: "description here", schema: "Users")
+
+        ...
+      end
+
+  You can specify a custom request schema name by passing the option `req_schema` to `document/2`
+
+      test "test name", %{conn: conn} do
+        ...
+
+        document(conn, as: "description here", req_schema: "createUsers")
+
+        ...
+      end
+
+  In the Swagger format a schema name becomes a key under `components.schemas`, referenced with
+  `$ref`. API Blueprint has no component section, so the name surfaces as the JSON Schema `title`
+  of the request or response instead.
+
+  You also can use module attributes to define tags and schemas inside a test file.
+  They apply to a single test, to a `describe` block, or to the whole file
+
+      defmodule YourAppTest do
         use ExUnit.Case
 
         @xcribe_tags ["Authenticated API"]
+        @xcribe_schema "Users"
+        @xcribe_req_schema "createUsers"
 
         test "test name", %{conn: conn} do
           ...
@@ -94,12 +130,22 @@ defmodule Xcribe.Document do
 
     groups_tags =
       opts
-      |> Keyword.get(:tags, Module.get_attribute(module, :xcribe_tags, []))
-      |> List.wrap()
+      |> Keyword.get(:tags, Module.get_attribute(module, :xcribe_tags))
+      |> case do
+        false -> []
+        true -> nil
+        nil -> nil
+        tags -> List.wrap(tags)
+      end
+
+    schema = Keyword.get(opts, :schema, Module.get_attribute(module, :xcribe_schema))
+    req_schema = Keyword.get(opts, :req_schema, Module.get_attribute(module, :xcribe_req_schema))
 
     [
       description: description,
-      groups_tags: groups_tags
+      groups_tags: groups_tags,
+      schema: schema,
+      req_schema: req_schema
     ]
   end
 

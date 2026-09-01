@@ -35,7 +35,7 @@ defmodule Xcribe.ApiBlueprint.APIB do
   end
 
   def groups(struct, config) do
-    Enum.reduce(struct, "", fn {name, %{resources: resources}}, acc ->
+    Enum.reduce(sorted(struct), "", fn {name, %{resources: resources}}, acc ->
       acc <> group(String.trim(name)) <> reduce_group_resources(resources, config)
     end)
   end
@@ -48,6 +48,7 @@ defmodule Xcribe.ApiBlueprint.APIB do
         uri,
         %{
           name: name,
+          description: desc,
           parameters: params,
           query_parameters: query_parameters,
           requests: requests
@@ -55,6 +56,7 @@ defmodule Xcribe.ApiBlueprint.APIB do
         config
       ) do
     action(name, action_uri(uri, query_parameters)) <>
+      description(desc) <>
       parameters(Map.merge(params, query_parameters)) <> reduce_action_requests(requests, config)
   end
 
@@ -73,6 +75,9 @@ defmodule Xcribe.ApiBlueprint.APIB do
     response(response.status, response.content_type) <>
       headers(response.headers) <> body(response.body, config) <> schema(response.schema, config)
   end
+
+  def description(""), do: ""
+  def description(text), do: "#{text}\n\n"
 
   def group(""), do: ""
   def group(name), do: apply_template(@group_template, identifier: name)
@@ -143,24 +148,32 @@ defmodule Xcribe.ApiBlueprint.APIB do
   end
 
   defp action_uri(uri, query_parameters),
-    do: Enum.reduce(query_parameters, uri, &add_query_parameter/2)
+    do: Enum.reduce(sorted(query_parameters), uri, &add_query_parameter/2)
 
   defp add_query_parameter({param, _value}, uri), do: uri <> "{?#{param}}"
 
+  defp sorted(map), do: Enum.sort_by(map, fn {key, _value} -> key end)
+
   defp reduce_group_resources(resources, config) do
-    Enum.reduce(resources, "", fn {name, res}, acc -> acc <> full_resource(name, res, config) end)
+    Enum.reduce(sorted(resources), "", fn {name, res}, acc ->
+      acc <> full_resource(name, res, config)
+    end)
   end
 
   defp reduce_resource_actions(actions, config) do
-    Enum.reduce(actions, "", fn {name, act}, acc -> acc <> full_action(name, act, config) end)
+    Enum.reduce(sorted(actions), "", fn {name, act}, acc ->
+      acc <> full_action(name, act, config)
+    end)
   end
 
   defp reduce_action_requests(requests, config) do
-    Enum.reduce(requests, "", fn {name, req}, acc -> acc <> full_request(name, req, config) end)
+    Enum.reduce(sorted(requests), "", fn {name, req}, acc ->
+      acc <> full_request(name, req, config)
+    end)
   end
 
   defp reduce_parameters_items(parameters),
-    do: Enum.reduce(parameters, "", &parameter_item/2)
+    do: Enum.reduce(sorted(parameters), "", &parameter_item/2)
 
   defp parameter_item({name, %{items: items, type: "array"}}, acc) do
     acc <>
@@ -174,7 +187,7 @@ defmodule Xcribe.ApiBlueprint.APIB do
   defp parameter_item({name, %{example: ex, type: type}}, acc),
     do: acc <> apply_template(@item_template, name: name, value: ex, type: type)
 
-  defp reduce_header_items(headers), do: Enum.reduce(headers, "", &header_item/2)
+  defp reduce_header_items(headers), do: Enum.reduce(sorted(headers), "", &header_item/2)
 
   defp header_item({header, value}, acc),
     do: acc <> "#{apply_template(@header_item_template, header: header, value: value)}"

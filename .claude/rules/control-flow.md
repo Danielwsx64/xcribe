@@ -20,7 +20,7 @@
   stop at the first configuration error or first failing endpoint instead of collecting work
   that will be thrown away.
 - **`|> case do ... end` is the accepted way to branch at the end of a pipe** (see
-  `Xcribe.fetch_config/2`, `Xcribe.Information.fetch_information/3`). Don't bind an intermediate
+  `Xcribe.fetch_config/2`, `Xcribe.Document.build_opts/3`). Don't bind an intermediate
   variable just to run a `case` on it.
 - **Pipes may start from a plain value and may have a single step.**
   `:xcribe |> Application.get_env(endpoint, []) |> apply_default_values()` is house style;

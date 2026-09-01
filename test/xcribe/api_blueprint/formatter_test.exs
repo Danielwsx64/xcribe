@@ -37,6 +37,14 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
              }
     end
 
+    test "request without groups tags go into the untagged group", %{config: config} do
+      request = put_in(RequestsGenerator.users_index(groups_tags: []).__meta__, %{config: config})
+
+      request_object = Formatter.full_request_object(request)
+
+      assert Formatter.put_object_into_groups(%{}, request_object) == %{"" => request_object}
+    end
+
     test "same request twice merge data", %{config: config} do
       base_request = put_in(RequestsGenerator.users_index().__meta__, %{config: config})
 
@@ -693,6 +701,24 @@ defmodule Xcribe.ApiBlueprint.FormatterTest do
       }
 
       assert Formatter.response_body(struct) == %{}
+    end
+  end
+
+  describe "response_schema/1 and request_schema/1 with named schemas" do
+    test "use a named schema as the json schema title", %{config: config} do
+      request =
+        RequestsGenerator.users_create(schema: "Users", req_schema: "createUsers")
+        |> put_in([Access.key!(:__meta__)], %{config: config})
+
+      assert %{title: "createUsers"} = Formatter.request_schema(request)
+      assert %{title: "Users"} = Formatter.response_schema(request)
+    end
+
+    test "keep the schema anonymous when no name was given", %{config: config} do
+      request = put_in(RequestsGenerator.users_create().__meta__, %{config: config})
+
+      refute Map.has_key?(Formatter.request_schema(request), :title)
+      refute Map.has_key?(Formatter.response_schema(request), :title)
     end
   end
 end

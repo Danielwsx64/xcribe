@@ -6,16 +6,21 @@ defmodule Xcribe.Formatter do
   It handles the `suite_finished` event and then generates the documentation from
   the collected requests.
 
-  You must add `Xcribe.Formatter` in the list of formatters in your `test_helper.exs`.
+  To run Xcribe whille running `mix test` task you must add `Xcribe.Formatter`
+  in the list of formatters in your `test_helper.exs`.
 
       ExUnit.start(formatters: [ExUnit.CLIFormatter, Xcribe.Formatter])
 
-  You must keep `ExUnit.CLIFormatter` in the list as well.
+  You must keep "ExUnit.CLIFormatter" in the list as well.
 
-  The document will be generated if the pre-configured env var has a truthy value.
-  Other wise the Formatter will ignore the finished event.
+  The document will be generated if the `XCRIBE_ENV` env var has a truthy value.
+  Other wise the Formatter will ignore the finished event. Ex:
 
-  All request documented with macro `document/2` (See `Xcribe`) will be parsed
+  ```sh
+  XCRIBE_ENV=true mix test
+  ```
+
+  All request documented with macro `document/2` (See `Xcribe.Document`) will be parsed
   by Xcribe. When the test suite finish `Xcribe.Formatter` will check if all
   colleted requests are valid. If some invalid request is found, an error output
   will appear and the documentation will not be generated.

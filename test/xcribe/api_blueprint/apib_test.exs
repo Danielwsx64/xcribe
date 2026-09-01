@@ -6,7 +6,8 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
   alias Xcribe.Support.RequestsGenerator
 
   setup do
-    {:ok, %{config: %{information_source: Xcribe.Support.Information, json_library: Jason}}}
+    {:ok,
+     %{config: %{specification_source: "test/support/.simple_example.exs", json_library: Jason}}}
   end
 
   describe "encode/2" do
@@ -36,7 +37,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test"
+                           "title": "user 1"
                          }
 
                  + Schema
@@ -44,7 +45,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              }
                            },
@@ -59,7 +60,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test",
+                           "title": "user 1",
                            "users_id": "1"
                          }
 
@@ -68,7 +69,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              },
                              "users_id": {
@@ -173,7 +174,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              },
                              "users_id": {
@@ -228,7 +229,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test",
+                           "title": "user 1",
                            "users_id": "1"
                          }
 
@@ -292,7 +293,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test",
+                           "title": "user 1",
                            "users_id": "1"
                          }
 
@@ -301,7 +302,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              },
                              "users_id": {
@@ -344,7 +345,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test"
+                           "title": "user 1"
                          }
 
                  + Schema
@@ -352,7 +353,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              }
                            },
@@ -367,7 +368,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test",
+                           "title": "user 1",
                            "users_id": "1"
                          }
 
@@ -376,7 +377,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              },
                              "users_id": {
@@ -409,7 +410,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test"
+                           "title": "user 1"
                          }
 
                  + Schema
@@ -417,7 +418,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              }
                            },
@@ -432,7 +433,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test",
+                           "title": "user 1",
                            "users_id": "1"
                          }
 
@@ -441,7 +442,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              },
                              "users_id": {
@@ -535,7 +536,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test"
+                           "title": "user 1"
                          }
 
                  + Schema
@@ -543,7 +544,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              }
                            },
@@ -558,7 +559,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test",
+                           "title": "user 1",
                            "users_id": "1"
                          }
 
@@ -567,7 +568,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              },
                              "users_id": {
@@ -583,6 +584,22 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
   end
 
   describe "groups/2" do
+    test "emit groups in name order past the flatmap threshold" do
+      # Over 32 keys a map stops iterating in term order, so the encoder has to sort explicitly or
+      # adding one group reshuffles the whole document.
+      groups =
+        Map.new(1..40, fn index ->
+          {"Group #{String.pad_leading(to_string(index), 2, "0")}", %{resources: %{}}}
+        end)
+
+      output = APIB.groups(groups, %{json_library: Jason})
+
+      names = Regex.scan(~r/## Group (.+)\n/, output) |> Enum.map(fn [_, name] -> name end)
+
+      assert names == Enum.sort(names)
+      assert length(names) == 40
+    end
+
     test "return groups", %{config: config} do
       request_object =
         RequestsGenerator.users_posts_create()
@@ -607,7 +624,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test"
+                           "title": "user 1"
                          }
 
                  + Schema
@@ -615,7 +632,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              }
                            },
@@ -630,7 +647,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Body
 
                          {
-                           "title": "test",
+                           "title": "user 1",
                            "users_id": "1"
                          }
 
@@ -639,7 +656,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                          {
                            "properties": {
                              "title": {
-                               "example": "test",
+                               "example": "user 1",
                                "type": "string"
                              },
                              "users_id": {

@@ -1,543 +1,308 @@
 {
+  "info": {
+    "version": "1.0.0",
+    "description": "The description of the API",
+    "title": "Basic API"
+  },
   "components": {
-    "securitySchemes": {
-      "api_key": {
-        "in": "header",
-        "name": "authorization",
-        "type": "apiKey"
+    "schemas": {
+      "Users": {
+        "type": "object",
+        "properties": {
+          "age": { "type": "number", "format": "int32", "example": 5 },
+          "id": { "type": "number", "format": "int32", "example": 1 },
+          "name": { "type": "string", "example": "user 1" }
+        }
       },
-      "basic": {
-        "scheme": "basic",
-        "type": "http"
+      "UsersPosts": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "format": "int32", "example": 1 },
+          "title": { "type": "string", "example": "user 1" },
+          "users_id": { "type": "string", "example": "1" }
+        }
       },
-      "bearer": {
-        "bearerFormat": "JWT",
-        "scheme": "bearer",
-        "type": "http"
+      "createUsers": {
+        "type": "object",
+        "properties": {
+          "age": { "type": "number", "format": "int32", "example": 5 },
+          "name": { "type": "string", "example": "user 1" }
+        }
+      },
+      "createUsersPosts": {
+        "type": "object",
+        "properties": { "title": { "type": "string", "example": "user 1" } }
+      },
+      "updateUsers": {
+        "type": "object",
+        "properties": {
+          "age": { "type": "number", "format": "int32", "example": 5 },
+          "name": { "type": "string", "example": "user 1" }
+        }
+      },
+      "updateUsersPosts": {
+        "type": "object",
+        "properties": { "title": { "type": "string", "example": "user 1" } }
       }
+    },
+    "securitySchemes": {
+      "api_key": { "in": "header", "name": "authorization", "type": "apiKey" },
+      "basic": { "scheme": "basic", "type": "http" },
+      "bearer": { "scheme": "bearer", "type": "http", "bearerFormat": "JWT" }
     }
   },
-  "info": {
-    "description": "The description of the API",
-    "title": "Basic API",
-    "version": "1"
-  },
-  "openapi": "3.0.3",
   "paths": {
     "/users": {
       "get": {
-        "description": "",
+        "description": "show users",
         "parameters": [],
+        "tags": ["Users"],
+        "security": [{ "basic": [] }],
         "responses": {
           "200": {
+            "description": "",
+            "headers": { "cache-control": { "schema": { "type": "string" } } },
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "properties": {
-                      "id": {
-                        "example": 1,
-                        "format": "int32",
-                        "type": "number"
-                      },
-                      "name": {
-                        "example": "user 1",
-                        "type": "string"
-                      }
-                    },
-                    "type": "object"
-                  },
-                  "type": "array"
-                }
-              }
-            },
-            "description": "",
-            "headers": {
-              "cache-control": {
-                "description": "",
-                "schema": {
-                  "type": "string"
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Users" }
                 }
               }
             }
           }
-        },
-        "security": [
-          {
-            "basic": []
-          }
-        ],
-        "summary": "",
-        "tags": ["Users"]
+        }
       },
       "post": {
-        "description": "",
+        "description": "create user",
         "parameters": [],
+        "tags": ["Users"],
+        "security": [{ "bearer": [] }],
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {
-                "properties": {
-                  "age": {
-                    "example": 5,
-                    "format": "int32",
-                    "type": "number"
-                  },
-                  "name": {
-                    "example": "teste",
-                    "type": "string"
-                  }
-                },
-                "type": "object"
-              }
+              "schema": { "$ref": "#/components/schemas/createUsers" }
             }
-          },
-          "description": ""
+          }
         },
         "responses": {
           "201": {
+            "description": "",
+            "headers": { "cache-control": { "schema": { "type": "string" } } },
             "content": {
               "application/json": {
-                "schema": {
-                  "properties": {
-                    "age": {
-                      "example": 5,
-                      "format": "int32",
-                      "type": "number"
-                    },
-                    "name": {
-                      "example": "teste",
-                      "type": "string"
-                    }
-                  },
-                  "type": "object"
-                }
-              }
-            },
-            "description": "",
-            "headers": {
-              "cache-control": {
-                "description": "",
-                "schema": {
-                  "type": "string"
-                }
+                "schema": { "$ref": "#/components/schemas/Users" }
               }
             }
           }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "",
-        "tags": ["Users"]
+        }
       }
     },
     "/users/{id}": {
       "delete": {
-        "description": "",
+        "description": "delete user",
         "parameters": [
           {
-            "example": "1",
             "in": "path",
             "name": "id",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "string" },
+            "example": "1"
           }
         ],
+        "tags": ["Users"],
+        "security": [{ "bearer": [] }],
         "responses": {
           "204": {
             "description": "",
-            "headers": {
-              "cache-control": {
-                "description": "",
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "headers": { "cache-control": { "schema": { "type": "string" } } }
           }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "",
-        "tags": ["Users"]
+        }
       },
       "get": {
-        "description": "",
+        "description": "show user info",
         "parameters": [
           {
-            "example": "1",
             "in": "path",
             "name": "id",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "string" },
+            "example": "1"
           }
         ],
+        "tags": ["Users"],
+        "security": [{ "basic": [] }],
         "responses": {
           "200": {
+            "description": "",
+            "headers": { "cache-control": { "schema": { "type": "string" } } },
             "content": {
               "application/json": {
-                "schema": {
-                  "properties": {
-                    "id": {
-                      "example": 1,
-                      "format": "int32",
-                      "type": "number"
-                    },
-                    "name": {
-                      "example": "user 1",
-                      "type": "string"
-                    }
-                  },
-                  "type": "object"
-                }
-              }
-            },
-            "description": "",
-            "headers": {
-              "cache-control": {
-                "description": "",
-                "schema": {
-                  "type": "string"
-                }
+                "schema": { "$ref": "#/components/schemas/Users" }
               }
             }
           }
-        },
-        "security": [
-          {
-            "basic": []
-          }
-        ],
-        "summary": "",
-        "tags": ["Users"]
+        }
       },
       "put": {
-        "description": "",
+        "description": "update user",
         "parameters": [
           {
-            "example": "1",
             "in": "path",
             "name": "id",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "string" },
+            "example": "1"
           }
         ],
+        "tags": ["Users"],
+        "security": [{ "bearer": [] }],
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {
-                "properties": {
-                  "age": {
-                    "example": 5,
-                    "format": "int32",
-                    "type": "number"
-                  },
-                  "name": {
-                    "example": "teste",
-                    "type": "string"
-                  }
-                },
-                "type": "object"
-              }
+              "schema": { "$ref": "#/components/schemas/updateUsers" }
             }
-          },
-          "description": ""
+          }
         },
         "responses": {
           "200": {
+            "description": "",
+            "headers": { "cache-control": { "schema": { "type": "string" } } },
             "content": {
               "application/json": {
-                "schema": {
-                  "properties": {
-                    "age": {
-                      "example": 5,
-                      "format": "int32",
-                      "type": "number"
-                    },
-                    "name": {
-                      "example": "teste",
-                      "type": "string"
-                    }
-                  },
-                  "type": "object"
-                }
-              }
-            },
-            "description": "",
-            "headers": {
-              "cache-control": {
-                "description": "",
-                "schema": {
-                  "type": "string"
-                }
+                "schema": { "$ref": "#/components/schemas/Users" }
               }
             }
           }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "",
-        "tags": ["Users"]
+        }
       }
     },
     "/users/{users_id}/cancel": {
       "post": {
-        "description": "",
+        "description": "custom action with user",
         "parameters": [
           {
-            "example": "1",
             "in": "path",
             "name": "users_id",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "string" },
+            "example": "1"
           }
         ],
+        "tags": ["Users"],
+        "security": [{ "api_key": [] }],
         "responses": {
           "204": {
             "description": "",
-            "headers": {
-              "cache-control": {
-                "description": "",
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "headers": { "cache-control": { "schema": { "type": "string" } } }
           }
-        },
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "summary": "",
-        "tags": ["Users"]
+        }
       }
     },
     "/users/{users_id}/posts": {
       "get": {
-        "description": "",
+        "description": "show all user posts",
         "parameters": [
           {
-            "example": "1",
             "in": "path",
             "name": "users_id",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "string" },
+            "example": "1"
           }
         ],
+        "tags": ["Users Posts"],
+        "security": [{ "api_key": [] }],
         "responses": {
           "200": {
+            "description": "",
+            "headers": { "cache-control": { "schema": { "type": "string" } } },
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "properties": {
-                      "id": {
-                        "example": 1,
-                        "format": "int32",
-                        "type": "number"
-                      },
-                      "title": {
-                        "example": "user 1",
-                        "type": "string"
-                      }
-                    },
-                    "type": "object"
-                  },
-                  "type": "array"
-                }
-              }
-            },
-            "description": "",
-            "headers": {
-              "cache-control": {
-                "description": "",
-                "schema": {
-                  "type": "string"
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/UsersPosts" }
                 }
               }
             }
           }
-        },
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "summary": "",
-        "tags": ["Users Posts"]
+        }
       },
       "post": {
-        "description": "",
+        "description": "show user post",
         "parameters": [
           {
-            "example": "1",
             "in": "path",
             "name": "users_id",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "string" },
+            "example": "1"
           }
         ],
+        "tags": ["Users Posts"],
+        "security": [{ "api_key": [] }],
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {
-                "properties": {
-                  "title": {
-                    "example": "test",
-                    "type": "string"
-                  }
-                },
-                "type": "object"
-              }
+              "schema": { "$ref": "#/components/schemas/createUsersPosts" }
             }
-          },
-          "description": ""
+          }
         },
         "responses": {
           "201": {
+            "description": "",
+            "headers": { "cache-control": { "schema": { "type": "string" } } },
             "content": {
               "application/json": {
-                "schema": {
-                  "properties": {
-                    "title": {
-                      "example": "test",
-                      "type": "string"
-                    },
-                    "users_id": {
-                      "example": "1",
-                      "type": "string"
-                    }
-                  },
-                  "type": "object"
-                }
-              }
-            },
-            "description": "",
-            "headers": {
-              "cache-control": {
-                "description": "",
-                "schema": {
-                  "type": "string"
-                }
+                "schema": { "$ref": "#/components/schemas/UsersPosts" }
               }
             }
           }
-        },
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "summary": "",
-        "tags": ["Users Posts"]
+        }
       }
     },
     "/users/{users_id}/posts/{id}": {
       "patch": {
-        "description": "",
+        "description": "update user post",
         "parameters": [
           {
-            "example": "2",
             "in": "path",
             "name": "id",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "string" },
+            "example": "2"
           },
           {
-            "example": "1",
             "in": "path",
             "name": "users_id",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "string" },
+            "example": "1"
           }
         ],
+        "tags": ["Users Posts"],
+        "security": [{ "api_key": [] }],
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {
-                "properties": {
-                  "title": {
-                    "example": "test",
-                    "type": "string"
-                  }
-                },
-                "type": "object"
-              }
+              "schema": { "$ref": "#/components/schemas/updateUsersPosts" }
             }
-          },
-          "description": ""
+          }
         },
         "responses": {
           "200": {
+            "description": "",
+            "headers": { "cache-control": { "schema": { "type": "string" } } },
             "content": {
               "application/json": {
-                "schema": {
-                  "properties": {
-                    "title": {
-                      "example": "test",
-                      "type": "string"
-                    },
-                    "users_id": {
-                      "example": "1",
-                      "type": "string"
-                    }
-                  },
-                  "type": "object"
-                }
-              }
-            },
-            "description": "",
-            "headers": {
-              "cache-control": {
-                "description": "",
-                "schema": {
-                  "type": "string"
-                }
+                "schema": { "$ref": "#/components/schemas/UsersPosts" }
               }
             }
           }
-        },
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "summary": "",
-        "tags": ["Users Posts"]
+        }
       }
     }
   },
-  "servers": [
-    {
-      "description": "",
-      "url": "http://my-api.com"
-    }
-  ]
+  "servers": [{ "url": "http://my-api.com" }],
+  "openapi": "3.0.3"
 }

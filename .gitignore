@@ -12,3 +12,9 @@ api_bluefy-*.tar
 
 # Claude Code
 /.claude/settings.local.json
+
+# Xcribe generated specification file
+/.xcribe.exs
+
+# ExUnit tmp_dir
+/tmp/

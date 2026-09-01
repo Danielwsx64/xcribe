@@ -19,6 +19,11 @@ in [config.md](config.md).
   **Never drop `__meta__`.** It carries `%{call: %{description:, file:, line:}}` from the
   `document/2` call site, which is the only way `Xcribe.CLI.Output` can point the user at the
   failing line in *their* test file.
+- **The consumer's `.xcribe.exs` cannot be read** → raise `Xcribe.SpecificationFile`. This is the
+  one place a *consumer* mistake raises rather than returning a tuple, because the specification
+  file is read from deep inside a format orchestrator, after config validation has already passed.
+  `Xcribe.document/2` rescues it and `Xcribe.CLI.Output.print_specification_error/1` prints it, so
+  the consumer still sees an error box rather than a stacktrace.
 - **A bug — in xcribe, or in the consumer's doc code** → raise, and wrap it at the format
   orchestrator boundary so the offending request travels with the exception:
 
@@ -44,7 +49,7 @@ in [config.md](config.md).
   This is not hypothetical: a broad rescue is exactly what turned the Phoenix 1.8
   `__match_route__/3` argument swap into a silent "couldn't parse" for every request. See
   [dependencies.md](dependencies.md).
-- `lib/` contains five `rescue` blocks. Adding a sixth needs a reason; converting one to a
+- `lib/` contains six `rescue` blocks. Adding a seventh needs a reason; converting one to a
   catch-all needs a very good one.
 
 ## Exceptions and reporting

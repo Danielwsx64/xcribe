@@ -21,6 +21,26 @@ defmodule Xcribe.Support.RequestsGenerator do
     |> Map.put(:__meta__, %{})
   end
 
+  def notes_index(opts \\ []) do
+    conn = conn()
+
+    conn
+    |> put_needed_headers(opts)
+    |> ConnTest.get(notes_path(conn, :index))
+    |> ConnParser.execute(Keyword.put_new(opts, :description, "show notes"))
+    |> Map.put(:__meta__, %{})
+  end
+
+  def namespaced_users_index(opts \\ []) do
+    conn = conn()
+
+    conn
+    |> put_needed_headers(opts)
+    |> ConnTest.get(namespaced_users_path(conn, :index))
+    |> ConnParser.execute(Keyword.put_new(opts, :description, "show namespaced users"))
+    |> Map.put(:__meta__, %{})
+  end
+
   def users_index(opts \\ []) do
     conn = conn()
 
@@ -46,7 +66,7 @@ defmodule Xcribe.Support.RequestsGenerator do
 
     conn
     |> put_needed_headers(opts)
-    |> ConnTest.post(users_path(conn, :create), %{name: "teste", age: 5})
+    |> ConnTest.post(users_path(conn, :create), %{name: "user 1", age: 5})
     |> ConnParser.execute(Keyword.put_new(opts, :description, "create user"))
     |> Map.put(:__meta__, %{})
   end
@@ -56,7 +76,7 @@ defmodule Xcribe.Support.RequestsGenerator do
 
     conn
     |> put_needed_headers(opts)
-    |> ConnTest.put(users_path(conn, :update, 1), %{name: "teste", age: 5})
+    |> ConnTest.put(users_path(conn, :update, 1), %{name: "user 1", age: 5})
     |> ConnParser.execute(Keyword.put_new(opts, :description, "update user"))
     |> Map.put(:__meta__, %{})
   end
@@ -96,7 +116,7 @@ defmodule Xcribe.Support.RequestsGenerator do
 
     conn
     |> put_needed_headers(opts)
-    |> ConnTest.post(users_posts_path(conn, :create, 1), %{title: "test"})
+    |> ConnTest.post(users_posts_path(conn, :create, 1), %{title: "user 1"})
     |> ConnParser.execute(Keyword.put_new(opts, :description, "show user post"))
     |> Map.put(:__meta__, %{})
   end
@@ -106,7 +126,7 @@ defmodule Xcribe.Support.RequestsGenerator do
 
     conn
     |> put_needed_headers(opts)
-    |> ConnTest.patch(users_posts_path(conn, :update, 1, 2), %{title: "test"})
+    |> ConnTest.patch(users_posts_path(conn, :update, 1, 2), %{title: "user 1"})
     |> ConnParser.execute(Keyword.put_new(opts, :description, "update user post"))
     |> Map.put(:__meta__, %{})
   end

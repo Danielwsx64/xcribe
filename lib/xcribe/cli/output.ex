@@ -21,7 +21,7 @@ defmodule Xcribe.CLI.Output do
 
   @bar_size 95
 
-  alias Xcribe.DocException
+  alias Xcribe.{DocException, SpecificationFile}
 
   def print_message(message, type \\ :ok) when is_binary(message) do
     color = if type == :error, do: @red, else: @cyan
@@ -53,6 +53,19 @@ defmodule Xcribe.CLI.Output do
     print_header_error("[ Xcribe ] Configuration errors", @bg_green)
 
     Enum.each(errors, &print_error/1)
+  end
+
+  def print_specification_error(%SpecificationFile{message: message}) do
+    print_header_error("[ Xcribe ] Specification file errors", @bg_green)
+
+    IO.puts("""
+    #{tab(@green)}
+    #{tab(@green)} [S] → #{@blue} #{message}
+    #{tab(@dark_green)}
+    #{tab(@dark_green)} #{@dark_green}The specification file must be an Elixir file evaluating to a map.
+    #{tab(@dark_green)} #{@dark_green}Run `mix xcribe.gen.spec` to generate a valid one.
+    #{tab(@dark_green)}
+    """)
   end
 
   def print_file_errors({file_path, reason}) do

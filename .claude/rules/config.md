@@ -12,7 +12,7 @@ flows is [architecture.md](architecture.md); the error tuple it returns is [erro
 
   read with `Xcribe.Config.fetch_config/1`, which normalizes the keyword list into a **map with
   every default already applied** (`format: :swagger`, `json_library: Jason`,
-  `output:` per format, `serve: false`, `information_source: nil`).
+  `output:` per format, `serve: false`, `specification_source: ".xcribe.exs"`).
 - **Every other module receives that map as a trailing `config` argument and pattern-matches
   only the keys it needs** — the argument name is the documentation:
 
