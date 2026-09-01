@@ -203,4 +203,40 @@ defmodule Xcribe.SchemaTest do
       assert Schema.merge(base_schemas, new_schema) == expected
     end
   end
+
+  describe "merge_schema/2" do
+    test "merge two object schemas without properties" do
+      base = %{type: "object", description: "A user"}
+      new = %{type: "object", title: "Users"}
+
+      # Only `properties` is merged for an object; the base keeps every other key it declared.
+      assert Schema.merge_schema(base, new) == %{
+               type: "object",
+               description: "A user",
+               properties: %{}
+             }
+    end
+
+    test "keep a hand written description while taking generated properties" do
+      base = %{type: "object", description: "Every user in the account"}
+      new = %{type: "object", properties: %{"id" => %{type: "number", example: 1}}}
+
+      assert Schema.merge_schema(base, new) == %{
+               type: "object",
+               description: "Every user in the account",
+               properties: %{"id" => %{type: "number", example: 1}}
+             }
+    end
+
+    test "merge two array schemas without items" do
+      assert Schema.merge_schema(%{type: "array"}, %{type: "array"}) == %{
+               type: "array",
+               items: %{}
+             }
+    end
+
+    test "a schema of a different type replaces the base" do
+      assert Schema.merge_schema(%{type: "object"}, %{type: "string"}) == %{type: "string"}
+    end
+  end
 end

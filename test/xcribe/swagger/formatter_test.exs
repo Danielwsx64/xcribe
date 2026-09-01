@@ -3,7 +3,6 @@ defmodule Xcribe.Swagger.FormatterTest do
 
   alias Plug.Upload
   alias Xcribe.Request
-  alias Xcribe.Specification
   alias Xcribe.Swagger.Formatter
 
   describe "openapi_object/1" do
@@ -27,10 +26,9 @@ defmodule Xcribe.Swagger.FormatterTest do
     end
   end
 
-  describe "request_objects/1" do
+  describe "request_objects/2" do
     test "request as a fully openapi path specification" do
       config = %{specification_source: "test/support/.xcribe.exs", json_library: Jason}
-      spec = Specification.api_specification(config)
 
       request = %Request{
         path: "/users",
@@ -108,7 +106,7 @@ defmodule Xcribe.Swagger.FormatterTest do
         "api_key" => %{"in" => "header", "name" => "authorization", "type" => "apiKey"}
       }
 
-      assert Formatter.request_objects(request, spec, config) == %{
+      assert Formatter.request_objects(request, config) == %{
                path: path,
                schemas: schemas,
                security: security
@@ -117,7 +115,6 @@ defmodule Xcribe.Swagger.FormatterTest do
 
     test "with request body" do
       config = %{specification_source: "test/support/.xcribe.exs", json_library: Jason}
-      spec = Specification.api_specification(config)
 
       request = %Request{
         path: "/users",
@@ -175,7 +172,7 @@ defmodule Xcribe.Swagger.FormatterTest do
 
       security = %{}
 
-      assert Formatter.request_objects(request, spec, config) == %{
+      assert Formatter.request_objects(request, config) == %{
                path: path,
                schemas: schemas,
                security: security
@@ -184,7 +181,6 @@ defmodule Xcribe.Swagger.FormatterTest do
 
     test "when has a 204 with no content" do
       config = %{specification_source: "test/support/.xcribe.exs", json_library: Jason}
-      spec = Specification.api_specification(config)
 
       request = %Request{
         path: "/users/{id}",
@@ -223,7 +219,7 @@ defmodule Xcribe.Swagger.FormatterTest do
         }
       }
 
-      assert Formatter.request_objects(request, spec, config) == %{
+      assert Formatter.request_objects(request, config) == %{
                path: path,
                schemas: schemas,
                security: security
@@ -232,7 +228,6 @@ defmodule Xcribe.Swagger.FormatterTest do
 
     test "with upload body" do
       config = %{specification_source: "test/support/.xcribe.exs", json_library: Jason}
-      spec = Specification.api_specification(config)
 
       request = %Request{
         path: "/users",
@@ -301,7 +296,7 @@ defmodule Xcribe.Swagger.FormatterTest do
         }
       }
 
-      assert Formatter.request_objects(request, spec, config) == %{
+      assert Formatter.request_objects(request, config) == %{
                path: path,
                schemas: schemas,
                security: security

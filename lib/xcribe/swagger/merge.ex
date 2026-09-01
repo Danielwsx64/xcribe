@@ -9,6 +9,19 @@ defmodule Xcribe.Swagger.Merge do
     end)
   end
 
+  @doc """
+  Overlay the path items authored in the specification file onto the generated ones.
+
+  A value from the specification always wins; a generated value survives wherever the
+  specification is silent. A path or verb the specification names but no test documented is added
+  as-is, so an endpoint without a test can still be described.
+  """
+  def overlay_paths(generated, specified) do
+    Enum.reduce(specified, generated, fn {path, verbs}, all ->
+      Map.update(all, path, verbs, &overlay_verbs(&1, verbs))
+    end)
+  end
+
   def parameters([], new), do: new
   def parameters(base, []), do: base
 
@@ -19,6 +32,7 @@ defmodule Xcribe.Swagger.Merge do
       Map.update(all, name, param, &merge_params(&1, param))
     end)
     |> Map.values()
+    |> Enum.sort(&(&1.name < &2.name))
   end
 
   def responses(base, new) do
@@ -26,6 +40,20 @@ defmodule Xcribe.Swagger.Merge do
       Map.update(all, status, response, &merge_response(&1, response))
     end)
   end
+
+  defp overlay_verbs(generated, specified) do
+    Enum.reduce(specified, generated, fn {verb, object}, all ->
+      Map.update(all, verb, object, &overlay(&1, object))
+    end)
+  end
+
+  defp overlay(base, new) when is_map(base) and is_map(new) do
+    Enum.reduce(new, base, fn {key, value}, acc ->
+      Map.update(acc, key, value, &overlay(&1, value))
+    end)
+  end
+
+  defp overlay(_base, new), do: new
 
   defp merge_verbs(base, new) do
     Enum.reduce(new, base, fn {name, verb}, all ->
@@ -89,7 +117,7 @@ defmodule Xcribe.Swagger.Merge do
   end
 
   defp merge_content_schema(%{schema: %{oneOf: schemas}}, %{schema: new}) do
-    %{schema: %{oneOf: Enum.uniq_by([new | schemas], & &1["$ref"])}}
+    %{schema: %{oneOf: one_of([new | schemas])}}
   end
 
   defp merge_content_schema(%{schema: s} = base, %{schema: s} = _new) do
@@ -97,14 +125,16 @@ defmodule Xcribe.Swagger.Merge do
   end
 
   defp merge_content_schema(%{schema: base}, %{schema: new}) do
-    %{schema: %{oneOf: [base, new]}}
+    %{schema: %{oneOf: one_of([base, new])}}
   end
+
+  defp one_of(schemas), do: schemas |> Enum.uniq() |> Enum.sort()
 
   defp merge_params(%{schema: %{type: "object"}} = base, %{schema: %{type: "object"}} = new) do
     %{
       base
       | example: Map.merge(Map.get(base, :example, %{}), new.example),
-        schema: Schema.merge(Map.get(base, :schema, %{}), new.schema)
+        schema: Schema.merge_schema(Map.get(base, :schema, %{}), new.schema)
     }
   end
 

@@ -3,7 +3,7 @@ defmodule XcribeTest do
 
   import ExUnit.CaptureIO
 
-  alias Xcribe.{DocException, Request, Request.Error}
+  alias Xcribe.{DocException, Request, Request.Error, SpecificationFile}
 
   alias Xcribe.Support.RequestsGenerator
 
@@ -21,9 +21,9 @@ defmodule XcribeTest do
   end
 
   describe "document/2" do
-    test "write documentation with swagger format" do
-      # TODO: use exunit temp dir instead of this
-      output_path = "/tmp/xcribe_test_#{:rand.uniform()}"
+    @tag :tmp_dir
+    test "write documentation with swagger format", %{tmp_dir: tmp_dir} do
+      output_path = Path.join(tmp_dir, "openapi.json")
 
       records = [
         RequestsGenerator.users_index([:basic_auth]),
@@ -55,8 +55,9 @@ defmodule XcribeTest do
                Jason.decode!(@sample_swagger_output)
     end
 
-    test "write documentation with api_blueprint format" do
-      output_path = "/tmp/xcribe_test_#{:rand.uniform()}"
+    @tag :tmp_dir
+    test "write documentation with api_blueprint format", %{tmp_dir: tmp_dir} do
+      output_path = Path.join(tmp_dir, "api_doc.apib")
 
       records = [
         RequestsGenerator.users_index([:basic_auth]),
@@ -85,6 +86,56 @@ defmodule XcribeTest do
       assert io_output =~ "Xcribe documentation written in"
 
       assert File.read!(output_path) == @sample_apib_output
+    end
+
+    @tag :tmp_dir
+    test "handle an unreadable specification file", %{tmp_dir: tmp_dir} do
+      spec_file = Path.join(tmp_dir, ".xcribe.exs")
+      File.write!(spec_file, ~s(%{\n  "missing_comma" => 1\n  "missing_comma" => 2\n}\n))
+
+      records = [RequestsGenerator.users_index()]
+
+      config = %{
+        format: :swagger,
+        specification_source: spec_file,
+        json_library: Jason,
+        output: Path.join(tmp_dir, "openapi.json")
+      }
+
+      assert {:error, %SpecificationFile{message: message}} = Xcribe.document(records, config)
+      assert message =~ "invalid Elixir syntax"
+    end
+
+    @tag :tmp_dir
+    test "report a missing specification file instead of raising", %{tmp_dir: tmp_dir} do
+      records = [RequestsGenerator.users_index()]
+
+      config = %{
+        format: :swagger,
+        specification_source: ".not_there.exs",
+        json_library: Jason,
+        output: Path.join(tmp_dir, "openapi.json")
+      }
+
+      assert {:error, %SpecificationFile{message: message}} = Xcribe.document(records, config)
+      assert message == "File not found .not_there.exs"
+    end
+
+    @tag :tmp_dir
+    test "report an unwritable output file without crashing", %{tmp_dir: tmp_dir} do
+      records = [RequestsGenerator.users_index()]
+
+      config = %{
+        format: :swagger,
+        specification_source: "test/support/.simple_example.exs",
+        json_library: Jason,
+        output: tmp_dir
+      }
+
+      output = capture_io(fn -> assert Xcribe.document(records, config) == :error end)
+
+      assert output =~ "Output file errors"
+      assert output =~ "Could not write to #{tmp_dir}"
     end
 
     test "handle  validation errors" do

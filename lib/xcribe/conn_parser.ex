@@ -55,13 +55,12 @@ defmodule Xcribe.ConnParser do
   end
 
   defp add_schemas(request, opts) do
-    %{request | schema: schema_name(opts), req_schema: req_schema_name(opts)}
-  rescue
-    _ ->
-      %{
-        @error_struct
-        | message: "An invalid schema name was given. Schema names MUST be an String.t()"
-      }
+    with {:ok, schema} <- schema_name(opts, :schema),
+         {:ok, req_schema} <- schema_name(opts, :req_schema) do
+      %{request | schema: schema, req_schema: req_schema}
+    else
+      {:error, error} -> error
+    end
   end
 
   defp build_opts(opts), do: Keyword.put_new(opts, :description, "")
@@ -109,25 +108,16 @@ defmodule Xcribe.ConnParser do
 
   defp transform_param(param, path), do: String.replace(path, ":#{param}", "{#{param}}")
 
-  defp schema_name(opts) do
-    opts
-    |> Keyword.get(:schema)
-    |> case do
-      nil -> nil
-      {:module, schema} -> replace_s(schema)
-      schema -> replace_s(schema)
-    end
-  end
+  @invalid_schema_message "An invalid schema name was given. Schema names MUST be an String.t()"
 
-  defp req_schema_name(opts) do
-    opts
-    |> Keyword.get(:req_schema)
-    |> case do
-      nil -> nil
-      {:module, schema} -> replace_s(schema)
-      schema -> replace_s(schema)
-    end
-  end
+  defp schema_name(opts, key), do: opts |> Keyword.get(key) |> validate_schema_name()
 
-  defp replace_s(string), do: String.replace(string, " ", "")
+  defp validate_schema_name(nil), do: {:ok, nil}
+
+  # Schema names become OpenAPI component keys, which cannot contain spaces.
+  defp validate_schema_name(name) when is_binary(name),
+    do: {:ok, String.replace(name, " ", "")}
+
+  defp validate_schema_name(_name),
+    do: {:error, %{@error_struct | message: @invalid_schema_message}}
 end

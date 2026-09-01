@@ -155,6 +155,18 @@ defmodule Xcribe.CLI.OutputTest do
     end
   end
 
+  describe "print_specification_error/1" do
+    test "print the specification file error" do
+      error = %Xcribe.SpecificationFile{message: "File not found .missing.exs"}
+
+      output = capture_io(fn -> Output.print_specification_error(error) end)
+
+      assert output =~ "Specification file errors"
+      assert output =~ "File not found .missing.exs"
+      assert output =~ "mix xcribe.gen.spec"
+    end
+  end
+
   describe "print_file_errors/1" do
     test "prints output file erro message" do
       expected_output = """

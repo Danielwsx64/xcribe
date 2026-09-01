@@ -15,7 +15,7 @@ change — never defer tests. Coverage is reported to Codecov by CI.
   formatted code, and it is **not** public API ([public-api.md](public-api.md)).
 - Infrastructure fakes are named bare `Xcribe.*` (`Xcribe.Endpoint`, `Xcribe.WebRouter`,
   `Xcribe.ConnCase`, `Xcribe.UsersController`); data builders and helpers are `Xcribe.Support.*`
-  (`Xcribe.Support.RequestsGenerator`, `Xcribe.Support.Information`).
+  (`Xcribe.Support.RequestsGenerator`).
 
 ## Structure
 
@@ -35,7 +35,7 @@ change — never defer tests. Coverage is reported to Codecov by CI.
 
 - **There is no mocking library** — no mox, no Mimic, no meck. Do not add one. Two substitutes:
   - **Inline `defmodule Fake*` modules at the top of the test file** — `FakeEndpoint`,
-    `FakeProject`, `FakeProjectNonUmbrella`, `FakeInformation`. Each implements only the
+    `FakeProject`, `FakeProjectNonUmbrella`. Each implements only the
     function the code under test reflects on.
   - **Pass a function into an injected argument** (see [control-flow.md](control-flow.md)):
 

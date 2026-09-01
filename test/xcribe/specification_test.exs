@@ -1,6 +1,7 @@
 defmodule Xcribe.SpecificationTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
+  alias Xcribe.Config
   alias Xcribe.Specification
   alias Xcribe.SpecificationFile
 
@@ -37,9 +38,9 @@ defmodule Xcribe.SpecificationTest do
                name: "API Documentation",
                paths: %{},
                schemas: %{},
-               ignore_namespaces: ["/v1"],
+               ignore_namespaces: [],
                ignore_resources_prefix: [],
-               servers: [%{url: "https://api.xcribe.com/v1"}],
+               servers: [%{url: "http://localhost:4000"}],
                version: "1.0.0"
              }
     end
@@ -47,46 +48,98 @@ defmodule Xcribe.SpecificationTest do
     test "merge specific ignored namespaces with namespaces from servers urls" do
       config = %{specification_source: "test/support/.name_spaces_example.exs"}
 
-      assert %{
-               ignore_namespaces: ["/v1", "/sandbox/v1", "api", "v1"],
-               servers: [
-                 %{url: "https://api.xcribe.com/v1"},
-                 %{url: "https://sandbox.xcribe.com/sandbox/v1"}
-               ]
-             } = Specification.api_specification(config)
-    end
-
-    test "merge empty map when default file does not exist" do
-      config = %{specification_source: ".xcribe.exs"}
-
+      # Slash-less entries in the file gain a leading slash, and the list is ordered longest first
+      # so a shorter namespace cannot strip part of a longer one.
       assert Specification.api_specification(config) == %{
                description: "",
-               ignore_namespaces: ["/v1"],
-               ignore_resources_prefix: [],
                name: "API Documentation",
                paths: %{},
                schemas: %{},
-               servers: [%{url: "https://api.xcribe.com/v1"}],
+               ignore_namespaces: ["/sandbox/v1", "/api", "/v1"],
+               ignore_resources_prefix: [],
+               servers: [
+                 %{url: "https://api.xcribe.com/v1"},
+                 %{url: "https://sandbox.xcribe.com/sandbox/v1"}
+               ],
                version: "1.0.0"
              }
     end
 
-    test "raise error when file has invalid sintax" do
-      config = %{specification_source: "test/support/.invalid_sintax.exs"}
+    test "merge empty map when default file does not exist" do
+      config = %{specification_source: Config.default_spec_file()}
 
-      assert_raise SpecificationFile,
-                   ~r"Specification file has invalid Elixir syntax. Check: test/support/.invalid_sintax.exs",
-                   fn ->
-                     Specification.api_specification(config)
-                   end
+      refute File.exists?(config.specification_source),
+             "this test asserts the defaults, so the repository must not carry a spec file"
+
+      assert Specification.api_specification(config) == %{
+               description: "",
+               ignore_namespaces: [],
+               ignore_resources_prefix: [],
+               name: "API Documentation",
+               paths: %{},
+               schemas: %{},
+               servers: [%{url: "http://localhost:4000"}],
+               version: "1.0.0"
+             }
     end
 
-    test "raise error when file does not exist" do
+    @tag :tmp_dir
+    test "raise error when file has invalid syntax", %{tmp_dir: tmp_dir} do
+      file = Path.join(tmp_dir, ".xcribe.exs")
+      File.write!(file, ~s(%{\n  "missing_comma" => 1\n  "missing_comma" => 2\n}\n))
+
+      config = %{specification_source: file}
+
+      assert_raise SpecificationFile,
+                   ~r"Specification file has invalid Elixir syntax\. Check: #{file}",
+                   fn -> Specification.api_specification(config) end
+    end
+
+    @tag :tmp_dir
+    test "raise error when file does not evaluate to a map", %{tmp_dir: tmp_dir} do
+      file = Path.join(tmp_dir, ".xcribe.exs")
+      File.write!(file, ~s([name: "API"]\n))
+
+      config = %{specification_source: file}
+
+      assert_raise SpecificationFile,
+                   ~r"Specification file must evaluate to a map\. Check: #{file}",
+                   fn -> Specification.api_specification(config) end
+    end
+
+    @tag :tmp_dir
+    test "raise error when a server has no url", %{tmp_dir: tmp_dir} do
+      file = Path.join(tmp_dir, ".xcribe.exs")
+      File.write!(file, ~s(%{servers: [%{"url" => "http://my-api.com"}]}\n))
+
+      config = %{specification_source: file}
+
+      assert_raise SpecificationFile,
+                   ~r"Every entry in `servers` must be a map with a `:url` string",
+                   fn -> Specification.api_specification(config) end
+    end
+
+    test "raise when a configured file does not exist, guarding skipped config validation" do
       config = %{specification_source: "test/support/.not_exists.exs"}
 
       assert_raise SpecificationFile, "File not found test/support/.not_exists.exs", fn ->
         Specification.api_specification(config)
       end
+    end
+  end
+
+  describe "defaults/0" do
+    test "return the normalized specification with no file involved" do
+      assert Specification.defaults() == %{
+               description: "",
+               name: "API Documentation",
+               paths: %{},
+               schemas: %{},
+               ignore_namespaces: [],
+               ignore_resources_prefix: [],
+               servers: [%{url: "http://localhost:4000"}],
+               version: "1.0.0"
+             }
     end
   end
 end

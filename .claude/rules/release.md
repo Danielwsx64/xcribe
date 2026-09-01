@@ -19,7 +19,7 @@ version is public forever. What counts as breaking is [public-api.md](public-api
   plus its compare links. **Never hand-edit `@version`**; the three files drift silently and
   nothing catches it.
 - **SemVer against the public API, strictly.** Major: breaking a documented config key, the
-  `document/2` signature, the `Xcribe.Information` DSL, the generated output shape, or dropping
+  `document/2` signature, a documented `.xcribe.exs` key, the generated output shape, or dropping
   an Elixir/OTP/Phoenix/Plug version ([dependencies.md](dependencies.md)). Minor: a new config
   key with a default, a new output format, a new documented capability. Patch: everything else.
 - **Merging a PR to `master` runs `mix hex.publish --yes` and creates the `vX.Y.Z` tag.** The

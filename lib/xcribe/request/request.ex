@@ -69,6 +69,8 @@ defmodule Xcribe.Request do
     }
   end
 
+  # Only a lone tag is rewritten, because that is the one Xcribe derived from the resource name. A
+  # list the consumer wrote by hand through `tags:` or `@xcribe_tags` is left exactly as given.
   defp replace_for_tags([tag], prefix), do: [replace_and_trim(tag, prefix)]
   defp replace_for_tags(tags, _prefix), do: tags
 
@@ -81,8 +83,7 @@ defmodule Xcribe.Request do
   defp format(prefix) do
     prefix
     |> String.split(~r"[/_]")
-    |> Enum.map(&String.capitalize(&1))
-    |> Enum.join("\s")
+    |> Enum.map_join("\s", &String.capitalize(&1))
     |> String.trim()
   end
 end

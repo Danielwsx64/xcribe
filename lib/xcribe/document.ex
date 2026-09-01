@@ -36,7 +36,7 @@ defmodule Xcribe.Document do
         ...
       end
 
-  You can remove default  groups tags by passing the option `tags` with value false
+  You can remove the default group tags by passing the option `tags` with value false
 
       test "test name", %{conn: conn} do
         ...
@@ -66,10 +66,14 @@ defmodule Xcribe.Document do
         ...
       end
 
-  You also can use module attributes to define tags and schemas insite a test file.
-  It works to single tests, describes and all file
+  In the Swagger format a schema name becomes a key under `components.schemas`, referenced with
+  `$ref`. API Blueprint has no component section, so the name surfaces as the JSON Schema `title`
+  of the request or response instead.
 
-      Module YourAppTest do
+  You also can use module attributes to define tags and schemas inside a test file.
+  They apply to a single test, to a `describe` block, or to the whole file
+
+      defmodule YourAppTest do
         use ExUnit.Case
 
         @xcribe_tags ["Authenticated API"]
@@ -134,21 +138,8 @@ defmodule Xcribe.Document do
         tags -> List.wrap(tags)
       end
 
-    schema =
-      opts
-      |> Keyword.get(:schema, {:module, Module.get_attribute(module, :xcribe_schema)})
-      |> case do
-        {:module, nil} -> nil
-        other -> other
-      end
-
-    req_schema =
-      opts
-      |> Keyword.get(:req_schema, {:module, Module.get_attribute(module, :xcribe_req_schema)})
-      |> case do
-        {:module, nil} -> nil
-        other -> other
-      end
+    schema = Keyword.get(opts, :schema, Module.get_attribute(module, :xcribe_schema))
+    req_schema = Keyword.get(opts, :req_schema, Module.get_attribute(module, :xcribe_req_schema))
 
     [
       description: description,

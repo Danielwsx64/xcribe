@@ -8,7 +8,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   import Xcribe.Helpers.Formatter
 
   def put_object_into_groups(requests_map, request) do
-    Enum.reduce(request.groups, requests_map, fn group, requests ->
+    Enum.reduce(groups_of(request), requests_map, fn group, requests ->
       Map.update(
         requests,
         group,
@@ -18,33 +18,33 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     end)
   end
 
-  def full_request_object(%Request{} = request) do
+  def full_request_object(%Request{} = request, action_description \\ "") do
     %{
       summary: "",
       description: "",
       groups: request.groups_tags,
-      resources: resource_object(request)
+      resources: resource_object(request, action_description)
     }
   end
 
-  def resource_object(%Request{resource: resource} = request) do
+  def resource_object(%Request{resource: resource} = request, action_description \\ "") do
     %{
       resource_key(request) => %{
         name: resource,
         summary: "",
         description: "",
         parameters: resource_parameters(request),
-        actions: action_object(request)
+        actions: action_object(request, action_description)
       }
     }
   end
 
-  def action_object(%Request{} = request) do
+  def action_object(%Request{} = request, action_description \\ "") do
     %{
       action_key(request) => %{
         name: action_name(request),
         summary: "",
-        description: "",
+        description: action_description,
         parameters: action_parameters(request),
         query_parameters: action_query_parameters(request),
         requests: request_object(request)
@@ -88,10 +88,10 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     |> Enum.reduce(%{}, &reduce_path_params/2)
   end
 
-  def response_schema(%Request{__meta__: meta, resp_body: body, resp_headers: headers}) do
+  def response_schema(%Request{__meta__: meta, resp_body: body, resp_headers: headers} = request) do
     content_type = content_type(headers)
 
-    json_schema_for(content_type, response_content(body, content_type, meta))
+    json_schema_for(content_type, response_content(body, content_type, meta), request.schema)
   end
 
   def response_body(%Request{__meta__: %{config: config}, resp_body: body, resp_headers: headers}) do
@@ -103,10 +103,10 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   def request_schema(%Request{request_body: body}) when body == %{}, do: %{}
 
-  def request_schema(%Request{request_body: body, header_params: headers}) do
+  def request_schema(%Request{request_body: body, header_params: headers} = request) do
     headers
     |> content_type()
-    |> json_schema_for(body)
+    |> json_schema_for(body, request.req_schema)
   end
 
   def request_body(%Request{request_body: body}) when body == %{}, do: %{}
@@ -187,10 +187,13 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     |> List.last()
   end
 
-  defp json_schema_for("application/json", body) when is_map(body) or is_list(body),
-    do: JsonSchema.schema_for(body)
+  defp groups_of(%{groups: []}), do: [""]
+  defp groups_of(%{groups: groups}), do: groups
 
-  defp json_schema_for(_content_type, _body), do: %{}
+  defp json_schema_for("application/json", body, name) when is_map(body) or is_list(body),
+    do: JsonSchema.schema_for({name, body})
+
+  defp json_schema_for(_content_type, _body, _name), do: %{}
 
   defp body_data_for("multipart/form-data", headers, body) when is_map(body) do
     %Multipart{

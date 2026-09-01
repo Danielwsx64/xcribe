@@ -7,18 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
+### Added
 
-- Route matching against Phoenix 1.8. The private router function xcribe uses to
-  resolve a route swapped its argument order in Phoenix 1.8, which made every
-  request fail to parse. The `rescue` around the call was also narrowed so a future
-  signature change surfaces instead of being reported as a generic parsing error.
-- Generated JSON now has a stable key order. Object keys were inherited from the
-  iteration order of maps with atom keys, which is arbitrary and changes between
-  Elixir/OTP releases.
+- A specification file, `.xcribe.exs`, replaces the `Xcribe.Information` module as the place your
+  API's title, description, version and servers are declared. It is plain Elixir evaluating to a
+  map, so it needs no compilation and no `use` — and it is optional, since Xcribe falls back to
+  defaults. `mix xcribe.gen.spec` writes a starting point, and `--output` puts it somewhere other
+  than the project root. See `Xcribe.Specification`.
+- The specification file's `paths:` key lets you write documentation Xcribe cannot infer from a
+  test: a description for a route, or a whole route your suite never exercises. Values you author
+  there win over the generated ones. Swagger accepts a full OpenAPI Path Item Object; API Blueprint
+  has no equivalent structure and reads only `description`.
+- The specification file's `schemas:` key seeds `components.schemas`, so hand-written component
+  schemas survive alongside the ones derived from your responses. Swagger only.
+- `ignore_namespaces:` and `ignore_resources_prefix:` strip routing noise out of the generated
+  document. An app that mounts everything under `/api/v1` no longer gets that prefix repeated in
+  every path, group tag and schema name. The path of each configured server is stripped
+  automatically, and longer prefixes are applied first so a short one cannot leave a fragment
+  behind.
+- `document/2` accepts `schema:` and `req_schema:` to name the response and request schemas of a
+  route, and the `@xcribe_schema` / `@xcribe_req_schema` module attributes do the same for a whole
+  test file. In Swagger the name becomes a `components.schemas` key referenced by `$ref`, which
+  removes the schema duplication that made large documents unreadable. API Blueprint has no
+  component section, so the name surfaces as the JSON Schema `title`.
+- `document/2` accepts `tags: false` to document a route without a group tag, for endpoints that do
+  not belong in any group.
+- The `:specification_source` config key points at the specification file. Default `".xcribe.exs"`.
 
 ### Changed
 
+- **Breaking.** `Xcribe.Information`, the `xcribe_info` DSL and the `information_source` config key
+  are removed. They required consumers to compile a module whose only job was to hold static text,
+  and the DSL had to be re-learned to change an API description. Run `mix xcribe.gen.spec` and move
+  the values across to `.xcribe.exs`.
+- **Breaking.** The generated Swagger document now references named schemas under
+  `components.schemas` with `$ref` instead of inlining a copy into every operation, and no longer
+  emits the always-empty `summary` field on operations. Both change a committed document's diff, so
+  expect one large diff on first regeneration.
+- Resource names now split on underscores, so a route mounted under `/namespace_with_underscore`
+  reads as `Namespace With Underscore` rather than as a single run-together word.
 - Requires Elixir 1.18+, Erlang/OTP 27+, Phoenix 1.8.9+ and Plug 1.18.5+. The
   Phoenix and Plug floors are the first releases without known security advisories.
 - `phoenix` moved to a dev/test-only dependency; it is no longer pulled into
@@ -26,6 +53,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `plug`, `jason`, `floki`, `ex_doc`, `excoveralls`, `credo` and
   `credo_naming` to current releases; dropped the unused `earmark` dependency.
 - Bundled Swagger UI updated from 3.x to 5.32.14.
+
+### Fixed
+
+- Requests documented with `tags: false` were silently dropped from the API Blueprint output
+  entirely, because the formatter grouped requests by tag and a request with no tags reduced to
+  nothing. They are now documented in the unnamed group.
+- Merging two responses that returned arrays of different types collapsed them into whichever was
+  recorded first. Array schemas keep their reference under `items`, and the deduplication only
+  looked for a top-level `$ref`, so every array compared equal.
+- Merging two object-typed query parameters dropped any property that only the first one had.
+- The `parameters` list of a generated operation is now sorted by name, and `oneOf` schema lists are
+  sorted too. Both previously followed map iteration order, which is unspecified past 32 keys and
+  can change between Erlang/OTP releases.
+- An unreadable specification file now prints an Xcribe error report instead of a raw stacktrace,
+  and no longer takes the ExUnit formatter process down with it. A file that parses but does not
+  evaluate to a map, and a `servers` entry without a `:url`, are reported as themselves rather than
+  as a syntax error.
+- A specification listing no servers no longer crashes the API Blueprint format.
+- A `schemas:` entry in the specification file crashed with a `KeyError` whenever it named a schema
+  Xcribe also derived from a response — which is the whole point of the key. Hand-written schemas
+  carry only the fields their author cared about, and the merge assumed every schema had
+  `properties`.
+- The API Blueprint document now orders groups, resources, actions, requests, parameters and
+  headers explicitly. They followed map iteration order, which stops matching term order once a map
+  passes 32 keys, so a large API's document could reshuffle wholesale on adding a single route.
+- An output file that cannot be written is now reported and returns `:error`, instead of raising
+  `FunctionClauseError` out of `document_all_records/1` after printing the error — which took the
+  ExUnit formatter process down with it.
+- `mix xcribe.gen.spec` exits non-zero when it refuses to overwrite an existing file, so it can be
+  chained in a script.
+- Route matching against Phoenix 1.8. The private router function xcribe uses to
+  resolve a route swapped its argument order in Phoenix 1.8, which made every
+  request fail to parse. The `rescue` around the call was also narrowed so a future
+  signature change surfaces instead of being reported as a generic parsing error.
+- Generated JSON now has a stable key order. Object keys were inherited from the
+  iteration order of maps with atom keys, which is arbitrary and changes between
+  Elixir/OTP releases.
 
 ## [1.0.0] - 2021-07-17
 

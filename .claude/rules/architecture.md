@@ -19,6 +19,13 @@ Error *shapes* live in [errors.md](errors.md); config threading in [config.md](c
 - **`Xcribe.ConnParser.execute/2` is the only place a `Plug.Conn` becomes an
   `%Xcribe.Request{}`**, and `Xcribe.Request.Validator.validate/1` is the only gate a request
   passes before it reaches a formatter. Nothing downstream re-reads the `conn`.
+- **`Xcribe.Specification.api_specification/1` is the only reader of the `.xcribe.exs` file's
+  contents**, the way `Xcribe.Config` is the only reader of `Application.get_env`. (`Xcribe.Config`
+  stats the path to validate it exists, and reports a missing one as a configuration error with
+  instructions — it never reads it.) It normalizes the file into a map
+  with every key defaulted; every other module receives that map and pattern-matches the keys it
+  needs. `Xcribe.Swagger` and `Xcribe.ApiBlueprint` each call it once, at the top of
+  `generate_doc/2`.
 - **`Xcribe.Writter` is the only module that touches the filesystem** and
   **`Xcribe.CLI.Output` is the only module that prints.** Every other module returns data and
   lets those two act. No `IO.puts`, no `File.write`, no `Logger` anywhere else in `lib/`.

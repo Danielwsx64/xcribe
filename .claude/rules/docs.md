@@ -2,10 +2,10 @@
 
 Note the inversion if you also work in `livecircle-web-api`: **that repo bans doc annotations;
 this one requires them on its public surface.** xcribe publishes to Hex and its docs to
-HexDocs, so the six public modules' docs *are* the product. Which modules those are:
+HexDocs, so the seven public modules' docs *are* the product. Which modules those are:
 [public-api.md](public-api.md).
 
-- **A real `@moduledoc` goes on the six public modules only.** Every other module —
+- **A real `@moduledoc` goes on the seven public modules only.** Every other module —
   including every new one — gets `@moduledoc false`. `Xcribe`'s `@moduledoc` is the
   user-facing config reference: a new config key is documented there as a bullet, or it is
   undocumented (see [config.md](config.md)).

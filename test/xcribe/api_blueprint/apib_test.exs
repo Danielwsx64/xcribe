@@ -43,13 +43,13 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Schema
 
                          {
-                           "type": "object",
                            "properties": {
                              "title": {
-                               "type": "string",
-                               "example": "user 1"
+                               "example": "user 1",
+                               "type": "string"
                              }
-                           }
+                           },
+                           "type": "object"
                          }
 
              + Response 201 (application/json)
@@ -67,17 +67,17 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Schema
 
                          {
-                           "type": "object",
                            "properties": {
                              "title": {
-                               "type": "string",
-                               "example": "user 1"
+                               "example": "user 1",
+                               "type": "string"
                              },
                              "users_id": {
-                               "type": "string",
-                               "example": "1"
+                               "example": "1",
+                               "type": "string"
                              }
-                           }
+                           },
+                           "type": "object"
                          }
 
              """
@@ -172,17 +172,17 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Schema
 
                          {
-                           "type": "object",
                            "properties": {
                              "title": {
-                               "type": "string",
-                               "example": "user 1"
+                               "example": "user 1",
+                               "type": "string"
                              },
                              "users_id": {
-                               "type": "string",
-                               "example": "1"
+                               "example": "1",
+                               "type": "string"
                              }
-                           }
+                           },
+                           "type": "object"
                          }
 
              """
@@ -300,17 +300,17 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Schema
 
                          {
-                           "type": "object",
                            "properties": {
                              "title": {
-                               "type": "string",
-                               "example": "user 1"
+                               "example": "user 1",
+                               "type": "string"
                              },
                              "users_id": {
-                               "type": "string",
-                               "example": "1"
+                               "example": "1",
+                               "type": "string"
                              }
-                           }
+                           },
+                           "type": "object"
                          }
 
              """
@@ -351,13 +351,13 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Schema
 
                          {
-                           "type": "object",
                            "properties": {
                              "title": {
-                               "type": "string",
-                               "example": "user 1"
+                               "example": "user 1",
+                               "type": "string"
                              }
-                           }
+                           },
+                           "type": "object"
                          }
 
              + Response 201 (application/json)
@@ -375,17 +375,17 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Schema
 
                          {
-                           "type": "object",
                            "properties": {
                              "title": {
-                               "type": "string",
-                               "example": "user 1"
+                               "example": "user 1",
+                               "type": "string"
                              },
                              "users_id": {
-                               "type": "string",
-                               "example": "1"
+                               "example": "1",
+                               "type": "string"
                              }
-                           }
+                           },
+                           "type": "object"
                          }
 
              """
@@ -416,13 +416,13 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Schema
 
                          {
-                           "type": "object",
                            "properties": {
                              "title": {
-                               "type": "string",
-                               "example": "user 1"
+                               "example": "user 1",
+                               "type": "string"
                              }
-                           }
+                           },
+                           "type": "object"
                          }
 
              + Response 201 (application/json)
@@ -440,17 +440,17 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Schema
 
                          {
-                           "type": "object",
                            "properties": {
                              "title": {
-                               "type": "string",
-                               "example": "user 1"
+                               "example": "user 1",
+                               "type": "string"
                              },
                              "users_id": {
-                               "type": "string",
-                               "example": "1"
+                               "example": "1",
+                               "type": "string"
                              }
-                           }
+                           },
+                           "type": "object"
                          }
 
              """
@@ -492,21 +492,21 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Schema
 
                          {
-                           "type": "array",
                            "items": {
-                             "type": "object",
                              "properties": {
                                "id": {
-                                 "type": "number",
+                                 "example": 1,
                                  "format": "int32",
-                                 "example": 1
+                                 "type": "number"
                                },
                                "name": {
-                                 "type": "string",
-                                 "example": "user 1"
+                                 "example": "user 1",
+                                 "type": "string"
                                }
-                             }
-                           }
+                             },
+                             "type": "object"
+                           },
+                           "type": "array"
                          }
 
              """
@@ -542,13 +542,13 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Schema
 
                          {
-                           "type": "object",
                            "properties": {
                              "title": {
-                               "type": "string",
-                               "example": "user 1"
+                               "example": "user 1",
+                               "type": "string"
                              }
-                           }
+                           },
+                           "type": "object"
                          }
 
              + Response 201 (application/json)
@@ -566,17 +566,17 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Schema
 
                          {
-                           "type": "object",
                            "properties": {
                              "title": {
-                               "type": "string",
-                               "example": "user 1"
+                               "example": "user 1",
+                               "type": "string"
                              },
                              "users_id": {
-                               "type": "string",
-                               "example": "1"
+                               "example": "1",
+                               "type": "string"
                              }
-                           }
+                           },
+                           "type": "object"
                          }
 
              """
@@ -584,6 +584,22 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
   end
 
   describe "groups/2" do
+    test "emit groups in name order past the flatmap threshold" do
+      # Over 32 keys a map stops iterating in term order, so the encoder has to sort explicitly or
+      # adding one group reshuffles the whole document.
+      groups =
+        Map.new(1..40, fn index ->
+          {"Group #{String.pad_leading(to_string(index), 2, "0")}", %{resources: %{}}}
+        end)
+
+      output = APIB.groups(groups, %{json_library: Jason})
+
+      names = Regex.scan(~r/## Group (.+)\n/, output) |> Enum.map(fn [_, name] -> name end)
+
+      assert names == Enum.sort(names)
+      assert length(names) == 40
+    end
+
     test "return groups", %{config: config} do
       request_object =
         RequestsGenerator.users_posts_create()
@@ -614,13 +630,13 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Schema
 
                          {
-                           "type": "object",
                            "properties": {
                              "title": {
-                               "type": "string",
-                               "example": "user 1"
+                               "example": "user 1",
+                               "type": "string"
                              }
-                           }
+                           },
+                           "type": "object"
                          }
 
              + Response 201 (application/json)
@@ -638,17 +654,17 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
                  + Schema
 
                          {
-                           "type": "object",
                            "properties": {
                              "title": {
-                               "type": "string",
-                               "example": "user 1"
+                               "example": "user 1",
+                               "type": "string"
                              },
                              "users_id": {
-                               "type": "string",
-                               "example": "1"
+                               "example": "1",
+                               "type": "string"
                              }
-                           }
+                           },
+                           "type": "object"
                          }
 
              """

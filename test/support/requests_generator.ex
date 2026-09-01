@@ -21,6 +21,26 @@ defmodule Xcribe.Support.RequestsGenerator do
     |> Map.put(:__meta__, %{})
   end
 
+  def notes_index(opts \\ []) do
+    conn = conn()
+
+    conn
+    |> put_needed_headers(opts)
+    |> ConnTest.get(notes_path(conn, :index))
+    |> ConnParser.execute(Keyword.put_new(opts, :description, "show notes"))
+    |> Map.put(:__meta__, %{})
+  end
+
+  def namespaced_users_index(opts \\ []) do
+    conn = conn()
+
+    conn
+    |> put_needed_headers(opts)
+    |> ConnTest.get(namespaced_users_path(conn, :index))
+    |> ConnParser.execute(Keyword.put_new(opts, :description, "show namespaced users"))
+    |> Map.put(:__meta__, %{})
+  end
+
   def users_index(opts \\ []) do
     conn = conn()
 

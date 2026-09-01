@@ -1,13 +1,8 @@
 defmodule Xcribe.Swagger do
   @moduledoc false
 
-  alias Xcribe.DocException
-  alias Xcribe.JSON
-  alias Xcribe.Request
-  alias Xcribe.Schema
-  alias Xcribe.Specification
-  alias Xcribe.Swagger.Formatter
-  alias Xcribe.Swagger.Merge
+  alias Xcribe.{DocException, JSON, Request, Schema, Specification}
+  alias Xcribe.Swagger.{Formatter, Merge}
 
   def generate_doc(requests, config) do
     specification = Specification.api_specification(config)
@@ -21,11 +16,13 @@ defmodule Xcribe.Swagger do
   defp build_paths_and_components(requests, spec, config) do
     initial = %{paths: %{}, schemas: spec.schemas, security: %{}}
 
-    Enum.reduce(requests, initial, fn request, acc ->
+    requests
+    |> Enum.reduce(initial, fn request, acc ->
       request
       |> request_objects(spec, config)
       |> merge_objects(acc, request)
     end)
+    |> Map.update!(:paths, &Merge.overlay_paths(&1, spec.paths))
   end
 
   defp build_openapi_object(%{paths: _, schemas: _, security: _} = params, specification) do
@@ -50,7 +47,7 @@ defmodule Xcribe.Swagger do
   defp request_objects(request, specification, config) do
     request
     |> Request.remove_ignored_prefixes(specification)
-    |> Formatter.request_objects(specification, config)
+    |> Formatter.request_objects(config)
   rescue
     exception -> raise DocException, {request, exception, __STACKTRACE__}
   end

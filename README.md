@@ -35,7 +35,13 @@ Update deps
 mix deps.get
 ```
 
-To run `mix xcribe.doc` you must configure `preferred_cli_env: ["xcribe.doc": :test]` on your mix.ex file.
+To run `mix xcribe.doc` you must add it to `preferred_envs` in your `mix.exs`:
+
+```elixir
+def cli do
+  [preferred_envs: ["xcribe.doc": :test]]
+end
+```
 
 ## Usage
 
@@ -79,7 +85,58 @@ end
 
 See more about document macro `Xcribe.Document`
 
-### Generating documetation file
+### Naming schemas and groups
+
+`document/2` takes a few options that shape the generated document:
+
+```elixir
+document(conn, as: "Create a user", schema: "Users", req_schema: "createUsers")
+document(conn, tags: false)
+```
+
+- `as:` the request description.
+- `schema:` / `req_schema:` name the response and request schemas. In Swagger they become keys
+  under `components.schemas`; in API Blueprint they become the JSON Schema `title`.
+- `tags:` a list of group tags, or `false` to drop the default one.
+
+The same values can be set for a whole test file with the `@xcribe_tags`, `@xcribe_schema` and
+`@xcribe_req_schema` module attributes. See `Xcribe.Document`.
+
+### Describing your API
+
+Everything Xcribe cannot learn from a `Plug.Conn` — your API's title, description, version and
+servers — lives in a specification file. Generate one with:
+
+```sh
+mix xcribe.gen.spec
+```
+
+That writes `.xcribe.exs` in your project root, ready to edit:
+
+```elixir
+%{
+  name: "API Documentation",
+  description: "",
+  version: "1.0.0",
+  servers: [%{url: "http://localhost:4000"}],
+  ignore_namespaces: [],
+  ignore_resources_prefix: [],
+  paths: %{},
+  schemas: %{}
+}
+```
+
+The file is optional; without it Xcribe uses defaults. Use `paths:` to write descriptions Xcribe
+cannot infer, `schemas:` to define your own component schemas, and the `ignore_*` keys to strip
+routing prefixes such as `/api/v1` out of paths, group tags and schema names.
+
+See `Xcribe.Specification` for every key.
+
+> **Upgrading from 0.x?** The `Xcribe.Information` module and its `xcribe_info` DSL are gone,
+> along with the `information_source` config key. Run `mix xcribe.gen.spec` and move the values
+> from your old information module into `.xcribe.exs`.
+
+### Generating the documentation file
 
 By Xcribe task:
 
@@ -89,36 +146,38 @@ mix xcribe.doc
 
 See `Mix.Tasks.Xcribe.Doc` for more details.
 
-You can also run Xcribe while runing `mix test`, see `Xcribe.Formatter`.
+You can also run Xcribe while running `mix test`, see `Xcribe.Formatter`.
 
 ### Rendering HTML
 
-The output file is write in Blueprint sintax. To render to HTML you can use the
+The output file is written in Blueprint syntax. To render it to HTML you can use the
 tools listed at [APIBLUEPRINT.ORG](https://apiblueprint.org/tools.html#renderers)
 
 If Swagger format is configured, [Swagger UI](https://swagger.io/tools/swagger-ui/download/) can be used to display Swagger documentation.
 
 ## Configure
 
-You can add this configurations to your `config/test.ex`
+Add the configuration to your `config/test.exs`, scoped by endpoint:
 
-- output: a custom name to the output file
-- format: ApiBlueprint or Swagger formats
-- json_library: The library to be used for json decode/encode.
-- serve: Enables Xcribe serve mode. See more in `Serving doc` session.
-- specification_source: a custom path to specification file. See `Xcribe.Specification`
+- `output`: a custom name for the output file. Defaults to `"openapi.json"` or `"api_doc.apib"`,
+  depending on the format.
+- `format`: `:swagger` or `:api_blueprint`. Defaults to `:swagger`.
+- `json_library`: the library used for JSON decode/encode. Defaults to `Jason`.
+- `serve`: enables Xcribe serve mode. See `Serving doc` below.
+- `specification_source`: path to the specification file. Defaults to `".xcribe.exs"`.
+  See `Xcribe.Specification`.
 
 Example
 
 ```elixir
 config :xcribe, YourAppWeb.Endpoint,
   output: "openapi.json",
-  format: :swagger # or :api_blueprint,
+  format: :swagger,
   json_library: Jason,
   specification_source: ".xcribe.exs"
 ```
 
-See `Xcribe` to more configuration options.
+See `Xcribe` for the full configuration reference.
 
 ### Serve documentation
 

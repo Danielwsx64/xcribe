@@ -4,9 +4,13 @@ defmodule Xcribe.Writter do
   alias Xcribe.CLI.Output
 
   @doc """
-  This writes the given text to the configured output file
+  This writes the given text to the configured output file.
+
+  `artifact` names what was written, for the success message only.
   """
-  def write(text, %{output: output_file}) do
+  def write(text, config, artifact \\ "documentation")
+
+  def write(text, %{output: output_file}, artifact) do
     output_file
     |> Path.dirname()
     |> File.mkdir_p!()
@@ -15,7 +19,7 @@ defmodule Xcribe.Writter do
       {:ok, file} ->
         IO.binwrite(file, text)
 
-        Output.print_message("Xcribe documentation written in #{output_file}")
+        Output.print_message("Xcribe #{artifact} written in #{output_file}")
 
         File.close(file)
 

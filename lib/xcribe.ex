@@ -35,7 +35,8 @@ defmodule Xcribe do
 
   ## API information
 
-  You must provide your API information by creatint a specification file.
+  The API title, description, version and servers come from a specification file, `.xcribe.exs`.
+  Generate one with `mix xcribe.gen.spec`.
 
   See `Xcribe.Specification` for more details.
 
@@ -51,13 +52,13 @@ defmodule Xcribe do
 
     * `:format` - Format to generate documentation, allowed `:api_blueprint` and
     `:swagger`. Default `:swagger`.
-    * `:output` - The name of file output with generated configuration. Default
-    value changes by the format, 'api_blueprint.apib' for Blueprint and
-    'app_doc.json' for swagger.
+    * `:output` - The name of the generated documentation file. The default changes
+    with the format: `"api_doc.apib"` for Blueprint and `"openapi.json"` for Swagger.
     * `:json_library` - The library to be used for json decode/encode (Jason
     and Poison are supported). Default `Jason`.
     * `:serve` - Enable Xcribe serve mode. Default `false`. See more `Serving doc`
-    * `:specification_source` - A custom specification file path. See `Xcribe.Specification`.
+    * `:specification_source` - Path to the specification file. Default `".xcribe.exs"`.
+    See `Xcribe.Specification`.
   """
   alias Xcribe.{
     ApiBlueprint,
@@ -68,6 +69,7 @@ defmodule Xcribe do
     Request,
     Request.Error,
     Request.Validator,
+    SpecificationFile,
     Swagger,
     Writter
   }
@@ -88,7 +90,7 @@ defmodule Xcribe do
     |> generate_docs(config)
     |> write(config)
   rescue
-    e in DocException -> {:error, e}
+    e in [DocException, SpecificationFile] -> {:error, e}
   end
 
   defp get_records_with_endpoint do
@@ -159,6 +161,12 @@ defmodule Xcribe do
   defp write(text, config) when is_binary(text), do: Writter.write(text, config)
   defp write({:error, _msg} = err, _config), do: err
 
+  defp handle_result({:error, %SpecificationFile{} = e}) do
+    Output.print_specification_error(e)
+
+    :error
+  end
+
   defp handle_result({:error, %DocException{} = e}) do
     Output.print_doc_exception(e)
 
@@ -176,6 +184,8 @@ defmodule Xcribe do
 
     :error
   end
+
+  defp handle_result(:error), do: :error
 
   defp handle_result(:ok), do: :ok
 end
