@@ -3,13 +3,26 @@ defmodule Xcribe.APIModel.Body do
 
   alias Xcribe.{JsonSchema, Schema}
 
-  defstruct [:content_type, :schema_name, schema: %{}, examples: []]
+  defstruct [:content_type, :schema_name, collection: false, schema: %{}, examples: []]
 
+  @doc """
+  Build the content of one content type from a recorded payload.
+
+  `schema` always describes a single item and `collection` tells whether the payload is a list of
+  them. Keeping the two apart is what lets a route documented by one test returning a list and
+  another returning a single object share one named schema instead of replacing each other.
+  """
   def new(content_type, schema_name, body) do
+    {collection, schema} =
+      {nil, body}
+      |> JsonSchema.schema_for(title: false, example: true)
+      |> pop_collection()
+
     %__MODULE__{
       content_type: content_type,
       schema_name: schema_name,
-      schema: JsonSchema.schema_for({nil, body}, title: false, example: true),
+      collection: collection,
+      schema: schema,
       examples: [body]
     }
   end
@@ -22,5 +35,9 @@ defmodule Xcribe.APIModel.Body do
     }
   end
 
-  def sort_key(%__MODULE__{content_type: content_type}), do: content_type
+  def sort_key(%__MODULE__{} = body),
+    do: {body.content_type, body.schema_name, body.collection}
+
+  defp pop_collection(%{type: "array", items: items}), do: {true, items}
+  defp pop_collection(schema), do: {false, schema}
 end

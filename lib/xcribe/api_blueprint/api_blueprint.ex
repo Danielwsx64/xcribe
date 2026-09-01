@@ -2,49 +2,45 @@ defmodule Xcribe.ApiBlueprint do
   @moduledoc false
 
   alias Xcribe.ApiBlueprint.{APIB, Formatter}
-  alias Xcribe.{DocException, Request, Specification}
+  alias Xcribe.APIModel
+  alias Xcribe.APIModel.Operation
+  alias Xcribe.DocException
 
-  def generate_doc(requests, config) do
-    requests
-    |> apib_struct(config)
+  def generate_doc(%APIModel{} = model, specification, config) do
+    model
+    |> apib_struct(specification)
     |> APIB.encode(config)
   end
 
-  def apib_struct(requests, config) do
-    specifications = Specification.api_specification(config)
-
+  def apib_struct(%APIModel{} = model, specification) do
     %{
-      host: host(specifications.servers),
-      description: specifications.description,
-      name: specifications.name,
-      groups: reduce_groups(requests, specifications, config)
+      host: host(specification.servers),
+      description: specification.description,
+      name: specification.name,
+      groups: reduce_groups(model, specification)
     }
   end
 
   defp host([%{url: url} | _rest]), do: url
   defp host([]), do: ""
 
-  defp reduce_groups(requests, specifications, config),
-    do: Enum.reduce(requests, %{}, &format_and_merge(&1, &2, specifications, config))
-
-  defp format_and_merge(request, acc, specifications, config) do
-    prepared =
-      request
-      |> Request.remove_ignored_prefixes(specifications)
-      |> Map.update(:__meta__, %{config: config}, &Map.put(&1, :config, config))
-
-    item =
-      Formatter.full_request_object(
-        prepared,
-        action_description(specifications.paths, prepared)
-      )
-
-    Formatter.put_object_into_groups(acc, item)
-  rescue
-    exception -> raise DocException, {request, exception, __STACKTRACE__}
+  defp reduce_groups(%APIModel{routes: routes}, specification) do
+    routes
+    |> Enum.flat_map(& &1.operations)
+    |> Enum.reduce(%{}, &put_operation(&1, &2, specification))
   end
 
-  defp action_description(paths, %{path: path, verb: verb}) do
+  defp put_operation(%Operation{} = operation, groups, specification) do
+    Formatter.put_operation_into_groups(
+      groups,
+      operation,
+      action_description(specification.paths, operation)
+    )
+  rescue
+    exception -> raise DocException, {List.first(operation.examples), exception, __STACKTRACE__}
+  end
+
+  defp action_description(paths, %Operation{path: path, verb: verb}) do
     paths
     |> Map.get(path, %{})
     |> Map.get(verb, %{})

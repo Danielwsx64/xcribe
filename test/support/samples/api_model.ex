@@ -3,6 +3,12 @@ defmodule Xcribe.Support.Samples.APIModel do
 
   alias Xcribe.APIModel.{Body, Example, Operation, Parameter, Response}
 
+  @config %{json_library: Jason}
+
+  def operation(request), do: Operation.from_request(request, @config)
+
+  def example(request), do: request |> operation() |> Map.fetch!(:examples) |> List.first()
+
   def users_posts_create_operation do
     %Operation{
       verb: "post",

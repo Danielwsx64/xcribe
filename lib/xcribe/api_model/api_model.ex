@@ -2,7 +2,7 @@ defmodule Xcribe.APIModel do
   @moduledoc false
 
   alias Xcribe.APIModel.{Operation, Route}
-  alias Xcribe.{Request, Schema}
+  alias Xcribe.{DocException, Request, Schema}
 
   defstruct routes: [], schemas: %{}, security_schemes: []
 
@@ -15,13 +15,16 @@ defmodule Xcribe.APIModel do
   named schemas of every operation are collected into a single registry, which a format can emit as
   components and reference by name instead of repeating them.
 
+  The ignored namespaces and resource prefixes of the given specification are stripped from each
+  request first, since they rewrite the path, the resource and the tags this grouping keys on.
+
   Requests are sorted before being reduced and every collection in the result is sorted, so the
   same set of requests always builds the same model no matter the order the suite recorded them.
   """
-  def build(requests, config) do
+  def build(requests, specification, config) do
     requests
     |> sort_requests()
-    |> reduce_routes(config)
+    |> reduce_routes(specification, config)
     |> sort_routes()
     |> to_model()
   end
@@ -34,12 +37,20 @@ defmodule Xcribe.APIModel do
     {request.path, request.verb, request.status_code, request.description, file, line}
   end
 
-  defp reduce_routes(requests, config) do
+  defp reduce_routes(requests, specification, config) do
     Enum.reduce(requests, %{}, fn request, routes ->
-      route = Route.from_request(request, config)
+      route = route_from_request(request, specification, config)
 
       Map.update(routes, route.path, route, &Route.merge(&1, route))
     end)
+  end
+
+  defp route_from_request(request, specification, config) do
+    request
+    |> Request.remove_ignored_prefixes(specification)
+    |> Route.from_request(config)
+  rescue
+    exception -> raise DocException, {request, exception, __STACKTRACE__}
   end
 
   defp sort_routes(routes), do: routes |> Map.values() |> Enum.sort_by(&Route.sort_key/1)

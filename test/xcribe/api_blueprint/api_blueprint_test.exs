@@ -1,7 +1,7 @@
 defmodule Xcribe.ApiBlueprintTest do
   use ExUnit.Case, async: true
 
-  alias Xcribe.{ApiBlueprint, DocException, Request}
+  alias Xcribe.{ApiBlueprint, APIModel, DocException, Request, Specification}
   alias Xcribe.Support.RequestsGenerator
 
   @sample_apib_output File.read!("test/support/api_blueprint_example.apib")
@@ -11,7 +11,7 @@ defmodule Xcribe.ApiBlueprintTest do
      %{config: %{specification_source: "test/support/.simple_example.exs", json_library: Jason}}}
   end
 
-  describe "generate_doc/2" do
+  describe "generate_doc/3" do
     test "generate doc", %{config: config} do
       requests = [
         RequestsGenerator.users_index([:basic_auth]),
@@ -25,13 +25,13 @@ defmodule Xcribe.ApiBlueprintTest do
         RequestsGenerator.users_posts_update([:api_key_auth])
       ]
 
-      assert ApiBlueprint.generate_doc(requests, config) == @sample_apib_output
+      assert generate_doc(requests, config) == @sample_apib_output
     end
 
     test "document a request without groups tags", %{config: config} do
       requests = [RequestsGenerator.users_index(groups_tags: [])]
 
-      doc = ApiBlueprint.generate_doc(requests, config)
+      doc = generate_doc(requests, config)
 
       refute doc =~ "## Group"
       assert doc =~ "### Users index [GET /users]"
@@ -43,7 +43,7 @@ defmodule Xcribe.ApiBlueprintTest do
         json_library: Jason
       }
 
-      doc = ApiBlueprint.generate_doc([RequestsGenerator.users_index()], config)
+      doc = generate_doc([RequestsGenerator.users_index()], config)
 
       assert doc =~ "### Users index [GET /users]\nList every user in the account\n\n"
     end
@@ -51,7 +51,7 @@ defmodule Xcribe.ApiBlueprintTest do
     test "name a schema in the generated document", %{config: config} do
       requests = [RequestsGenerator.users_create(schema: "Users", req_schema: "createUsers")]
 
-      doc = ApiBlueprint.generate_doc(requests, config)
+      doc = generate_doc(requests, config)
 
       assert doc =~ ~s("title": "createUsers")
       assert doc =~ ~s("title": "Users")
@@ -65,7 +65,7 @@ defmodule Xcribe.ApiBlueprintTest do
 
       requests = [RequestsGenerator.notes_index(), RequestsGenerator.users_posts_index()]
 
-      doc = ApiBlueprint.generate_doc(requests, config)
+      doc = generate_doc(requests, config)
 
       assert doc =~ "## Group Notes"
       assert doc =~ "## Notes [/notes]"
@@ -80,10 +80,27 @@ defmodule Xcribe.ApiBlueprintTest do
 
       config = %{specification_source: spec_file, json_library: Jason}
 
-      doc = ApiBlueprint.generate_doc([RequestsGenerator.users_index()], config)
+      doc = generate_doc([RequestsGenerator.users_index()], config)
 
       assert doc =~ "HOST: \n"
       assert doc =~ "# Basic API"
+    end
+
+    test "generate the same document whatever the order the requests were recorded in", %{
+      config: config
+    } do
+      requests = [
+        RequestsGenerator.users_index([:basic_auth]),
+        RequestsGenerator.users_show([:basic_auth]),
+        RequestsGenerator.users_create([:bearer_auth]),
+        RequestsGenerator.users_posts_index([:api_key_auth])
+      ]
+
+      expected = generate_doc(requests, config)
+
+      for _attempt <- 1..10 do
+        assert generate_doc(Enum.shuffle(requests), config) == expected
+      end
     end
 
     test "handle exception", %{config: config} do
@@ -100,8 +117,16 @@ defmodule Xcribe.ApiBlueprintTest do
       ]
 
       assert_raise DocException, "An exception was raised. Elixir.FunctionClauseError", fn ->
-        ApiBlueprint.generate_doc(requests, config)
+        generate_doc(requests, config)
       end
     end
+  end
+
+  defp generate_doc(requests, config) do
+    specification = Specification.api_specification(config)
+
+    requests
+    |> APIModel.build(specification, config)
+    |> ApiBlueprint.generate_doc(specification, config)
   end
 end

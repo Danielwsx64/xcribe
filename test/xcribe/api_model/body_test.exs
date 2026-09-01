@@ -21,10 +21,24 @@ defmodule Xcribe.APIModel.BodyTest do
                }
     end
 
-    test "return an array schema for a list body" do
+    test "return the item schema and mark the body as a collection for a list body" do
       assert Body.new("application/json", "Users", [%{"id" => 1}]) == %Body{
                content_type: "application/json",
                schema_name: "Users",
+               collection: true,
+               schema: %{
+                 type: "object",
+                 properties: %{"id" => %{type: "number", format: "int32", example: 1}}
+               },
+               examples: [[%{"id" => 1}]]
+             }
+    end
+
+    test "pop only one level for a list of lists" do
+      assert Body.new("application/json", "Users", [[%{"id" => 1}]]) == %Body{
+               content_type: "application/json",
+               schema_name: "Users",
+               collection: true,
                schema: %{
                  type: "array",
                  items: %{
@@ -32,7 +46,7 @@ defmodule Xcribe.APIModel.BodyTest do
                    properties: %{"id" => %{type: "number", format: "int32", example: 1}}
                  }
                },
-               examples: [[%{"id" => 1}]]
+               examples: [[[%{"id" => 1}]]]
              }
     end
 
@@ -97,8 +111,21 @@ defmodule Xcribe.APIModel.BodyTest do
   end
 
   describe "sort_key/1" do
-    test "return the content type" do
-      assert Body.sort_key(Body.new("application/json", "Users", %{})) == "application/json"
+    test "return the content type, the schema name and the collection flag" do
+      assert Body.sort_key(Body.new("application/json", "Users", %{})) ==
+               {"application/json", "Users", false}
+    end
+
+    test "return a different key for a collection of the same schema name" do
+      collection = Body.new("application/json", "Users", [%{"id" => 1}])
+      single = Body.new("application/json", "Users", %{"id" => 1})
+
+      refute Body.sort_key(collection) == Body.sort_key(single)
+    end
+
+    test "return a different key for the same content type with another schema name" do
+      refute Body.sort_key(Body.new("application/json", "Users", %{})) ==
+               Body.sort_key(Body.new("application/json", "Posts", %{}))
     end
   end
 end

@@ -3,125 +3,114 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   alias Plug.Upload
   alias Xcribe.ApiBlueprint.Multipart
-  alias Xcribe.{ContentDecoder, JsonSchema, Request}
+  alias Xcribe.APIModel.{Example, Operation, Parameter}
+  alias Xcribe.JsonSchema
 
-  import Xcribe.Helpers.Formatter
+  import Xcribe.Helpers.Formatter, only: [content_type_boundary: 1, format_path_parameter: 1]
 
-  def put_object_into_groups(requests_map, request) do
-    Enum.reduce(groups_of(request), requests_map, fn group, requests ->
-      Map.update(
-        requests,
-        group,
-        request,
-        &merge_group(&1, request)
-      )
+  def put_operation_into_groups(groups, %Operation{} = operation, action_description \\ "") do
+    resources = resource_object(operation, action_description)
+
+    Enum.reduce(groups_of(operation), groups, fn group, all ->
+      Map.update(all, group, %{resources: resources}, &merge_group(&1, resources))
     end)
   end
 
-  def full_request_object(%Request{} = request, action_description \\ "") do
+  def resource_object(%Operation{} = operation, action_description \\ "") do
     %{
-      summary: "",
-      description: "",
-      groups: request.groups_tags,
-      resources: resource_object(request, action_description)
-    }
-  end
-
-  def resource_object(%Request{resource: resource} = request, action_description \\ "") do
-    %{
-      resource_key(request) => %{
-        name: resource,
-        summary: "",
-        description: "",
-        parameters: resource_parameters(request),
-        actions: action_object(request, action_description)
+      resource_key(operation) => %{
+        name: operation.resource,
+        parameters: resource_parameters(operation),
+        actions: action_object(operation, action_description)
       }
     }
   end
 
-  def action_object(%Request{} = request, action_description \\ "") do
+  def action_object(%Operation{} = operation, action_description \\ "") do
     %{
-      action_key(request) => %{
-        name: action_name(request),
-        summary: "",
+      action_key(operation) => %{
+        name: action_name(operation),
         description: action_description,
-        parameters: action_parameters(request),
-        query_parameters: action_query_parameters(request),
-        requests: request_object(request)
+        parameters: action_parameters(operation),
+        query_parameters: action_query_parameters(operation),
+        requests: request_objects(operation.examples)
       }
     }
   end
 
-  def request_object(%Request{description: desc, header_params: headers} = request) do
+  def request_objects(examples),
+    do: Enum.reduce(examples, %{}, &Map.put(&2, &1.description, request_object(&1)))
+
+  def request_object(%Example{} = example) do
     %{
-      desc => %{
-        content_type: content_type(headers),
-        headers: headers(headers),
-        body: request_body(request),
-        schema: request_schema(request),
-        response: response_object(request)
-      }
+      content_type: example.request_content_type,
+      headers: headers(example.request_headers),
+      body: request_body(example),
+      schema: request_schema(example),
+      response: response_object(example)
     }
   end
 
-  def response_object(%Request{resp_headers: headers, status_code: code} = request) do
+  def response_object(%Example{} = example) do
     %{
-      status: code,
-      content_type: content_type(headers),
-      headers: headers(headers),
-      body: response_body(request),
-      schema: response_schema(request)
+      status: example.status,
+      content_type: example.response_content_type,
+      headers: headers(example.response_headers),
+      body: response_body(example),
+      schema: response_schema(example)
     }
   end
 
-  def action_parameters(%Request{path_params: path_params}) do
-    Enum.reduce(path_params, %{}, &reduce_path_params/2)
+  def action_parameters(%Operation{} = operation),
+    do: operation |> path_parameters() |> Enum.reduce(%{}, &put_path_parameter/2)
+
+  def action_query_parameters(%Operation{parameters: parameters}) do
+    parameters
+    |> Enum.filter(&(&1.location == :query))
+    |> Enum.reduce(%{}, &put_query_parameter/2)
   end
 
-  def action_query_parameters(%Request{query_params: query_params}) do
-    Enum.reduce(query_params, %{}, &reduce_query_params/2)
+  def resource_parameters(%Operation{} = operation) do
+    url_params = url_params(operation.path)
+
+    operation
+    |> path_parameters()
+    |> Enum.filter(&(&1.name in url_params))
+    |> Enum.reduce(%{}, &put_path_parameter/2)
   end
 
-  def resource_parameters(%Request{path: path, path_params: path_params}) do
-    path_params
-    |> Map.take(url_params(path))
-    |> Enum.reduce(%{}, &reduce_path_params/2)
+  def request_schema(%Example{request_body: body}) when body == %{}, do: %{}
+
+  def request_schema(%Example{} = example) do
+    json_schema_for(
+      example.request_content_type,
+      example.request_body,
+      example.request_schema_name
+    )
   end
 
-  def response_schema(%Request{__meta__: meta, resp_body: body, resp_headers: headers} = request) do
-    content_type = content_type(headers)
-
-    json_schema_for(content_type, response_content(body, content_type, meta), request.schema)
+  def response_schema(%Example{} = example) do
+    json_schema_for(
+      example.response_content_type,
+      example.response_body,
+      example.response_schema_name
+    )
   end
 
-  def response_body(%Request{__meta__: %{config: config}, resp_body: body, resp_headers: headers}) do
-    case content_type(headers) do
-      nil -> %{}
-      content_type -> ContentDecoder.decode!(body, content_type, config)
-    end
-  end
+  def response_body(%Example{response_decode_error: nil, response_body: nil}), do: %{}
+  def response_body(%Example{response_decode_error: nil} = example), do: example.response_body
+  def response_body(%Example{response_decode_error: :missing_content_type}), do: %{}
 
-  def request_schema(%Request{request_body: body}) when body == %{}, do: %{}
+  def response_body(%Example{} = example), do: example.response_raw_body
 
-  def request_schema(%Request{request_body: body, header_params: headers} = request) do
-    headers
-    |> content_type()
-    |> json_schema_for(body, request.req_schema)
-  end
+  def request_body(%Example{request_body: body}) when body == %{}, do: %{}
 
-  def request_body(%Request{request_body: body}) when body == %{}, do: %{}
+  def request_body(%Example{} = example),
+    do: body_data_for(example.request_content_type, example.request_headers, example.request_body)
 
-  def request_body(%Request{request_body: body, header_params: headers}) do
-    headers
-    |> content_type()
-    |> body_data_for(headers, body)
-  end
+  def action_name(%Operation{action: action, resource: resource}), do: "#{resource} #{action}"
 
-  def action_name(%Request{action: action, resource: resource}) do
-    "#{resource} #{action}"
-  end
-
-  def action_key(%Request{path: path, verb: verb}) do
+  def action_key(%Operation{path: path, verb: verb}) do
     Enum.reduce(
       url_params(path),
       "#{String.upcase(verb)} #{path}",
@@ -129,7 +118,7 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     )
   end
 
-  def resource_key(%Request{path: path}) do
+  def resource_key(%Operation{path: path}) do
     Enum.reduce(
       url_params(path),
       resource_path(path),
@@ -137,49 +126,25 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     )
   end
 
-  defp merge_group(group, new_request) do
-    %{group | resources: merge_group_resources(group.resources, new_request.resources)}
+  defp merge_group(group, resources),
+    do: %{group | resources: merge_resources(group.resources, resources)}
+
+  defp merge_resources(base, new) do
+    Enum.reduce(new, base, fn {key, resource}, all ->
+      Map.update(all, key, resource, &merge_resource(&1, resource))
+    end)
   end
 
-  defp merge_group_resources(resources, new_request) do
-    resource_key = object_key(new_request)
+  defp merge_resource(base, new), do: %{base | actions: Map.merge(base.actions, new.actions)}
 
-    Map.update(
-      resources,
-      resource_key,
-      new_request[resource_key],
-      &merge_resource(&1, new_request[resource_key])
-    )
-  end
+  defp path_parameters(%Operation{parameters: parameters}),
+    do: Enum.filter(parameters, &(&1.location == :path))
 
-  defp merge_resource(resource, new_request) do
-    %{resource | actions: merge_resource_actions(resource.actions, new_request.actions)}
-  end
+  defp put_path_parameter(%Parameter{} = parameter, parameters),
+    do: Map.put(parameters, format_path_parameter(parameter.name), schema_for(parameter, true))
 
-  defp merge_resource_actions(actions, new_request) do
-    action_key = object_key(new_request)
-
-    Map.update(
-      actions,
-      action_key,
-      new_request[action_key],
-      &merge_action(&1, new_request[action_key])
-    )
-  end
-
-  defp merge_action(action, new_request) do
-    %{
-      action
-      | requests: Map.merge(action.requests, new_request.requests),
-        query_parameters: Map.merge(action.query_parameters, new_request.query_parameters)
-    }
-  end
-
-  defp object_key(%{} = request) do
-    request
-    |> Map.keys()
-    |> List.first()
-  end
+  defp put_query_parameter(%Parameter{} = parameter, parameters),
+    do: Map.put(parameters, parameter.name, schema_for(parameter, false))
 
   defp resource_path(path) do
     ~r/(.*)(?=\/{.*}$)|(.*)/
@@ -187,8 +152,8 @@ defmodule Xcribe.ApiBlueprint.Formatter do
     |> List.last()
   end
 
-  defp groups_of(%{groups: []}), do: [""]
-  defp groups_of(%{groups: groups}), do: groups
+  defp groups_of(%Operation{tags: []}), do: [""]
+  defp groups_of(%Operation{tags: tags}), do: tags
 
   defp json_schema_for("application/json", body, name) when is_map(body) or is_list(body),
     do: JsonSchema.schema_for({name, body})
@@ -219,24 +184,8 @@ defmodule Xcribe.ApiBlueprint.Formatter do
   defp data_schema({key, value}, acc),
     do: [%{content_type: "text/plain", name: key, value: value} | acc]
 
-  defp reduce_path_params({param, value}, parameters) do
-    Map.put(
-      parameters,
-      format_path_parameter(param),
-      schema_for(value, true)
-    )
-  end
-
-  defp reduce_query_params({param, value}, parameters) do
-    Map.put(
-      parameters,
-      param,
-      schema_for(value, false)
-    )
-  end
-
-  defp schema_for(value, required) do
-    {nil, value}
+  defp schema_for(%Parameter{examples: examples}, required) do
+    {nil, List.first(examples)}
     |> JsonSchema.schema_for()
     |> add_required(required)
   end
@@ -245,11 +194,6 @@ defmodule Xcribe.ApiBlueprint.Formatter do
 
   defp add_required(map, true), do: Map.put(map, :required, true)
   defp add_required(map, false), do: map
-
-  defp response_content(body, "application/json", %{config: config}) when is_binary(body),
-    do: ContentDecoder.decode!(body, "application/json", config)
-
-  defp response_content(body, _content_type, _meta), do: body
 
   defp url_params(path) do
     case Regex.run(~r/\{(.*?)\}.+/, path, capture: :all_but_first) do

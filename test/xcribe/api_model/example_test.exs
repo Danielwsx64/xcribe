@@ -16,6 +16,8 @@ defmodule Xcribe.APIModel.ExampleTest do
                path_params: %{},
                query_params: %{},
                request_content_type: "application/json",
+               request_schema_name: nil,
+               response_schema_name: nil,
                request_headers: [{"content-type", "application/json"}],
                request_body: %{"age" => 5, "name" => "user 1"},
                response_content_type: "application/json",
@@ -44,6 +46,22 @@ defmodule Xcribe.APIModel.ExampleTest do
       assert example.response_body == nil
       assert example.response_decode_error == error
       assert example.response_raw_body == request.resp_body
+    end
+
+    test "keep the schema names the consumer declared" do
+      request = RequestsGenerator.users_create(schema: "Users", req_schema: "createUsers")
+
+      example = Example.from_request(request, nil, nil)
+
+      assert example.request_schema_name == "createUsers"
+      assert example.response_schema_name == "Users"
+    end
+
+    test "keep the schema names empty when the consumer declared none" do
+      example = Example.from_request(RequestsGenerator.users_create(), nil, nil)
+
+      assert example.request_schema_name == nil
+      assert example.response_schema_name == nil
     end
 
     test "keep the call site metadata of the request" do

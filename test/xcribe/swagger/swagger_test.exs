@@ -1,12 +1,12 @@
 defmodule Xcribe.SwaggerTest do
   use ExUnit.Case, async: true
 
-  alias Xcribe.{DocException, Request, Swagger}
+  alias Xcribe.{APIModel, DocException, Request, Specification, Swagger}
   alias Xcribe.Support.RequestsGenerator
 
   @sample_swagger_output File.read!("test/support/swagger_example.json")
 
-  describe "generate_doc/2" do
+  describe "generate_doc/3" do
     test "parse requests do string" do
       config = %{specification_source: "test/support/.simple_example.exs", json_library: Jason}
 
@@ -24,7 +24,7 @@ defmodule Xcribe.SwaggerTest do
 
       expected = Jason.decode!(@sample_swagger_output)
 
-      response = Swagger.generate_doc(requests, config)
+      response = generate_doc(requests, config)
 
       assert Jason.decode!(response) == expected
     end
@@ -35,7 +35,7 @@ defmodule Xcribe.SwaggerTest do
       requests = [RequestsGenerator.users_index(groups_tags: [])]
 
       assert %{"paths" => %{"/users" => %{"get" => %{"tags" => []}}}} =
-               requests |> Swagger.generate_doc(config) |> Jason.decode!()
+               requests |> generate_doc(config) |> Jason.decode!()
     end
 
     test "use the description of a specified path" do
@@ -43,7 +43,7 @@ defmodule Xcribe.SwaggerTest do
 
       doc =
         [RequestsGenerator.users_index()]
-        |> Swagger.generate_doc(config)
+        |> generate_doc(config)
         |> Jason.decode!()
 
       assert get_in(doc, ["paths", "/users", "get", "description"]) ==
@@ -59,7 +59,7 @@ defmodule Xcribe.SwaggerTest do
           RequestsGenerator.namespaced_users_index(),
           RequestsGenerator.users_posts_index()
         ]
-        |> Swagger.generate_doc(config)
+        |> generate_doc(config)
         |> Jason.decode!()
 
       assert doc["paths"] |> Map.keys() |> Enum.sort() == [
@@ -99,7 +99,7 @@ defmodule Xcribe.SwaggerTest do
         }
       ]
 
-      doc = requests |> Swagger.generate_doc(config) |> Jason.decode!()
+      doc = requests |> generate_doc(config) |> Jason.decode!()
 
       assert doc["components"]["securitySchemes"] == %{}
       assert doc["paths"]["/servers"]["get"]["security"] == []
@@ -119,7 +119,7 @@ defmodule Xcribe.SwaggerTest do
 
       doc =
         [RequestsGenerator.users_index()]
-        |> Swagger.generate_doc(config)
+        |> generate_doc(config)
         |> Jason.decode!()
 
       assert doc["components"]["schemas"]["Users"] == %{
@@ -130,6 +130,23 @@ defmodule Xcribe.SwaggerTest do
                  "name" => %{"type" => "string", "example" => "user 1"}
                }
              }
+    end
+
+    test "generate the same document whatever the order the requests were recorded in" do
+      config = %{specification_source: "test/support/.simple_example.exs", json_library: Jason}
+
+      requests = [
+        RequestsGenerator.users_index([:basic_auth]),
+        RequestsGenerator.users_show([:basic_auth]),
+        RequestsGenerator.users_create([:bearer_auth]),
+        RequestsGenerator.users_posts_index([:api_key_auth])
+      ]
+
+      expected = generate_doc(requests, config)
+
+      for _attempt <- 1..10 do
+        assert generate_doc(Enum.shuffle(requests), config) == expected
+      end
     end
 
     test "handle excptions into Request Error structs" do
@@ -148,8 +165,16 @@ defmodule Xcribe.SwaggerTest do
         })
 
       assert_raise DocException, "An exception was raised. Elixir.Protocol.UndefinedError", fn ->
-        Swagger.generate_doc([request], config)
+        generate_doc([request], config)
       end
     end
+  end
+
+  defp generate_doc(requests, config) do
+    specification = Specification.api_specification(config)
+
+    requests
+    |> APIModel.build(specification, config)
+    |> Swagger.generate_doc(specification, config)
   end
 end

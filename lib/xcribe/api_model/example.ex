@@ -9,7 +9,9 @@ defmodule Xcribe.APIModel.Example do
     :description,
     :status,
     :request_content_type,
+    :request_schema_name,
     :response_content_type,
+    :response_schema_name,
     :response_raw_body,
     :response_body,
     :response_decode_error,
@@ -28,6 +30,11 @@ defmodule Xcribe.APIModel.Example do
       path_params: request.path_params,
       query_params: request.query_params,
       request_content_type: Formatter.content_type(request.header_params),
+      # The consumer-declared names, not the synthesized ones every Body carries: API Blueprint has
+      # no component section, so a name reaches its document only as a JSON Schema title, and a
+      # schema the consumer never named must stay untitled.
+      request_schema_name: request.req_schema,
+      response_schema_name: request.schema,
       request_headers: Enum.sort(request.header_params),
       # A Plug.Conn never keeps the raw request body, only the parsed `body_params`, so the request
       # side has nothing to pair with `response_raw_body`. The response is the other way around:

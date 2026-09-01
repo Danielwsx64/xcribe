@@ -119,6 +119,30 @@ defmodule Xcribe.SpecificationTest do
                    fn -> Specification.api_specification(config) end
     end
 
+    @tag :tmp_dir
+    test "raise error when a key that must be a map is not one", %{tmp_dir: tmp_dir} do
+      file = Path.join(tmp_dir, ".xcribe.exs")
+      File.write!(file, ~s(%{schemas: []}\n))
+
+      config = %{specification_source: file}
+
+      assert_raise SpecificationFile,
+                   ~s(The `schemas` key of the specification file must be a map. Got: []),
+                   fn -> Specification.api_specification(config) end
+    end
+
+    @tag :tmp_dir
+    test "raise error when a key that must be a list is not one", %{tmp_dir: tmp_dir} do
+      file = Path.join(tmp_dir, ".xcribe.exs")
+      File.write!(file, ~s(%{servers: %{url: "http://my-api.com"}}\n))
+
+      config = %{specification_source: file}
+
+      assert_raise SpecificationFile,
+                   ~r"The `servers` key of the specification file must be a list",
+                   fn -> Specification.api_specification(config) end
+    end
+
     test "raise when a configured file does not exist, guarding skipped config validation" do
       config = %{specification_source: "test/support/.not_exists.exs"}
 

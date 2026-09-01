@@ -1,9 +1,9 @@
 defmodule Xcribe.ApiBlueprint.APIBTest do
   use ExUnit.Case, async: true
 
-  alias Xcribe.ApiBlueprint
+  alias Xcribe.{ApiBlueprint, APIModel, Specification}
   alias Xcribe.ApiBlueprint.{APIB, Formatter, Multipart}
-  alias Xcribe.Support.RequestsGenerator
+  alias Xcribe.Support.{RequestsGenerator, Samples}
 
   setup do
     {:ok,
@@ -12,8 +12,9 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
 
   describe "encode/2" do
     test "encode apib struct into apib format", %{config: config} do
-      request = RequestsGenerator.users_posts_create()
-      struct = ApiBlueprint.apib_struct([request], config)
+      specification = Specification.api_specification(config)
+      model = APIModel.build([RequestsGenerator.users_posts_create()], specification, config)
+      struct = ApiBlueprint.apib_struct(model, specification)
 
       assert APIB.encode(struct, config) == """
              FORMAT: 1A
@@ -165,7 +166,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
     test "return schema", %{config: config} do
       %{schema: schema} =
         RequestsGenerator.users_posts_create()
-        |> Map.put(:__meta__, %{config: config})
+        |> Samples.APIModel.example()
         |> Formatter.response_object()
 
       assert APIB.schema(schema, config) == """
@@ -195,7 +196,8 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
 
   describe "parameters/1" do
     test "return parameters" do
-      parameters = Formatter.action_parameters(RequestsGenerator.users_posts_create())
+      operation = Samples.APIModel.operation(RequestsGenerator.users_posts_create())
+      parameters = Formatter.action_parameters(operation)
 
       assert APIB.parameters(parameters) == """
              + Parameters
@@ -222,7 +224,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
     test "return body", %{config: config} do
       %{body: body} =
         RequestsGenerator.users_posts_create()
-        |> Map.put(:__meta__, %{config: config})
+        |> Samples.APIModel.example()
         |> Formatter.response_object()
 
       assert APIB.body(body, config) == """
@@ -281,7 +283,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
     test "return full response", %{config: config} do
       response =
         RequestsGenerator.users_posts_create()
-        |> Map.put(:__meta__, %{config: config})
+        |> Samples.APIModel.example()
         |> Formatter.response_object()
 
       assert APIB.full_response(response, config) == """
@@ -319,7 +321,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
     test "when status code is 204", %{config: config} do
       response =
         RequestsGenerator.users_posts_create()
-        |> Map.put(:__meta__, %{config: config})
+        |> Samples.APIModel.example()
         |> Formatter.response_object()
 
       assert APIB.full_response(%{response | status: 204}, config) == """
@@ -334,61 +336,58 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
 
   describe "full_request/2" do
     test "return full request", %{config: config} do
-      [{name, request}] =
-        RequestsGenerator.users_posts_create()
-        |> Map.put(:__meta__, %{config: config})
-        |> Formatter.request_object()
-        |> Map.to_list()
+      example = Samples.APIModel.example(RequestsGenerator.users_posts_create())
 
-      assert APIB.full_request(name, request, config) == """
-             + Request show user post (application/json)
-                 + Body
+      assert APIB.full_request(example.description, Formatter.request_object(example), config) ==
+               """
+               + Request show user post (application/json)
+                   + Body
 
-                         {
-                           "title": "user 1"
-                         }
+                           {
+                             "title": "user 1"
+                           }
 
-                 + Schema
+                   + Schema
 
-                         {
-                           "properties": {
-                             "title": {
-                               "example": "user 1",
-                               "type": "string"
-                             }
-                           },
-                           "type": "object"
-                         }
-
-             + Response 201 (application/json)
-                 + Headers
-
-                         cache-control: max-age=0, private, must-revalidate
-
-                 + Body
-
-                         {
-                           "title": "user 1",
-                           "users_id": "1"
-                         }
-
-                 + Schema
-
-                         {
-                           "properties": {
-                             "title": {
-                               "example": "user 1",
-                               "type": "string"
+                           {
+                             "properties": {
+                               "title": {
+                                 "example": "user 1",
+                                 "type": "string"
+                               }
                              },
-                             "users_id": {
-                               "example": "1",
-                               "type": "string"
-                             }
-                           },
-                           "type": "object"
-                         }
+                             "type": "object"
+                           }
 
-             """
+               + Response 201 (application/json)
+                   + Headers
+
+                           cache-control: max-age=0, private, must-revalidate
+
+                   + Body
+
+                           {
+                             "title": "user 1",
+                             "users_id": "1"
+                           }
+
+                   + Schema
+
+                           {
+                             "properties": {
+                               "title": {
+                                 "example": "user 1",
+                                 "type": "string"
+                               },
+                               "users_id": {
+                                 "example": "1",
+                                 "type": "string"
+                               }
+                             },
+                             "type": "object"
+                           }
+
+               """
     end
   end
 
@@ -396,7 +395,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
     test "return full action", %{config: config} do
       [{key, action}] =
         RequestsGenerator.users_posts_create()
-        |> Map.put(:__meta__, %{config: config})
+        |> Samples.APIModel.operation()
         |> Formatter.action_object()
         |> Map.to_list()
 
@@ -459,8 +458,8 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
     test "action with query parameters", %{config: config} do
       [{key, action}] =
         RequestsGenerator.users_index()
-        |> Map.put(:__meta__, %{config: config})
         |> Map.put(:query_params, %{"limit" => "6"})
+        |> Samples.APIModel.operation()
         |> Formatter.action_object()
         |> Map.to_list()
 
@@ -517,7 +516,7 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
     test "return full action", %{config: config} do
       [{key, resource}] =
         RequestsGenerator.users_posts_create()
-        |> Map.put(:__meta__, %{config: config})
+        |> Samples.APIModel.operation()
         |> Formatter.resource_object()
         |> Map.to_list()
 
@@ -601,12 +600,8 @@ defmodule Xcribe.ApiBlueprint.APIBTest do
     end
 
     test "return groups", %{config: config} do
-      request_object =
-        RequestsGenerator.users_posts_create()
-        |> Map.put(:__meta__, %{config: config})
-        |> Formatter.full_request_object()
-
-      requests = Formatter.put_object_into_groups(%{}, request_object)
+      operation = Samples.APIModel.operation(RequestsGenerator.users_posts_create())
+      requests = Formatter.put_operation_into_groups(%{}, operation)
 
       assert APIB.groups(requests, config) == """
              ## Group Users Posts
