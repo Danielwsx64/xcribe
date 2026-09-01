@@ -1,3 +1,3 @@
 defmodule Xcribe.PostCommentsController do
-  use Phoenix.Controller, namespace: Xcribe
+  use Phoenix.Controller, formats: [:json]
 end

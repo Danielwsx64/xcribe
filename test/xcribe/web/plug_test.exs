@@ -50,7 +50,8 @@ defmodule Xcribe.Web.PlugTest do
       assert Floki.find(html, "#swagger-ui") != []
 
       assert html |> Floki.find("link[type='text/css']") |> Floki.attribute("href") == [
-               "http://www.example.com//swagger-ui.css"
+               "http://www.example.com//swagger-ui.css",
+               "http://www.example.com//index.css"
              ]
 
       assert html |> Floki.find("link[rel='icon'][sizes='32x32']") |> Floki.attribute("href") == [
@@ -61,12 +62,15 @@ defmodule Xcribe.Web.PlugTest do
                "http://www.example.com//favicon-16x16.png"
              ]
 
-      assert [
-               {"script", [{"src", "http://www.example.com//swagger-ui-bundle.js"}], [""]},
-               {"script", [{"src", "http://www.example.com//swagger-ui-standalone-preset.js"}],
-                [""]},
-               script
-             ] = Floki.find(html, "script")
+      assert [bundle, preset, script] = Floki.find(html, "script")
+
+      assert Floki.attribute(bundle, "src") == [
+               "http://www.example.com//swagger-ui-bundle.js"
+             ]
+
+      assert Floki.attribute(preset, "src") == [
+               "http://www.example.com//swagger-ui-standalone-preset.js"
+             ]
 
       assert Floki.text(script, js: true) =~ "file.json"
     end
