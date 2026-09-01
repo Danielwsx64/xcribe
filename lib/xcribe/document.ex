@@ -87,7 +87,7 @@ defmodule Xcribe.Document do
   """
   defmacro document(conn, opts \\ []) do
     register_xcribe_tag(__CALLER__)
-    test_description = __CALLER__.function |> elem(0) |> to_string()
+    test_description = caller_function_name(__CALLER__)
 
     meta =
       Macro.escape(%{
@@ -117,6 +117,9 @@ defmodule Xcribe.Document do
       Module.put_attribute(module, :ex_unit_tests, to_put)
     end)
   end
+
+  defp caller_function_name(%Macro.Env{function: {name, _arity}}), do: to_string(name)
+  defp caller_function_name(%Macro.Env{function: nil}), do: ""
 
   defp build_opts(opts, "test " <> desc, %{module: module}) do
     description = Keyword.get(opts, :as, desc)

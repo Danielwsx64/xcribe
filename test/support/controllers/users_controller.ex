@@ -1,5 +1,5 @@
 defmodule Xcribe.UsersController do
-  use Phoenix.Controller, namespace: Xcribe
+  use Phoenix.Controller, formats: [:json]
 
   def index(conn, _params) do
     conn

@@ -1,8 +1,8 @@
 defmodule Xcribe.SwaggerTest do
   use ExUnit.Case, async: true
 
-  alias Xcribe.Support.RequestsGenerator
   alias Xcribe.{DocException, Swagger}
+  alias Xcribe.Support.RequestsGenerator
 
   @sample_swagger_output File.read!("test/support/swagger_example.json")
 

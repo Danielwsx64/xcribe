@@ -68,11 +68,12 @@ defmodule Xcribe.ConnParser do
 
   defp identify_route(%{method: method, host: host, path_info: path} = conn) do
     module = router_module(conn)
-    route = module.__match_route__(decode_uri(path), method, host)
+    route = module.__match_route__(method, decode_uri(path), host)
 
     extract_route_info(route)
   rescue
-    _ -> %{@error_struct | message: "An invalid Plug.Conn was given or maybe an invalid Router"}
+    _e in [UndefinedFunctionError, FunctionClauseError, KeyError, BadMapError] ->
+      %{@error_struct | message: "An invalid Plug.Conn was given or maybe an invalid Router"}
   end
 
   defp router_module(%{private: %{phoenix_router: router}}), do: router

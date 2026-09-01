@@ -12,19 +12,27 @@ defmodule Xcribe.MixProject do
       name: "Xcribe",
       docs: docs(),
       description: @description,
-      elixir: "~> 1.8",
+      elixir: "~> 1.18",
       package: package(),
       source_url: @links["GitHub"],
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [
+      aliases: aliases(),
+      deps: deps()
+    ]
+  end
+
+  def cli do
+    [
+      preferred_envs: [
+        precommit: :test,
         coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.post": :test,
-        "coveralls.html": :test
-      ],
-      deps: deps()
+        "coveralls.html": :test,
+        "xcribe.doc": :test
+      ]
     ]
   end
 
@@ -44,21 +52,25 @@ defmodule Xcribe.MixProject do
 
   defp application_mod(_), do: {Xcribe.Application, []}
 
+  defp aliases do
+    [precommit: ["compile --warnings-as-errors", "format", "credo", "test"]]
+  end
+
   defp deps do
     [
-      {:phoenix, "~> 1.5"},
+      # Floors are the first releases without known security advisories.
+      {:plug, ">= 1.18.5 and < 2.0.0"},
 
       # Dev environment
-      {:earmark, "~> 1.2", only: :dev},
-      {:ex_doc, "~> 0.19", only: :dev},
-      {:plug, "~> 1.0"},
+      {:ex_doc, "~> 0.40", only: :dev, runtime: false},
 
       # Test environment
-      {:floki, "~> 0.26", only: [:test]},
-      {:jason, "~> 1.1", only: [:dev, :test]},
-      {:excoveralls, "~> 0.13", only: :test},
-      {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
-      {:credo_naming, "~> 1.0", only: [:dev, :test], runtime: false}
+      {:phoenix, ">= 1.8.9 and < 2.0.0", only: [:dev, :test]},
+      {:floki, "~> 0.38", only: [:test]},
+      {:jason, "~> 1.4", only: [:dev, :test]},
+      {:excoveralls, "~> 0.18", only: :test},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:credo_naming, "~> 2.1", only: [:dev, :test], runtime: false}
     ]
   end
 

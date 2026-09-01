@@ -1,6 +1,6 @@
 # Xcribe
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Finbits/xcribe/CI?style=flat-square)](https://github.com/Finbits/xcribe/actions?query=workflow%3ACI)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Finbits/xcribe/ci.yml?branch=master&style=flat-square)](https://github.com/Finbits/xcribe/actions?query=workflow%3ACI)
 [![Hex.pm](https://img.shields.io/hexpm/v/xcribe?style=flat-square)](https://hex.pm/packages/xcribe)
 [![Hex.pm](https://img.shields.io/hexpm/l/xcribe?style=flat-square)](https://hex.pm/packages/xcribe)
 [![Hex.pm](https://img.shields.io/hexpm/dt/xcribe?style=flat-square)](https://hex.pm/packages/xcribe)
@@ -10,6 +10,10 @@ Xcribe is a doc generator for Rest APIs built with Phoenix. The documentation is
 
 Currently both Blueprint and Swagger (OpenAPI Spec 3.0) syntax are supported. In the future other formats will
 be added.
+
+## Requirements
+
+Elixir 1.18+, Erlang/OTP 27+, Phoenix 1.8.9+ and Plug 1.18.5+.
 
 ## Installation
 
