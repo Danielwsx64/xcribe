@@ -1,16 +1,16 @@
 # Serving generated doc
 
-You can use `Xcribe` to serve your API documentation. Currently we support serve
-`Swagger` format. To render documentation we use [Swagger UI](https://swagger.io/tools/swagger-ui/).
+You can use `Xcribe` to serve your API documentation. Currently we support serving
+the `OpenAPI` format. To render documentation we use [Swagger UI](https://swagger.io/tools/swagger-ui/).
 
 ## Configuration
 
-For serving with `Xcribe` you must configure doc format as `:swagger` the output path
+For serving with `Xcribe` you must configure doc format as `:openapi` the output path
 must be `priv/static` and you must enable `serve` config.
 
 ```elixir
 config :xcribe, YourAppWeb.Endpoint,
-  format: :swagger,
+  format: :openapi,
   output: "priv/static/my_doc.json",
   serve: true
 ```
@@ -23,7 +23,7 @@ The title, description and server list shown by Swagger UI come from your specif
 Add a doc scope to your router, and forward all requests to `Xcribe.Web.Plug`
 
 ```
-      scope "doc/swagger" do
+      scope "doc/openapi" do
         forward "/", Xcribe.Web.Plug, endpoint: YourAppWeb.Endpoint
       end
 

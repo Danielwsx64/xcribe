@@ -5,7 +5,7 @@ defmodule Mix.Tasks.Xcribe.Doc do
   You can override the application config by passing the arguments `--format` and `--output`
 
   ```sh
-  mix xcribe.doc -f swagger -o /home/user/api.doc
+  mix xcribe.doc -f openapi -o /home/user/api.doc
   ```
 
   You can generate doc for an specific endpoint by passing it as argument

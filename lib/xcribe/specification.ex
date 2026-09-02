@@ -22,23 +22,23 @@ defmodule Xcribe.Specification do
 
     * `:description` - A long description of the API. Default `""`.
 
-    * `:version` - The API version. Default `"1.0.0"`. Swagger only; API Blueprint has no
+    * `:version` - The API version. Default `"1.0.0"`. OpenAPI only; API Blueprint has no
     field for it.
 
-    * `:servers` - A list of maps, each with a `:url` and an optional `:description`. Swagger emits
+    * `:servers` - A list of maps, each with a `:url` and an optional `:description`. OpenAPI emits
     all of them; API Blueprint has a single `HOST` and uses the first.
 
     * `:paths` - Values to overlay onto the generated routes, keyed by path and then by HTTP verb.
     Anything you write here wins over what Xcribe generated. **The path key must be the path as it
     appears in the finished document** — that is, after `:ignore_namespaces` and the server paths
     have been stripped. With `ignore_namespaces: ["/api/v1"]`, the route `/api/v1/users` is keyed
-    as `"/users"`. Swagger accepts a full OpenAPI Path Item Object, and a path no test documented
+    as `"/users"`. The OpenAPI format accepts a full Path Item Object, and a path no test documented
     is added to the document as-is. API Blueprint has no equivalent structure: it reads only
     `:description`, and it cannot add a route no test documented.
 
     * `:schemas` - Named component schemas, merged with the ones Xcribe derives from your
     responses. Where both define the same name, your schema wins for every field except
-    `properties`, which is merged, and a generated `example` or `format` on a leaf. Swagger only —
+    `properties`, which is merged, and a generated `example` or `format` on a leaf. OpenAPI only —
     API Blueprint has no component section.
 
     * `:ignore_namespaces` - Prefixes to strip from paths, default group tags and default schema

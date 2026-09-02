@@ -1,7 +1,7 @@
-defmodule Xcribe.Swagger.MergeTest do
+defmodule Xcribe.OpenAPI.MergeTest do
   use ExUnit.Case, async: true
 
-  alias Xcribe.Swagger.Merge
+  alias Xcribe.OpenAPI.Merge
 
   describe "overlay_paths/2" do
     test "specification values win over generated ones" do

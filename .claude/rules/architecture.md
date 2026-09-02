@@ -43,8 +43,8 @@ Error *shapes* live in [errors.md](errors.md); config threading in [config.md](c
 
 - **A format is always three modules**, and they never collapse into each other:
 
-      Xcribe.Swagger        / Xcribe.ApiBlueprint          # orchestrator: generate_doc/3
-      Xcribe.Swagger.Formatter / Xcribe.ApiBlueprint.Formatter  # builds intermediate maps/objects
+      Xcribe.OpenAPI        / Xcribe.ApiBlueprint          # orchestrator: generate_doc/3
+      Xcribe.OpenAPI.Formatter / Xcribe.ApiBlueprint.Formatter  # builds intermediate maps/objects
       Xcribe.JSON              / Xcribe.ApiBlueprint.APIB       # encodes to the final binary
 
 - The orchestrator only reduces the API model's operations through the formatter and hands the

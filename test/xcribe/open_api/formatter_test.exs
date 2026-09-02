@@ -1,11 +1,11 @@
-defmodule Xcribe.Swagger.FormatterTest do
+defmodule Xcribe.OpenAPI.FormatterTest do
   use ExUnit.Case, async: true
 
   alias Plug.Upload
   alias Xcribe.APIModel
+  alias Xcribe.OpenAPI.Formatter
   alias Xcribe.Request
   alias Xcribe.Support.Samples
-  alias Xcribe.Swagger.Formatter
 
   @config %{json_library: Jason}
   @specification %{ignore_namespaces: [], ignore_resources_prefix: [], schemas: %{}}

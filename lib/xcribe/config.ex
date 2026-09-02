@@ -1,7 +1,7 @@
 defmodule Xcribe.Config do
   @moduledoc false
 
-  @valid_formats [:api_blueprint, :swagger]
+  @valid_formats [:api_blueprint, :openapi]
 
   def default_spec_file, do: ".xcribe.exs"
   def active?, do: System.get_env("XCRIBE_ENV") in ["1", "true", "TRUE"]
@@ -28,7 +28,7 @@ defmodule Xcribe.Config do
   end
 
   @format_message "Xcribe doesn't support the configured documentation format"
-  @format_instructions "Xcribe supports Swagger and Blueprint, configure as: `config :xcribe, Endpoint, format: :swagger`"
+  @format_instructions "Xcribe supports :openapi and :api_blueprint, configure as: `config :xcribe, Endpoint, format: :openapi`. The :swagger format was renamed to :openapi."
   defp validate_config(:format, {_errors, config} = results) do
     format = Map.fetch!(config, :format)
 
@@ -73,12 +73,12 @@ defmodule Xcribe.Config do
     end
   end
 
-  @serve_format_message "When serve config is true you must use swagger format"
-  @serve_format_instructions "You must use Swagger format: `config :xcribe, Endpoint, format: :swagger`"
+  @serve_format_message "When serve config is true you must use the :openapi format"
+  @serve_format_instructions "You must use the OpenAPI format: `config :xcribe, Endpoint, format: :openapi`"
   defp validate_serve_format({_errors, config} = results) do
     format = Map.fetch!(config, :format)
 
-    if format == :swagger do
+    if format == :openapi do
       results
     else
       add_error(results, :format, format, @serve_format_message, @serve_format_instructions)
@@ -106,7 +106,7 @@ defmodule Xcribe.Config do
   end
 
   defp apply_default_values(keyword) do
-    format = Keyword.get(keyword, :format, :swagger)
+    format = Keyword.get(keyword, :format, :openapi)
     json_library = Keyword.get(keyword, :json_library, Jason)
     output = Keyword.get(keyword, :output, default_output(format))
     serve = Keyword.get(keyword, :serve, false)
@@ -124,7 +124,7 @@ defmodule Xcribe.Config do
   defp default_output(format) do
     case format do
       :api_blueprint -> "api_doc.apib"
-      :swagger -> "openapi.json"
+      :openapi -> "openapi.json"
       _ -> ""
     end
   end

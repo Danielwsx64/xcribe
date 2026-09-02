@@ -104,7 +104,7 @@ defmodule Xcribe.CLI.OutputTest do
         {:json_library, FakeJson, "Given json library doesn't implement needed functions",
          "Try configure Xcribe with Jason or Poison `config :xcribe, [json_library: Jason]`"},
         {:format, :invalid, "An unsupported format was configured",
-         "Xcribe supports Swagger and Blueprint, configure as: `config :xcribe, [format: :swagger]`"}
+         "Xcribe supports OpenAPI and Blueprint, configure as: `config :xcribe, [format: :openapi]`"}
       ]
 
       expected_output = """
@@ -122,7 +122,7 @@ defmodule Xcribe.CLI.OutputTest do
       \e[32m┃\e[0m        \e[38;5;240m> Config key: format
       \e[38;5;100m┃\e[0m
       \e[38;5;100m┃\e[0m        Given value: \e[38;5;37m:invalid
-      \e[38;5;100m┃\e[0m        \e[38;5;100mXcribe supports Swagger and Blueprint, configure as: `config :xcribe, [format: :swagger]`
+      \e[38;5;100m┃\e[0m        \e[38;5;100mXcribe supports OpenAPI and Blueprint, configure as: `config :xcribe, [format: :openapi]`
       \e[38;5;100m┃\e[0m
 
       """
@@ -192,10 +192,10 @@ defmodule Xcribe.CLI.OutputTest do
       message = "An exception was raised. Elixir.FunctionClauseError"
 
       stacktrace = """
-      (xcribe 0.6.0) lib/swagger/swagger.ex:53: Xcribe.Swagger.paths_object_func/2
+      (xcribe 0.6.0) lib/xcribe/open_api/open_api.ex:53: Xcribe.OpenAPI.paths_object_func/2
       (elixir 1.10.3) lib/enum.ex:2111: Enum."-reduce/3-lists^foldl/2-0-"/3
-      (xcribe 0.6.0) lib/swagger/swagger.ex:23: Xcribe.Swagger.mount_data_in_raw_object/2
-      (xcribe 0.6.0) lib/swagger/swagger.ex:14: Xcribe.Swagger.generate_doc/1
+      (xcribe 0.6.0) lib/xcribe/open_api/open_api.ex:23: Xcribe.OpenAPI.mount_data_in_raw_object/2
+      (xcribe 0.6.0) lib/xcribe/open_api/open_api.ex:14: Xcribe.OpenAPI.generate_doc/1
       (xcribe 0.6.0) lib/formatter.ex:48: Xcribe.Formatter.handle_cast/2
       test/lib/formatter_test.exs:129: (test)
       """
@@ -230,10 +230,10 @@ defmodule Xcribe.CLI.OutputTest do
 
        - Exception stacktrace:
 
-      (xcribe 0.6.0) lib/swagger/swagger.ex:53: Xcribe.Swagger.paths_object_func/2
+      (xcribe 0.6.0) lib/xcribe/open_api/open_api.ex:53: Xcribe.OpenAPI.paths_object_func/2
       (elixir 1.10.3) lib/enum.ex:2111: Enum.\"-reduce/3-lists^foldl/2-0-\"/3
-      (xcribe 0.6.0) lib/swagger/swagger.ex:23: Xcribe.Swagger.mount_data_in_raw_object/2
-      (xcribe 0.6.0) lib/swagger/swagger.ex:14: Xcribe.Swagger.generate_doc/1
+      (xcribe 0.6.0) lib/xcribe/open_api/open_api.ex:23: Xcribe.OpenAPI.mount_data_in_raw_object/2
+      (xcribe 0.6.0) lib/xcribe/open_api/open_api.ex:14: Xcribe.OpenAPI.generate_doc/1
       (xcribe 0.6.0) lib/formatter.ex:48: Xcribe.Formatter.handle_cast/2
       test/lib/formatter_test.exs:129: (test)
 

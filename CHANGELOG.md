@@ -16,10 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   than the project root. See `Xcribe.Specification`.
 - The specification file's `paths:` key lets you write documentation Xcribe cannot infer from a
   test: a description for a route, or a whole route your suite never exercises. Values you author
-  there win over the generated ones. Swagger accepts a full OpenAPI Path Item Object; API Blueprint
-  has no equivalent structure and reads only `description`.
+  there win over the generated ones. The OpenAPI format accepts a full Path Item Object; API
+  Blueprint has no equivalent structure and reads only `description`.
 - The specification file's `schemas:` key seeds `components.schemas`, so hand-written component
-  schemas survive alongside the ones derived from your responses. Swagger only.
+  schemas survive alongside the ones derived from your responses. OpenAPI only.
 - `ignore_namespaces:` and `ignore_resources_prefix:` strip routing noise out of the generated
   document. An app that mounts everything under `/api/v1` no longer gets that prefix repeated in
   every path, group tag and schema name. The path of each configured server is stripped
@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   behind.
 - `document/2` accepts `schema:` and `req_schema:` to name the response and request schemas of a
   route, and the `@xcribe_schema` / `@xcribe_req_schema` module attributes do the same for a whole
-  test file. In Swagger the name becomes a `components.schemas` key referenced by `$ref`, which
+  test file. In OpenAPI the name becomes a `components.schemas` key referenced by `$ref`, which
   removes the schema duplication that made large documents unreadable. API Blueprint has no
   component section, so the name surfaces as the JSON Schema `title`.
 - `document/2` accepts `tags: false` to document a route without a group tag, for endpoints that do
@@ -40,7 +40,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   are removed. They required consumers to compile a module whose only job was to hold static text,
   and the DSL had to be re-learned to change an API description. Run `mix xcribe.gen.spec` and move
   the values across to `.xcribe.exs`.
-- **Breaking.** The generated Swagger document now references named schemas under
+- **Breaking.** The Swagger output format is now called OpenAPI. Configure `format: :openapi`
+  (the default) instead of `format: :swagger`, and pass `mix xcribe.doc -f openapi`. The old atom is
+  rejected as an unsupported format rather than silently accepted, so a stale config fails with an
+  Xcribe error report naming the fix instead of quietly generating nothing. Swagger is the name of
+  the viewer Xcribe bundles for serve mode; the document Xcribe writes has always declared itself
+  `openapi: "3.0.3"`, and the config key now says the same thing. The generated document itself is
+  unchanged — only the name you configure.
+- **Breaking.** The generated OpenAPI document now references named schemas under
   `components.schemas` with `$ref` instead of inlining a copy into every operation, and no longer
   emits the always-empty `summary` field on operations. Both change a committed document's diff, so
   expect one large diff on first regeneration.
@@ -55,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bundled Swagger UI updated from 3.x to 5.32.14.
 - Both output formats are now generated from one format-agnostic model of the documented API
   instead of each grouping and merging the recorded requests for itself. Two consequences a
-  consumer can see. The `parameters` list of a Swagger operation is sorted by name even when a
+  consumer can see. The `parameters` list of an OpenAPI operation is sorted by name even when a
   single test documented the route, so an operation with a path parameter and a query parameter
   whose names sort the other way round will reorder once. And a group tag list given as
   `tags: ["B", "A"]` is emitted sorted, since the order of tags carries no meaning in either

@@ -10,7 +10,7 @@ HexDocs, so the seven public modules' docs *are* the product. Which modules thos
   user-facing config reference: a new config key is documented there as a bullet, or it is
   undocumented (see [config.md](config.md)).
 - An internal module **may** carry `@doc` strings on its functions as developer notes;
-  `Xcribe.JSON`, `Xcribe.JsonSchema`, `Xcribe.Swagger.Formatter` and `Xcribe.Helpers.Formatter`
+  `Xcribe.JSON`, `Xcribe.JsonSchema`, `Xcribe.OpenAPI.Formatter` and `Xcribe.Helpers.Formatter`
   do. They are never published — ex_doc hides the module.
 - **No `@spec`, `@type`, `@opaque`, `@behaviour`, `@impl`, `@callback`, `defprotocol`, or
   `defimpl`.** `lib/` contains zero of each and `Credo.Check.Readability.Specs` is `false` in

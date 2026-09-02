@@ -1,10 +1,10 @@
-defmodule Xcribe.SwaggerTest do
+defmodule Xcribe.OpenAPITest do
   use ExUnit.Case, async: true
 
-  alias Xcribe.{APIModel, DocException, Request, Specification, Swagger}
+  alias Xcribe.{APIModel, DocException, OpenAPI, Request, Specification}
   alias Xcribe.Support.RequestsGenerator
 
-  @sample_swagger_output File.read!("test/support/swagger_example.json")
+  @sample_openapi_output File.read!("test/support/openapi_example.json")
 
   describe "generate_doc/3" do
     test "parse requests do string" do
@@ -22,7 +22,7 @@ defmodule Xcribe.SwaggerTest do
         RequestsGenerator.users_posts_update([:api_key_auth])
       ]
 
-      expected = Jason.decode!(@sample_swagger_output)
+      expected = Jason.decode!(@sample_openapi_output)
 
       response = generate_doc(requests, config)
 
@@ -175,6 +175,6 @@ defmodule Xcribe.SwaggerTest do
 
     requests
     |> APIModel.build(specification, config)
-    |> Swagger.generate_doc(specification, config)
+    |> OpenAPI.generate_doc(specification, config)
   end
 end

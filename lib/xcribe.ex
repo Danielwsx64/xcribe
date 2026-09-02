@@ -51,9 +51,9 @@ defmodule Xcribe do
   #### Available configurations:
 
     * `:format` - Format to generate documentation, allowed `:api_blueprint` and
-    `:swagger`. Default `:swagger`.
+    `:openapi`. Default `:openapi`.
     * `:output` - The name of the generated documentation file. The default changes
-    with the format: `"api_doc.apib"` for Blueprint and `"openapi.json"` for Swagger.
+    with the format: `"api_doc.apib"` for API Blueprint and `"openapi.json"` for OpenAPI.
     * `:json_library` - The library to be used for json decode/encode (Jason
     and Poison are supported). Default `Jason`.
     * `:serve` - Enable Xcribe serve mode. Default `false`. See more `Serving doc`
@@ -66,13 +66,13 @@ defmodule Xcribe do
     CLI.Output,
     Config,
     DocException,
+    OpenAPI,
     Recorder,
     Request,
     Request.Error,
     Request.Validator,
     Specification,
     SpecificationFile,
-    Swagger,
     Writter
   }
 
@@ -159,7 +159,7 @@ defmodule Xcribe do
   defp generate_docs({:ok, {model, specification}}, %{format: doc_format} = config) do
     case doc_format do
       :api_blueprint -> ApiBlueprint.generate_doc(model, specification, config)
-      :swagger -> Swagger.generate_doc(model, specification, config)
+      :openapi -> OpenAPI.generate_doc(model, specification, config)
     end
   end
 

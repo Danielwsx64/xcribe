@@ -67,7 +67,7 @@ change — never defer tests. Coverage is reported to Codecov by CI.
   dynamic value: `assert %{description: ^test_name, __meta__: ^meta} = Recorder.pop_all()`.
 - **Large expected payloads move out of the test body** — to a module under
   `test/support/samples/**` returning the map, or to the golden files
-  `test/support/swagger_example.json` / `api_blueprint_example.apib`. A golden-file change is a
+  `test/support/openapi_example.json` / `api_blueprint_example.apib`. A golden-file change is a
   behaviour change ([output.md](output.md)).
 - CLI output is tested with `import ExUnit.CaptureIO`, `capture_io(fn -> ... end)` and `=~`.
 - **No doctests** — `iex>` examples in `@doc` are decorative ([docs.md](docs.md)).

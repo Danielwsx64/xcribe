@@ -6,11 +6,11 @@
 - **A namespace root lives at `lib/xcribe/<ns>/<ns>.ex`**, inside the directory it names:
 
       lib/xcribe/request/request.ex             -> Xcribe.Request
-      lib/xcribe/swagger/swagger.ex             -> Xcribe.Swagger
+      lib/xcribe/open_api/open_api.ex           -> Xcribe.OpenAPI
       lib/xcribe/api_blueprint/api_blueprint.ex -> Xcribe.ApiBlueprint
 
-  **Not** `lib/xcribe/swagger.ex`. Sub-namespaces mirror directories exactly (`CLI`, `Web`,
-  `Helpers`, `Request`, `Tasks`, `ApiBlueprint`, `Swagger`).
+  **Not** `lib/xcribe/open_api.ex`. Sub-namespaces mirror directories exactly (`CLI`, `Web`,
+  `Helpers`, `Request`, `Tasks`, `ApiBlueprint`, `OpenAPI`).
 - **Multi-alias braces are the house style** — `alias Xcribe.{ConnParser, Recorder}` — and the
   list is **alphabetical** (`Credo.Check.Readability.AliasOrder` is on;
   `Consistency.MultiAliasImportRequireUse` is off). `import` is always scoped:
@@ -25,7 +25,6 @@
 - **`Xcribe.Writter` is misspelled.** It is `@moduledoc false`, but it is referenced across the
   codebase and by anyone who has read the source. **Do not rename it in a patch release** — a
   rename is a change to be batched into a major bump with the rest, not a drive-by cleanup.
-  The same applies to `test/support/samples/swagger_formater/`.
 - **Never nest two modules in one file** — with one deliberate exception,
   `lib/xcribe/exceptions.ex`, which holds every custom exception (see [errors.md](errors.md)).
   Don't add a second exception to that rule.
