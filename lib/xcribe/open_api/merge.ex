@@ -1,4 +1,4 @@
-defmodule Xcribe.Swagger.Merge do
+defmodule Xcribe.OpenAPI.Merge do
   @moduledoc false
 
   @doc """

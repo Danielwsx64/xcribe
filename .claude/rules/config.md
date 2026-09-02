@@ -8,10 +8,10 @@ flows is [architecture.md](architecture.md); the error tuple it returns is [erro
   `all_endpoints/0`) — keep it that way. A second reader anywhere else is a bug.
 - Config is **scoped per endpoint**, never global:
 
-      config :xcribe, YourAppWeb.Endpoint, format: :swagger, output: "openapi.json"
+      config :xcribe, YourAppWeb.Endpoint, format: :openapi, output: "openapi.json"
 
   read with `Xcribe.Config.fetch_config/1`, which normalizes the keyword list into a **map with
-  every default already applied** (`format: :swagger`, `json_library: Jason`,
+  every default already applied** (`format: :openapi`, `json_library: Jason`,
   `output:` per format, `serve: false`, `specification_source: ".xcribe.exs"`).
 - **Every other module receives that map as a trailing `config` argument and pattern-matches
   only the keys it needs** — the argument name is the documentation:
@@ -34,7 +34,7 @@ flows is [architecture.md](architecture.md); the error tuple it returns is [erro
   declared immediately above the clause that uses them** — the pair reads as one unit:
 
       @format_message "Xcribe doesn't support the configured documentation format"
-      @format_instructions "Xcribe supports Swagger and Blueprint, configure as: `config :xcribe, Endpoint, format: :swagger`"
+      @format_instructions "Xcribe supports :openapi and :api_blueprint, configure as: `config :xcribe, Endpoint, format: :openapi`. The :swagger format was renamed to :openapi."
       defp validate_config(:format, {_errors, config} = results) do
 
   `instructions` is the copy-pasteable fix the user needs. Never leave it blank.

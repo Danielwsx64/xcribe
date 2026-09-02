@@ -15,12 +15,12 @@ The `.apib` / JSON document xcribe writes is part of the public contract
 
       Enum.sort_by(requests, &request_sort_key/1)  # Xcribe.APIModel, a total key per request
       Enum.sort_by(key_function)                   # Xcribe.APIModel.Merge.by_key/4, every collection
-      Enum.sort_by(&{&1.name, &1.location})        # Xcribe.Swagger.Formatter, parameter objects
+      Enum.sort_by(&{&1.name, &1.location})        # Xcribe.OpenAPI.Formatter, parameter objects
 
   **Never rely on the iteration order of a map, `Enum.group_by/3`, `Map.new/2`, or
   `MapSet`** — and never rely on the order requests were recorded in, which follows ExUnit's
   scheduling and changes with `async: true`.
-- **The golden files pin the contract**: `test/support/swagger_example.json` and
+- **The golden files pin the contract**: `test/support/openapi_example.json` and
   `test/support/api_blueprint_example.apib`. Changing either is a deliberate,
   CHANGELOG-worthy behaviour change — **never** an incidental test fixup to make a diff go
   away. If a change to `lib/` moves a golden file, say why in the CHANGELOG entry and confirm

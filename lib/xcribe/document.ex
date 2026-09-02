@@ -66,7 +66,7 @@ defmodule Xcribe.Document do
         ...
       end
 
-  In the Swagger format a schema name becomes a key under `components.schemas`, referenced with
+  In the OpenAPI format a schema name becomes a key under `components.schemas`, referenced with
   `$ref`. API Blueprint has no component section, so the name surfaces as the JSON Schema `title`
   of the request or response instead.
 

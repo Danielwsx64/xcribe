@@ -9,7 +9,7 @@ depend on. Version consequences live in [release.md](release.md).
       Xcribe.Document            # the document/1,2 macro imported into the consumer's ConnCase
       Xcribe.Specification       # the `.xcribe.exs` file format (its @moduledoc IS that reference)
       Xcribe.Formatter           # the ExUnit formatter a consumer adds to ExUnit.configure/1
-      Xcribe.Web.Plug            # serving the generated Swagger doc
+      Xcribe.Web.Plug            # serving the generated OpenAPI doc
       Mix.Tasks.Xcribe.Doc       # the `mix xcribe.doc` task and its CLI options
       Mix.Tasks.Xcribe.Gen.Spec  # the `mix xcribe.gen.spec` task and its `--output` option
 
@@ -22,7 +22,7 @@ depend on. Version consequences live in [release.md](release.md).
   decision to support that module forever — take it deliberately, not by habit. Most of the
   modules in `lib/` are `@moduledoc false`; a new internal module joins them.
 - An internal (`@moduledoc false`) module **may** still carry `@doc` strings on its functions
-  as developer notes — `Xcribe.JSON`, `Xcribe.Swagger.Formatter`, `Xcribe.JsonSchema` and
+  as developer notes — `Xcribe.JSON`, `Xcribe.OpenAPI.Formatter`, `Xcribe.JsonSchema` and
   `Xcribe.Helpers.Formatter` do. Those docs are not published; ex_doc hides the module.
 - **`@doc false` on functions that must be public for an internal caller but are not API** —
   `Xcribe.document_all_records/1`, `Xcribe.document/2`, `__using__/1`, `__before_compile__/1`,

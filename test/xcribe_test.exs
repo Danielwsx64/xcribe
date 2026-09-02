@@ -7,7 +7,7 @@ defmodule XcribeTest do
 
   alias Xcribe.Support.RequestsGenerator
 
-  @sample_swagger_output File.read!("test/support/swagger_example.json")
+  @sample_openapi_output File.read!("test/support/openapi_example.json")
   @sample_apib_output File.read!("test/support/api_blueprint_example.apib")
 
   test "README install version check" do
@@ -22,7 +22,7 @@ defmodule XcribeTest do
 
   describe "document/2" do
     @tag :tmp_dir
-    test "write documentation with swagger format", %{tmp_dir: tmp_dir} do
+    test "write documentation with openapi format", %{tmp_dir: tmp_dir} do
       output_path = Path.join(tmp_dir, "openapi.json")
 
       records = [
@@ -38,7 +38,7 @@ defmodule XcribeTest do
       ]
 
       config = %{
-        format: :swagger,
+        format: :openapi,
         specification_source: "test/support/.simple_example.exs",
         json_library: Jason,
         output: output_path
@@ -52,7 +52,7 @@ defmodule XcribeTest do
       assert io_output =~ "Xcribe documentation written in"
 
       assert output_path |> File.read!() |> Jason.decode!() ==
-               Jason.decode!(@sample_swagger_output)
+               Jason.decode!(@sample_openapi_output)
     end
 
     @tag :tmp_dir
@@ -96,7 +96,7 @@ defmodule XcribeTest do
       records = [RequestsGenerator.users_index()]
 
       config = %{
-        format: :swagger,
+        format: :openapi,
         specification_source: spec_file,
         json_library: Jason,
         output: Path.join(tmp_dir, "openapi.json")
@@ -111,7 +111,7 @@ defmodule XcribeTest do
       records = [RequestsGenerator.users_index()]
 
       config = %{
-        format: :swagger,
+        format: :openapi,
         specification_source: ".not_there.exs",
         json_library: Jason,
         output: Path.join(tmp_dir, "openapi.json")
@@ -126,7 +126,7 @@ defmodule XcribeTest do
       records = [RequestsGenerator.users_index()]
 
       config = %{
-        format: :swagger,
+        format: :openapi,
         specification_source: "test/support/.simple_example.exs",
         json_library: Jason,
         output: tmp_dir
@@ -209,7 +209,7 @@ defmodule XcribeTest do
       records = [request_with_error]
 
       config = %{
-        format: :swagger,
+        format: :openapi,
         specification_source: "test/support/.simple_example.exs",
         json_library: Jason
       }

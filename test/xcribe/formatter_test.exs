@@ -16,7 +16,7 @@ defmodule Xcribe.FormatterTest do
       Xcribe.Endpoint,
       output: "/tmp/test",
       specification_source: "test/support/.xcribe.exs",
-      format: :swagger,
+      format: :openapi,
       json_library: Jason
     )
 
@@ -50,7 +50,7 @@ defmodule Xcribe.FormatterTest do
       Application.put_env(:xcribe, Xcribe.Endpoint,
         output: Path.join(tmp_dir, "openapi.json"),
         specification_source: spec_file,
-        format: :swagger,
+        format: :openapi,
         json_library: Jason
       )
 
@@ -71,7 +71,7 @@ defmodule Xcribe.FormatterTest do
       Application.put_env(:xcribe, Xcribe.Endpoint,
         output: tmp_dir,
         specification_source: "test/support/.simple_example.exs",
-        format: :swagger,
+        format: :openapi,
         json_library: Jason
       )
 

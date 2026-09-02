@@ -1,4 +1,4 @@
-defmodule Xcribe.Swagger.Formatter do
+defmodule Xcribe.OpenAPI.Formatter do
   @moduledoc false
 
   alias Xcribe.APIModel

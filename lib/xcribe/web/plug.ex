@@ -5,7 +5,7 @@ defmodule Xcribe.Web.Plug do
   Add a doc scope to your router, and forward all requests to `Xcribe.Web.Plug`
 
   ```
-        scope "doc/swagger" do
+        scope "doc/openapi" do
           forward "/", Xcribe.Web.Plug, endpoint: YourApp.Endpoint
         end
 

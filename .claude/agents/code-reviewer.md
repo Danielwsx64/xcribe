@@ -23,7 +23,7 @@ reaches other people's applications — weigh public-API and generated-output is
 | `public-api.md` | ✅ | — |
 | `config.md` | | `Application.get_env`, `Application.put_env`, `fetch_config`, `apply_default_values`, `validate_config` |
 | `errors.md` | | `rescue`, `raise`, `defexception`, `try`, `IO.puts`, `IO.inspect`, `Logger`, `System.halt`, `%Error{` |
-| `output.md` | | `encode!`, `Jason`, `Enum.group_by`, `Map.new`, `MapSet`, `Enum.sort`, `swagger_example`, `api_blueprint_example` |
+| `output.md` | | `encode!`, `Jason`, `Enum.group_by`, `Map.new`, `MapSet`, `Enum.sort`, `openapi_example`, `api_blueprint_example` |
 | `dependencies.md` | | `mix.exs`, `.tool-versions`, `ci.yml`, `phoenix_`, `conn.private`, `__match_route__`, `Phoenix.` |
 | `architecture.md` | | `generate_doc`, `File.`, `Writter`, `Recorder`, `ConnParser`, a new file under `lib/xcribe/` |
 | `tests.md` | | any `_test.exs` or `test/support/` file |

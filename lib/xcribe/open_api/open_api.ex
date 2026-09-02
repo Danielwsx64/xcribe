@@ -1,10 +1,10 @@
-defmodule Xcribe.Swagger do
+defmodule Xcribe.OpenAPI do
   @moduledoc false
 
   alias Xcribe.APIModel
   alias Xcribe.APIModel.{Operation, Route}
   alias Xcribe.{DocException, JSON}
-  alias Xcribe.Swagger.{Formatter, Merge}
+  alias Xcribe.OpenAPI.{Formatter, Merge}
 
   def generate_doc(%APIModel{} = model, specification, config) do
     model

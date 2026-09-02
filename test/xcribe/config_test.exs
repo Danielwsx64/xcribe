@@ -53,7 +53,7 @@ defmodule Xcribe.ConfigTest do
   describe "fetch_config/1" do
     test "fetch configuration with default values" do
       assert Config.fetch_config(Xcribe.FakeEndPoint) == %{
-               format: :swagger,
+               format: :openapi,
                specification_source: ".xcribe.exs",
                json_library: Jason,
                output: "openapi.json",
@@ -83,7 +83,7 @@ defmodule Xcribe.ConfigTest do
   describe "check_configurations/2" do
     test "return ok if has valid configurations" do
       config = %{
-        format: :swagger,
+        format: :openapi,
         specification_source: ".xcribe.exs",
         json_library: Jason,
         serve: false
@@ -94,7 +94,7 @@ defmodule Xcribe.ConfigTest do
 
     test "validate serve config" do
       config = %{
-        format: :swagger,
+        format: :openapi,
         specification_source: ".xcribe.exs",
         json_library: Jason,
         output: "priv/static/openapi.json",
@@ -119,8 +119,9 @@ defmodule Xcribe.ConfigTest do
                   {:output, "",
                    "When serve config is true you must confiture output to \"priv/static\" folder",
                    "You must configure output as: `config :xcribe, Endpoint, output: \"priv/static/doc.json\"`"},
-                  {:format, :invalid, "When serve config is true you must use swagger format",
-                   "You must use Swagger format: `config :xcribe, Endpoint, format: :swagger`"},
+                  {:format, :invalid,
+                   "When serve config is true you must use the :openapi format",
+                   "You must use the OpenAPI format: `config :xcribe, Endpoint, format: :openapi`"},
                   {:json_library, FakeJson,
                    "The configured json library doesn't implement the needed functions",
                    "Try configure Xcribe with Jason or Poison `config :xcribe, Endpoint, json_library: Jason`"},
@@ -129,7 +130,25 @@ defmodule Xcribe.ConfigTest do
                    "Add a valid spec file path in `config :xcribe, Endpoint, specification_source: \".xcribe.exs\"`"},
                   {:format, :invalid,
                    "Xcribe doesn't support the configured documentation format",
-                   "Xcribe supports Swagger and Blueprint, configure as: `config :xcribe, Endpoint, format: :swagger`"}
+                   "Xcribe supports :openapi and :api_blueprint, configure as: `config :xcribe, Endpoint, format: :openapi`. The :swagger format was renamed to :openapi."}
+                ]}
+    end
+
+    test "reject the removed swagger format" do
+      config = %{
+        format: :swagger,
+        specification_source: ".xcribe.exs",
+        json_library: Jason,
+        output: "openapi.json",
+        serve: false
+      }
+
+      assert Config.check_configurations(config) ==
+               {:error,
+                [
+                  {:format, :swagger,
+                   "Xcribe doesn't support the configured documentation format",
+                   "Xcribe supports :openapi and :api_blueprint, configure as: `config :xcribe, Endpoint, format: :openapi`. The :swagger format was renamed to :openapi."}
                 ]}
     end
 
@@ -148,8 +167,9 @@ defmodule Xcribe.ConfigTest do
                   {:output, "",
                    "When serve config is true you must confiture output to \"priv/static\" folder",
                    "You must configure output as: `config :xcribe, Endpoint, output: \"priv/static/doc.json\"`"},
-                  {:format, :invalid, "When serve config is true you must use swagger format",
-                   "You must use Swagger format: `config :xcribe, Endpoint, format: :swagger`"}
+                  {:format, :invalid,
+                   "When serve config is true you must use the :openapi format",
+                   "You must use the OpenAPI format: `config :xcribe, Endpoint, format: :openapi`"}
                 ]}
     end
   end

@@ -2,7 +2,7 @@ defmodule Mix.Tasks.Xcribe.Gen.Spec do
   @moduledoc """
   Generate specification file.
 
-  You can use OpenApi v3.0 specification to define schemas and custom path descriptions.
+  You can use OpenAPI 3.0.3 specification to define schemas and custom path descriptions.
   See `Xcribe.Specification`
 
   ```sh
