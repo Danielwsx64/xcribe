@@ -55,7 +55,7 @@ defmodule Mix.Tasks.Xcribe.Serve do
       {:error, errors} ->
         Output.print_configuration_errors(errors)
 
-        Output.print_message("Xcribe Task - aborted", :error)
+        Output.print_message("aborted", :error)
 
         exit({:shutdown, 1})
     end
@@ -64,7 +64,7 @@ defmodule Mix.Tasks.Xcribe.Serve do
   defp serve(config, supervisor, browser_function) do
     reference = Process.monitor(supervisor)
 
-    Output.print_message("Xcribe Task - serving documentation on #{document_url(config)}")
+    Output.print_message("serving documentation on #{document_url(config)}")
 
     open_documentation(config, browser_function)
 

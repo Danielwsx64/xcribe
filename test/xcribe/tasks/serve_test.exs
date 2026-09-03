@@ -29,7 +29,7 @@ defmodule Xcribe.Tasks.ServeTest do
 
       assert io_output =~ "Xcribe has no endpoint configured to serve documentation for"
       assert io_output =~ "config :xcribe, YourAppWeb.Endpoint"
-      assert io_output =~ "Xcribe Task - aborted"
+      assert io_output =~ "aborted"
     end
 
     test "report the endpoint already running when starting the real server" do
@@ -49,7 +49,7 @@ defmodule Xcribe.Tasks.ServeTest do
         end)
 
       assert io_output =~ "because it is already running"
-      assert io_output =~ "Xcribe Task - aborted"
+      assert io_output =~ "aborted"
     end
   end
 

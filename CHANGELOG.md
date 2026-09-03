@@ -105,6 +105,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   body exactly as the application sent it, instead of failing the whole document generation with
   an unknown-content-type error. Being unable to derive a schema from a response is no reason to
   refuse to document the rest of the API.
+- Xcribe's error reports in the terminal use a reduced palette of four colours, taken from the
+  basic ANSI set the terminal maps to the user's own theme. Five of the colours they used before
+  were absolute 256-colour values that ignore the theme entirely, so the detail half of every
+  error box — the hint lines, the caret under the offending `document` call — was drawn in a
+  near-black blue, red or olive that is unreadable on a dark scheme and muddy on a light one.
+  Colour now carries severity consistently: red for a failure Xcribe hit, yellow for something to
+  fix in the tests or the configuration, cyan for the emphasised parts of a report, grey for
+  secondary text, and green kept for a documented test that passed. Configuration errors no
+  longer print under a green header, which reads as success everywhere else in a terminal, and
+  the header band is drawn in reverse video so its text takes the terminal's own background
+  colour instead of a fixed white that some themes wash out. The status lines Xcribe prints while
+  a task runs join the same `┃` rail the error boxes and the per-test lines are drawn on, instead
+  of being wrapped in `>>>` and `<<<`: the delimiters said only "this line is Xcribe's", which the
+  rail now says without competing with the message for attention, and everything Xcribe writes
+  during a run shares one left margin. The mix tasks' messages also stopped repeating
+  `Xcribe Task -` on every line, since the rail already carries that.
 
 ### Fixed
 

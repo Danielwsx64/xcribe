@@ -1,84 +1,79 @@
 defmodule Xcribe.CLI.Output do
   @moduledoc false
 
-  @bg_blue IO.ANSI.blue_background()
-  @bg_green IO.ANSI.green_background()
-  @bg_red IO.ANSI.red_background()
-
   @cyan IO.ANSI.cyan()
-  @blue IO.ANSI.blue()
-  @dark_blue IO.ANSI.color(25)
-  @dark_green IO.ANSI.color(100)
-  @dark_red IO.ANSI.color(88)
-  @gray IO.ANSI.color(240)
+  @gray IO.ANSI.light_black()
   @green IO.ANSI.green()
-  @light_green IO.ANSI.color(37)
   @red IO.ANSI.red()
-  @white IO.ANSI.white()
   @yellow IO.ANSI.yellow()
 
+  @invert IO.ANSI.reverse()
   @reset IO.ANSI.reset()
 
   @bar_size 95
+  @gutter "┃"
+  @marker "▸"
 
   alias Xcribe.{DocException, SpecificationFile}
 
-  def print_message(message, type \\ :ok) when is_binary(message) do
-    color = if type == :error, do: @red, else: @cyan
+  def print_message(message, type \\ :ok)
 
-    IO.puts("#{color} >>> #{message} <<<#{@reset}")
-  end
+  def print_message(message, :error) when is_binary(message),
+    do: IO.puts("#{status_prefix(@red)} #{@red}#{message}#{@reset}")
+
+  def print_message(message, :ok) when is_binary(message),
+    do: IO.puts("#{status_prefix(@cyan)} #{message}")
 
   def print_captured_test(%{name: name_as_atom, time: time}) do
     "test " <> name = Atom.to_string(name_as_atom)
 
-    IO.puts("#{tab(@green)} #{name} - #{format_us(normalize_us(time))}s")
+    IO.puts("#{tab(@green)}#{space(3)}#{name} - #{format_us(normalize_us(time))}s")
   end
 
   def print_captured_error(%{name: name_as_atom}) do
     "test " <> name = Atom.to_string(name_as_atom)
 
-    IO.puts("#{tab(@red)} Test error: #{name}")
+    IO.puts("#{tab(@red)}#{space(3)}Test error: #{name}")
 
-    print_header_error("[ Xcribe ] doc tasks was aborted", @bg_red)
+    print_header_error("[ Xcribe ] doc tasks was aborted", @red)
   end
 
   def print_request_errors(errors) do
-    print_header_error("[ Xcribe ] Parsing and validation errors", @bg_blue)
+    print_header_error("[ Xcribe ] Parsing and validation errors", @yellow)
 
     Enum.each(errors, &print_error/1)
   end
 
   def print_configuration_errors(errors) do
-    print_header_error("[ Xcribe ] Configuration errors", @bg_green)
+    print_header_error("[ Xcribe ] Configuration errors", @yellow)
 
     Enum.each(errors, &print_error/1)
   end
 
   def print_specification_error(%SpecificationFile{message: message}) do
-    print_header_error("[ Xcribe ] Specification file errors", @bg_green)
+    print_header_error("[ Xcribe ] Specification file errors", @yellow)
 
     IO.puts("""
-    #{tab(@green)}
-    #{tab(@green)} [S] → #{@blue} #{message}
-    #{tab(@dark_green)}
-    #{tab(@dark_green)} #{@dark_green}The specification file must be an Elixir file evaluating to a map.
-    #{tab(@dark_green)} #{@dark_green}Run `mix xcribe.gen.spec` to generate a valid one.
-    #{tab(@dark_green)}
+    #{tab(@yellow)}
+    #{tab(@yellow)} [S] → #{@yellow} #{message}
+    #{tab(@yellow)}
+    #{tab(@yellow)} #{@gray}The specification file must be an Elixir file evaluating to a map.
+    #{tab(@yellow)} #{@gray}Run `mix xcribe.gen.spec` to generate a valid one.
+    #{tab(@yellow)}
     """)
   end
 
   def print_file_errors({file_path, reason}) do
-    print_header_error("[ Xcribe ] Output file errors", @bg_red)
+    print_header_error("[ Xcribe ] Output file errors", @red)
 
     IO.puts("""
     #{tab(@red)}
     #{tab(@red)} [E] → #{@red} Could not write to #{file_path}
     #{tab(@red)} #{space(6)} #{@red}Error: #{reason}
-    #{tab(@dark_red)}
-    #{tab(@dark_red)} #{@dark_red}The destination path for documentation artifact cannot be accessed.
-    #{tab(@dark_red)} #{@dark_red}Common reasons for this error are missing write permissions or the directory does not exist.
-    #{tab(@dark_red)}
+    #{tab(@red)}
+    #{tab(@red)} #{@gray}The destination path for documentation artifact cannot be accessed.
+    #{tab(@red)} #{@gray}Common reasons for this error are missing write permissions or the directory does not exist.
+    #{tab(@red)}
     """)
   end
 
@@ -89,17 +84,17 @@ defmodule Xcribe.CLI.Output do
       }) do
     line_call = get_line(call.file, call.line)
 
-    print_header_error("[ Xcribe ] Exception", @bg_red)
+    print_header_error("[ Xcribe ] Exception", @red)
 
     IO.puts("""
     #{tab(@red)}
     #{tab(@red)} [E] → #{@red} #{msg}
-    #{tab(@red)} #{space(6)} #{@blue}> #{call.description}
+    #{tab(@red)} #{space(6)} #{@cyan}> #{call.description}
     #{tab(@red)} #{space(6)} #{@gray}#{format_file_path(call.file)}:#{call.line}
-    #{tab(@dark_red)}
-    #{tab(@dark_red)} #{space(6)} #{@light_green}#{line_call}
-    #{tab(@dark_red)} #{space(6)} #{@dark_red}#{pointer_for(line_call)}
-    #{tab(@dark_red)}
+    #{tab(@red)}
+    #{tab(@red)} #{space(6)} #{@cyan}#{line_call}
+    #{tab(@red)} #{space(6)} #{@red}#{pointer_for(line_call)}
+    #{tab(@red)}
 
      - Exception stacktrace:
 
@@ -112,45 +107,47 @@ defmodule Xcribe.CLI.Output do
     line_call = get_line(call.file, call.line)
 
     IO.puts("""
-    #{tab(@blue)}
-    #{tab(@blue)} [#{error_char(typ)}] → #{@yellow} #{msg}
-    #{tab(@blue)} #{space(6)} #{@blue}> #{call.description}
-    #{tab(@blue)} #{space(6)} #{@gray}#{format_file_path(call.file)}:#{call.line}
-    #{tab(@dark_blue)}
-    #{tab(@dark_blue)} #{space(6)} #{@light_green}#{line_call}
-    #{tab(@dark_blue)} #{space(6)} #{@dark_blue}#{pointer_for(line_call)}
-    #{tab(@dark_blue)}
+    #{tab(@yellow)}
+    #{tab(@yellow)} [#{error_char(typ)}] → #{@yellow} #{msg}
+    #{tab(@yellow)} #{space(6)} #{@cyan}> #{call.description}
+    #{tab(@yellow)} #{space(6)} #{@gray}#{format_file_path(call.file)}:#{call.line}
+    #{tab(@yellow)}
+    #{tab(@yellow)} #{space(6)} #{@cyan}#{line_call}
+    #{tab(@yellow)} #{space(6)} #{@yellow}#{pointer_for(line_call)}
+    #{tab(@yellow)}
     """)
   end
 
   defp print_error({nil, nil, msg, info}) do
     IO.puts("""
-    #{tab(@green)}
-    #{tab(@green)} [C] → #{@blue} #{msg}
-    #{tab(@dark_green)}
-    #{tab(@dark_green)} #{space(6)} #{@dark_green}#{info}
-    #{tab(@dark_green)}
+    #{tab(@yellow)}
+    #{tab(@yellow)} [C] → #{@yellow} #{msg}
+    #{tab(@yellow)}
+    #{tab(@yellow)} #{space(6)} #{@gray}#{info}
+    #{tab(@yellow)}
     """)
   end
 
   defp print_error({config, value, msg, info}) do
     IO.puts("""
-    #{tab(@green)}
-    #{tab(@green)} [C] → #{@blue} #{msg}
-    #{tab(@green)} #{space(6)} #{@gray}> Config key: #{config}
-    #{tab(@dark_green)}
-    #{tab(@dark_green)} #{space(6)} Given value: #{@light_green}#{inspect(value)}
-    #{tab(@dark_green)} #{space(6)} #{@dark_green}#{info}
-    #{tab(@dark_green)}
+    #{tab(@yellow)}
+    #{tab(@yellow)} [C] → #{@yellow} #{msg}
+    #{tab(@yellow)} #{space(6)} #{@gray}> Config key: #{config}
+    #{tab(@yellow)}
+    #{tab(@yellow)} #{space(6)} Given value: #{@cyan}#{inspect(value)}
+    #{tab(@yellow)} #{space(6)} #{@gray}#{info}
+    #{tab(@yellow)}
     """)
   end
 
   defp format_file_path(path), do: Path.relative_to_cwd(path)
 
-  defp tab(color), do: "#{color}┃#{@reset}"
+  defp tab(color), do: "#{color}#{@gutter}#{@reset}"
 
-  defp print_header_error(message, bg),
-    do: IO.puts("#{bg}#{@white}  #{message}#{space_for(message)}#{@reset}")
+  defp status_prefix(color), do: "#{color}#{@gutter} #{@marker}#{@reset}"
+
+  defp print_header_error(message, color),
+    do: IO.puts("#{color}#{@invert}  #{message}#{space_for(message)}#{@reset}")
 
   defp pointer_for(message) do
     message

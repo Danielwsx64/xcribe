@@ -52,26 +52,26 @@ defmodule Mix.Tasks.Xcribe.Doc do
   defp run_tests({:error, errors}, _task_function, _project_module) do
     Output.print_configuration_errors(errors)
 
-    Output.print_message("Xcribe Task - aborted", :error)
+    Output.print_message("aborted", :error)
 
     exit({:shutdown, 1})
   end
 
   defp run_tests({:ok, options}, task_function, project_module) do
     Recorder.set_active(true)
-    Output.print_message("Xcribe Task - starting capture requests")
+    Output.print_message("starting request capture")
 
     task_function.(build_mix_test_opts(options))
 
-    Output.print_message("Xcribe Task - starting doc generation")
+    Output.print_message("generating documentation")
 
     case Xcribe.document_all_records(override_configs(options, project_module)) do
       :ok ->
-        Output.print_message("Xcribe Task - finished")
+        Output.print_message("finished")
         :ok
 
       :error ->
-        Output.print_message("Xcribe Task - aborted", :error)
+        Output.print_message("aborted", :error)
         exit({:shutdown, 1})
     end
   end

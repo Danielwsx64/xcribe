@@ -39,23 +39,23 @@ defmodule Xcribe.CLI.OutputTest do
       }
 
       expected_output = """
-      \e[44m\e[37m  [ Xcribe ] Parsing and validation errors                                                       \e[0m
-      \e[34m┃\e[0m
-      \e[34m┃\e[0m [P] → \e[33m route not found
-      \e[34m┃\e[0m        \e[34m> test name\n\e[34m┃\e[0m        \e[38;5;240mtest/xcribe/cli/output_test.exs:13
-      \e[38;5;25m┃\e[0m
-      \e[38;5;25m┃\e[0m        \e[38;5;37m# |> document(as: "some cool description")
-      \e[38;5;25m┃\e[0m        \e[38;5;25m     ^^^^^^^^                             
-      \e[38;5;25m┃\e[0m
+      \e[33m\e[7m  [ Xcribe ] Parsing and validation errors                                                       \e[0m
+      \e[33m┃\e[0m
+      \e[33m┃\e[0m [P] → \e[33m route not found
+      \e[33m┃\e[0m        \e[36m> test name\n\e[33m┃\e[0m        \e[90mtest/xcribe/cli/output_test.exs:13
+      \e[33m┃\e[0m
+      \e[33m┃\e[0m        \e[36m# |> document(as: "some cool description")
+      \e[33m┃\e[0m        \e[33m     ^^^^^^^^                             
+      \e[33m┃\e[0m
 
-      \e[34m┃\e[0m
-      \e[34m┃\e[0m [P] → \e[33m invalid Router or invalid Conn
-      \e[34m┃\e[0m        \e[34m> conn test
-      \e[34m┃\e[0m        \e[38;5;240mtest/xcribe/cli/output_test.exs:27
-      \e[38;5;25m┃\e[0m
-      \e[38;5;25m┃\e[0m        \e[38;5;37m# |> document(as: \"awesome route\")
-      \e[38;5;25m┃\e[0m        \e[38;5;25m     ^^^^^^^^                     
-      \e[38;5;25m┃\e[0m
+      \e[33m┃\e[0m
+      \e[33m┃\e[0m [P] → \e[33m invalid Router or invalid Conn
+      \e[33m┃\e[0m        \e[36m> conn test
+      \e[33m┃\e[0m        \e[90mtest/xcribe/cli/output_test.exs:27
+      \e[33m┃\e[0m
+      \e[33m┃\e[0m        \e[36m# |> document(as: \"awesome route\")
+      \e[33m┃\e[0m        \e[33m     ^^^^^^^^                     
+      \e[33m┃\e[0m
 
       """
 
@@ -79,15 +79,15 @@ defmodule Xcribe.CLI.OutputTest do
       }
 
       expected_output = """
-      \e[44m\e[37m  [ Xcribe ] Parsing and validation errors                                                       \e[0m
-      \e[34m┃\e[0m
-      \e[34m┃\e[0m [V] → \e[33m The Plug.Conn params must be valid HTTP params. A struct Elixir.Date was found!
-      \e[34m┃\e[0m        \e[34m> test name
-      \e[34m┃\e[0m        \e[38;5;240mtest/xcribe/cli/output_test.exs:13
-      \e[38;5;25m┃\e[0m
-      \e[38;5;25m┃\e[0m        \e[38;5;37m# |> document(as: \"some cool description\")
-      \e[38;5;25m┃\e[0m        \e[38;5;25m     ^^^^^^^^                             
-      \e[38;5;25m┃\e[0m
+      \e[33m\e[7m  [ Xcribe ] Parsing and validation errors                                                       \e[0m
+      \e[33m┃\e[0m
+      \e[33m┃\e[0m [V] → \e[33m The Plug.Conn params must be valid HTTP params. A struct Elixir.Date was found!
+      \e[33m┃\e[0m        \e[36m> test name
+      \e[33m┃\e[0m        \e[90mtest/xcribe/cli/output_test.exs:13
+      \e[33m┃\e[0m
+      \e[33m┃\e[0m        \e[36m# |> document(as: \"some cool description\")
+      \e[33m┃\e[0m        \e[33m     ^^^^^^^^                             
+      \e[33m┃\e[0m
       \
 
       """
@@ -108,22 +108,22 @@ defmodule Xcribe.CLI.OutputTest do
       ]
 
       expected_output = """
-      \e[42m\e[37m  [ Xcribe ] Configuration errors                                                                \e[0m
-      \e[32m┃\e[0m
-      \e[32m┃\e[0m [C] → \e[34m Given json library doesn't implement needed functions
-      \e[32m┃\e[0m        \e[38;5;240m> Config key: json_library
-      \e[38;5;100m┃\e[0m
-      \e[38;5;100m┃\e[0m        Given value: \e[38;5;37mFakeJson
-      \e[38;5;100m┃\e[0m        \e[38;5;100mTry configure Xcribe with Jason or Poison `config :xcribe, [json_library: Jason]`
-      \e[38;5;100m┃\e[0m
+      \e[33m\e[7m  [ Xcribe ] Configuration errors                                                                \e[0m
+      \e[33m┃\e[0m
+      \e[33m┃\e[0m [C] → \e[33m Given json library doesn't implement needed functions
+      \e[33m┃\e[0m        \e[90m> Config key: json_library
+      \e[33m┃\e[0m
+      \e[33m┃\e[0m        Given value: \e[36mFakeJson
+      \e[33m┃\e[0m        \e[90mTry configure Xcribe with Jason or Poison `config :xcribe, [json_library: Jason]`
+      \e[33m┃\e[0m
 
-      \e[32m┃\e[0m
-      \e[32m┃\e[0m [C] → \e[34m An unsupported format was configured
-      \e[32m┃\e[0m        \e[38;5;240m> Config key: format
-      \e[38;5;100m┃\e[0m
-      \e[38;5;100m┃\e[0m        Given value: \e[38;5;37m:invalid
-      \e[38;5;100m┃\e[0m        \e[38;5;100mXcribe supports OpenAPI and Blueprint, configure as: `config :xcribe, [format: :openapi]`
-      \e[38;5;100m┃\e[0m
+      \e[33m┃\e[0m
+      \e[33m┃\e[0m [C] → \e[33m An unsupported format was configured
+      \e[33m┃\e[0m        \e[90m> Config key: format
+      \e[33m┃\e[0m
+      \e[33m┃\e[0m        Given value: \e[36m:invalid
+      \e[33m┃\e[0m        \e[90mXcribe supports OpenAPI and Blueprint, configure as: `config :xcribe, [format: :openapi]`
+      \e[33m┃\e[0m
 
       """
 
@@ -139,12 +139,12 @@ defmodule Xcribe.CLI.OutputTest do
       ]
 
       expected_output = """
-      \e[42m\e[37m  [ Xcribe ] Configuration errors                                                                \e[0m
-      \e[32m┃\e[0m
-      \e[32m┃\e[0m [C] → \e[34m Xcribe couldn't find a web server to serve the documentation with
-      \e[38;5;100m┃\e[0m
-      \e[38;5;100m┃\e[0m        \e[38;5;100mAdd Bandit or Plug.Cowboy to your dependencies: `{:bandit, \"~> 1.0\"}`
-      \e[38;5;100m┃\e[0m
+      \e[33m\e[7m  [ Xcribe ] Configuration errors                                                                \e[0m
+      \e[33m┃\e[0m
+      \e[33m┃\e[0m [C] → \e[33m Xcribe couldn't find a web server to serve the documentation with
+      \e[33m┃\e[0m
+      \e[33m┃\e[0m        \e[90mAdd Bandit or Plug.Cowboy to your dependencies: `{:bandit, \"~> 1.0\"}`
+      \e[33m┃\e[0m
 
       """
 
@@ -169,14 +169,14 @@ defmodule Xcribe.CLI.OutputTest do
   describe "print_file_errors/1" do
     test "prints output file erro message" do
       expected_output = """
-      \e[41m\e[37m  [ Xcribe ] Output file errors                                                                  \e[0m
+      \e[31m\e[7m  [ Xcribe ] Output file errors                                                                  \e[0m
       \e[31m┃\e[0m
       \e[31m┃\e[0m [E] → \e[31m Could not write to /some/file/path
       \e[31m┃\e[0m        \e[31mError: eacces
-      \e[38;5;88m┃\e[0m
-      \e[38;5;88m┃\e[0m \e[38;5;88mThe destination path for documentation artifact cannot be accessed.
-      \e[38;5;88m┃\e[0m \e[38;5;88mCommon reasons for this error are missing write permissions or the directory does not exist.
-      \e[38;5;88m┃\e[0m
+      \e[31m┃\e[0m
+      \e[31m┃\e[0m \e[90mThe destination path for documentation artifact cannot be accessed.
+      \e[31m┃\e[0m \e[90mCommon reasons for this error are missing write permissions or the directory does not exist.
+      \e[31m┃\e[0m
 
       """
 
@@ -217,15 +217,15 @@ defmodule Xcribe.CLI.OutputTest do
       }
 
       expected_output = """
-      \e[41m\e[37m  [ Xcribe ] Exception                                                                           \e[0m
+      \e[31m\e[7m  [ Xcribe ] Exception                                                                           \e[0m
       \e[31m┃\e[0m
       \e[31m┃\e[0m [E] → \e[31m An exception was raised. Elixir.FunctionClauseError
-      \e[31m┃\e[0m        \e[34m> conn test
-      \e[31m┃\e[0m        \e[38;5;240mtest/xcribe/cli/output_test.exs:27
-      \e[38;5;88m┃\e[0m
-      \e[38;5;88m┃\e[0m        \e[38;5;37m# |> document(as: \"awesome route\")
-      \e[38;5;88m┃\e[0m        \e[38;5;88m     ^^^^^^^^                     
-      \e[38;5;88m┃\e[0m
+      \e[31m┃\e[0m        \e[36m> conn test
+      \e[31m┃\e[0m        \e[90mtest/xcribe/cli/output_test.exs:27
+      \e[31m┃\e[0m
+      \e[31m┃\e[0m        \e[36m# |> document(as: \"awesome route\")
+      \e[31m┃\e[0m        \e[31m     ^^^^^^^^                     
+      \e[31m┃\e[0m
 
        - Exception stacktrace:
 
@@ -245,9 +245,9 @@ defmodule Xcribe.CLI.OutputTest do
     end
   end
 
-  describe "print_message/1" do
+  describe "print_message/2" do
     test "print success message" do
-      expected_output = "\e[36m >>> ok <<<\e[0m\n"
+      expected_output = "\e[36m┃ ▸\e[0m ok\n"
 
       assert capture_io(fn ->
                assert Output.print_message("ok") == :ok
@@ -255,7 +255,7 @@ defmodule Xcribe.CLI.OutputTest do
     end
 
     test "print error message" do
-      expected_output = "\e[31m >>> error <<<\e[0m\n"
+      expected_output = "\e[31m┃ ▸\e[0m \e[31merror\e[0m\n"
 
       assert capture_io(fn ->
                assert Output.print_message("error", :error) == :ok
@@ -267,7 +267,7 @@ defmodule Xcribe.CLI.OutputTest do
     test "print test info" do
       test_struct = %{name: :"test success", time: 11_111}
 
-      expected_output = "\e[32m┃\e[0m success - 0.01s\n"
+      expected_output = "\e[32m┃\e[0m   success - 0.01s\n"
 
       assert capture_io(fn ->
                assert Output.print_captured_test(test_struct) == :ok
@@ -277,7 +277,7 @@ defmodule Xcribe.CLI.OutputTest do
     test "a large time" do
       test_struct = %{name: :"test success", time: 1_111_111}
 
-      expected_output = "\e[32m┃\e[0m success - 1.1s\n"
+      expected_output = "\e[32m┃\e[0m   success - 1.1s\n"
 
       assert capture_io(fn ->
                assert Output.print_captured_test(test_struct) == :ok
@@ -285,12 +285,12 @@ defmodule Xcribe.CLI.OutputTest do
     end
   end
 
-  describe "print_capture_error/1" do
+  describe "print_captured_error/1" do
     test "print test error" do
       test_struct = %{name: :"test success"}
 
       expected_output =
-        "\e[31m┃\e[0m Test error: success\n\e[41m\e[37m  [ Xcribe ] doc tasks was aborted                                                               \e[0m\n"
+        "\e[31m┃\e[0m   Test error: success\n\e[31m\e[7m  [ Xcribe ] doc tasks was aborted                                                               \e[0m\n"
 
       assert capture_io(fn ->
                assert Output.print_captured_error(test_struct) == :ok
