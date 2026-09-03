@@ -28,7 +28,7 @@ xcribe ships into other people's dependency trees. Every dep is a cost they pay.
   when you bump, or delete it.
 - **No new dependency without a stated reason in the PR.** There is no dialyzer/dialyxir here
   (and no typespecs for it to check — see [docs.md](docs.md)); don't add one incidentally.
-- **A support-matrix change must land in five places, or CI lies:**
+- **A support-matrix change must land in every one of these, or CI lies:**
 
       mix.exs                      # `elixir:` requirement and the dep floors
       .tool-versions               # the newest pair, used locally and as CI's lint toolchain

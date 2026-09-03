@@ -8,7 +8,7 @@ config :xcribe, Xcribe.Endpoint,
   secret_key_base: String.duplicate("x", 64)
 
 # Phoenix config for the test-only endpoint in test/support/static_endpoint.ex
-config :xcribe, Xcribe.Support.StaticEndpoint,
+config :xcribe, Xcribe.StaticEndpoint,
   url: [host: "localhost"],
   secret_key_base: String.duplicate("x", 64)
 

@@ -3,17 +3,21 @@
 Xcribe is consumed by other people's applications. This file defines what they are allowed to
 depend on. Version consequences live in [release.md](release.md).
 
-- **Seven modules are public surface**, and they are the only ones:
-
-      Xcribe                     # config reference (its @moduledoc IS the user-facing config doc)
-      Xcribe.Document            # the document/1,2 macro imported into the consumer's ConnCase
-      Xcribe.Specification       # the `.xcribe.exs` file format (its @moduledoc IS that reference)
-      Xcribe.Formatter           # the ExUnit formatter a consumer adds to ExUnit.configure/1
-      Xcribe.Web.Plug            # serving the generated OpenAPI doc
-      Mix.Tasks.Xcribe.Doc       # the `mix xcribe.doc` task and its CLI options
-      Mix.Tasks.Xcribe.Gen.Spec  # the `mix xcribe.gen.spec` task and its `--output` option
-
-- **Public by contract, though not a module**: every config key documented in `Xcribe`'s
+- **A module is public surface exactly when it carries a real `@moduledoc`.** That is the whole
+  test, and it needs no list: ex_doc publishes every module that has one and hides every module
+  with `@moduledoc false`, so the published documentation *is* the inventory, and
+  `groups_for_modules` in `mix.exs` is where the current set is declared. Run `mix docs` if you
+  need to know what is in it.
+- **The kinds of thing that are public**, so you can tell whether a new module belongs there: the
+  entry-point module and the macro a consumer imports into their `ConnCase`, the configuration
+  reference, the specification-file reference, the ExUnit formatter a consumer adds to
+  `ExUnit.configure/1`, the plug that serves the generated document, and every `mix xcribe.*`
+  task. Everything else — parsing, the API model, the formats, encoding, recording, printing,
+  writing — is internal.
+- **Inside a public module, only functions with a real `@doc` are public.** A public module is
+  not a licence over everything it exports: the `@doc false` functions exist for internal
+  callers, and so does any part of a data structure the docs do not describe.
+- **Public by contract, though not a module**: every config key documented in `Xcribe.Config`'s
   `@moduledoc`, every top-level key of the `.xcribe.exs` specification file documented in
   `Xcribe.Specification`'s `@moduledoc`, the `document: 1, document: 2` entries in
   `.formatter.exs`'s `export: [locals_without_parens: ...]`, and the shape of the generated
@@ -22,20 +26,18 @@ depend on. Version consequences live in [release.md](release.md).
   decision to support that module forever — take it deliberately, not by habit. Most of the
   modules in `lib/` are `@moduledoc false`; a new internal module joins them.
 - An internal (`@moduledoc false`) module **may** still carry `@doc` strings on its functions
-  as developer notes — `Xcribe.JSON`, `Xcribe.OpenAPI.Formatter`, `Xcribe.JsonSchema` and
-  `Xcribe.Helpers.Formatter` do. Those docs are not published; ex_doc hides the module.
+  as developer notes, and several do. Those docs are not published; ex_doc hides the module.
 - **`@doc false` on functions that must be public for an internal caller but are not API** —
-  `Xcribe.document_all_records/1`, `Xcribe.document/2`, `__using__/1`, `__before_compile__/1`,
-  `Plug.init/1`, `Plug.call/2`, `Mix.Task.run/1`.
+  every callback a `use` forces you to export (`run/1` of a Mix task, `init/1` and `call/2` of a
+  plug, `__using__/1`), every injection seam a test needs to reach, and every entry point one of
+  our own modules calls across a namespace.
 - **Breaking any of the following is a major-version change**: a documented config key, the
-  `document/2` signature or its `as:`/`schema:`/`req_schema:`/`tags:` options, a documented
-  `.xcribe.exs` key, the
-  `Xcribe.Formatter` or `Xcribe.Web.Plug` interface, `mix xcribe.doc`'s options, or the
-  generated output shape. **Prefer an additive config key with a default** in `Xcribe.Config`
-  over changing an existing one (see [config.md](config.md)).
+  `document/2` signature or any of its documented options, a documented `.xcribe.exs` key, the
+  interface of a public module, the options of a Mix task, or the generated output shape.
+  **Prefer an additive config key with a default** over changing an existing one
+  (see [config.md](config.md)).
 - **Renaming `document/2` breaks consumers' `mix format`**, not just their tests — they
   `import_deps: [:xcribe]` and inherit the exported `locals_without_parens`. Treat the name as
   frozen.
 - Test-support modules are compiled only in `:test` (`elixirc_paths(:test)`) and are **not**
-  public API even though they sit under `Xcribe.*` — `Xcribe.ConnCase`, `Xcribe.Endpoint`,
-  `Xcribe.WebRouter`, `Xcribe.Support.*`. Never tell a consumer to use one.
+  public API even though they sit under `Xcribe.*`. Never tell a consumer to use one.

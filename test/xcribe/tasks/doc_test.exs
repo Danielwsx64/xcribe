@@ -126,6 +126,49 @@ defmodule Xcribe.Tasks.DocTest do
       assert Recorder.pop_all() == %{errors: []}
     end
 
+    test "override path for umbrella apps when file_path is not configured" do
+      Application.put_env(:xcribe, Xcribe.Tasks.DocTest.FakeEndpoint,
+        specification_source: "test/support/.xcribe.exs",
+        file_name: "task_tests.doc"
+      )
+
+      mix_test_fun = fn _opts ->
+        Recorder.add(%{
+          RequestsGenerator.users_index()
+          | endpoint: Xcribe.Tasks.DocTest.FakeEndpoint
+        })
+      end
+
+      io_output = capture_io(fn -> Doc.run_task([], mix_test_fun, FakeProject) end)
+
+      assert io_output =~ "documentation written in /tmp/fake_app/task_tests.doc"
+      assert File.rm!("/tmp/fake_app/task_tests.doc")
+      assert Recorder.pop_all() == %{errors: []}
+    end
+
+    test "override path for umbrella apps when file_path is a static tuple" do
+      Application.put_env(:xcribe, Xcribe.Tasks.DocTest.FakeEndpoint,
+        specification_source: "test/support/.xcribe.exs",
+        file_path: {"priv/static", "api"},
+        file_name: "task_tests.doc"
+      )
+
+      mix_test_fun = fn _opts ->
+        Recorder.add(%{
+          RequestsGenerator.users_index()
+          | endpoint: Xcribe.Tasks.DocTest.FakeEndpoint
+        })
+      end
+
+      io_output = capture_io(fn -> Doc.run_task([], mix_test_fun, FakeProject) end)
+
+      assert io_output =~
+               "documentation written in /tmp/fake_app/priv/static/api/task_tests.doc"
+
+      assert File.rm!("/tmp/fake_app/priv/static/api/task_tests.doc")
+      assert Recorder.pop_all() == %{errors: []}
+    end
+
     test "keep path when cant find deps path for umbrella app" do
       output = "/tmp/task_tests.doc"
 

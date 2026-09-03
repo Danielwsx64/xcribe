@@ -35,11 +35,13 @@ Update deps
 mix deps.get
 ```
 
-To run `mix xcribe.doc` you must add it to `preferred_envs` in your `mix.exs`:
+To run `mix xcribe.doc` and `mix xcribe.serve` you must add them to
+`preferred_envs` in your `mix.exs`, so they run in the environment your Xcribe
+configuration lives in:
 
 ```elixir
 def cli do
-  [preferred_envs: ["xcribe.doc": :test]]
+  [preferred_envs: ["xcribe.doc": :test, "xcribe.serve": :test]]
 end
 ```
 
@@ -159,29 +161,47 @@ If the OpenAPI format is configured, [Swagger UI](https://swagger.io/tools/swagg
 
 Add the configuration to your `config/test.exs`, scoped by endpoint:
 
-- `output`: a custom name for the output file. Defaults to `"openapi.json"` or `"api_doc.apib"`,
-  depending on the format.
 - `format`: `:openapi` or `:api_blueprint`. Defaults to `:openapi`.
+- `file_name`: a custom name for the output file. Defaults to `"openapi.json"` or `"api_doc.apib"`,
+  depending on the format.
+- `file_path`: the directory the output file is written to. Defaults to the project root. To serve
+  the document, give a `{static_dir, sub_path}` tuple: `static_dir` is the directory your
+  `Plug.Static` reads from, so it is part of the written path but not of the served URL.
 - `json_library`: the library used for JSON decode/encode. Defaults to `Jason`.
-- `serve`: enables Xcribe serve mode. See `Serving doc` below.
+- `serve`: enables Xcribe serve mode, which requires the `:openapi` format. See `Serving doc` below.
+- `server_port`: the port `mix xcribe.serve` serves on. Defaults to `4040`.
+- `open_browser`: open the served documentation in your browser. Defaults to `false`.
 - `specification_source`: path to the specification file. Defaults to `".xcribe.exs"`.
   See `Xcribe.Specification`.
+
+Every key has a default, so generating documentation needs no configuration at all.
 
 Example
 
 ```elixir
 config :xcribe, YourAppWeb.Endpoint,
-  output: "openapi.json",
+  file_path: {"priv/static", "api"},
+  file_name: "openapi.json",
   format: :openapi,
   json_library: Jason,
+  serve: true,
   specification_source: ".xcribe.exs"
 ```
 
-See `Xcribe` for the full configuration reference.
+See `Xcribe.Config` for what each key means, the values it accepts and how it behaves with each of them.
 
 ### Serve documentation
 
-[Serve doc](documentation/serving_doc.md)
+Once the document is generated, serve it with Swagger UI:
+
+```sh
+mix xcribe.serve
+```
+
+The task serves the endpoint configured with `serve: true`; name one with `-e YourAppWeb.Endpoint`
+when several have it, or to serve an endpoint whose serve config is disabled. You can also forward a route of your own router to `Xcribe.Web.Plug`, which needs
+`serve: true` too. Either way the generated file has to be reachable through a `Plug.Static` — see
+[Serve doc](documentation/serving_doc.md).
 
 ## Contributing
 

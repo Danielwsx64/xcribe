@@ -8,6 +8,9 @@ defmodule Mix.Tasks.Xcribe.Doc do
   mix xcribe.doc -f openapi -o /home/user/api.doc
   ```
 
+  `--output` is the whole path of the document, and overrides both the `file_path`
+  and the `file_name` config keys.
+
   You can generate doc for an specific endpoint by passing it as argument
 
   ```sh
@@ -21,8 +24,8 @@ defmodule Mix.Tasks.Xcribe.Doc do
   mix xcribe.doc test/you_app_web/controllers/users_controller_test.exs:20
   ```
 
-  Note: to use this task you must configure `preferred_cli_env: ["xcribe.doc": :test]`
-  on your `mix.ex` file.
+  Note: to use this task you must configure `preferred_envs: ["xcribe.doc": :test]`
+  on your `mix.exs` file.
   """
   use Mix.Task
 
@@ -102,7 +105,7 @@ defmodule Mix.Tasks.Xcribe.Doc do
 
     case project_module.deps_paths()[app_name] do
       nil -> config
-      path -> %{config | file_path: Path.join(path, config.file_path)}
+      path -> Config.prefix_file_path(config, path)
     end
   end
 
@@ -145,6 +148,7 @@ defmodule Mix.Tasks.Xcribe.Doc do
 
   defp validate_format(options), do: {:ok, options}
 
+  @endpoint_instructions "Give a configured endpoint module: `mix xcribe.doc -e YourAppWeb.Endpoint`"
   defp endpoint_path({:ok, %{endpoint: endpoint} = options}, project_module) do
     with module <- String.to_atom("Elixir.#{endpoint}"),
          true <- function_exported?(module, :config, 1),
@@ -153,7 +157,11 @@ defmodule Mix.Tasks.Xcribe.Doc do
       {:ok, %{options | endpoint: path}}
     else
       _any ->
-        {:error, [{:endpoint, endpoint, "Couldn't find a path to endpoint #{endpoint}", ""}]}
+        {:error,
+         [
+           {:endpoint, endpoint, "Couldn't find a path to endpoint #{endpoint}",
+            @endpoint_instructions}
+         ]}
     end
   end
 

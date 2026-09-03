@@ -33,9 +33,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `document/2` accepts `tags: false` to document a route without a group tag, for endpoints that do
   not belong in any group.
 - The `:specification_source` config key points at the specification file. Default `".xcribe.exs"`.
+- `mix xcribe.serve` serves the generated OpenAPI document with Swagger UI. Viewing your own
+  documentation previously meant adding a scope and a forward to `Xcribe.Web.Plug` in a router
+  that also serves production traffic; the task starts your endpoint and a web server of its own
+  instead, so nothing has to be added to the application. It only serves, so run `mix xcribe.doc`
+  first, and add `"xcribe.serve": :test` to your `preferred_envs` so the task runs in the
+  environment your Xcribe configuration lives in. It serves the endpoint configured with
+  `serve: true`, and asks you to name one with `-e YourAppWeb.Endpoint` when several are.
+- The `:server_port` and `:open_browser` config keys control `mix xcribe.serve`. Defaults `4040`
+  and `false`. `:open_browser` and `:serve` accept the strings `"true"`, `"TRUE"`, `"1"`,
+  `"false"`, `"FALSE"` and `"0"` as well as booleans, so either can come from an environment
+  variable.
 
 ### Changed
 
+- **Breaking.** The `:output` config key is replaced by `:file_path` and `:file_name`, and an
+  unusable value for either is now reported as a configuration error instead of raising from
+  inside doc generation. A single path string cannot say which part of it is the directory a
+  `Plug.Static` reads from, so serve mode had to guess by stripping a literal `priv/static` prefix — which silently produced a
+  broken URL for anyone serving static files from anywhere else. `:file_path` now accepts a
+  `{static_dir, sub_path}` tuple that states the split: `static_dir` is part of the written path
+  and not of the served one. `output: "priv/static/api/doc.json"` becomes
+  `file_path: {"priv/static", "api"}, file_name: "doc.json"`, and an output path with no serving
+  involved becomes `file_path: "doc"`, `file_name: "doc.json"`. `mix xcribe.doc -o/--output` is
+  unchanged and still takes the whole path.
+- **Breaking.** `Xcribe.Config` and `Mix.Tasks.Xcribe.Serve` are public modules now, so the
+  functions `Xcribe.Config` documents and the options `mix xcribe.serve` accepts are covered by
+  the version contract. The config functions `get_serving_path` and `get_output_path` were renamed
+  to `serving_path` and `output_path` before being published. `Xcribe.Config`'s documentation is
+  also where the configuration reference moved to: it now describes every key, the values it
+  accepts and how it behaves with each of them, and `Xcribe` only lists the key names.
+- Configuration validation no longer touches the filesystem or calls your endpoint.
+  Xcribe validates the `serve` configuration while your application boots, so the checks that
+  create the document file and request it from the endpoint ran on every boot of every consumer
+  application — reporting a configuration error for an endpoint that had not started yet. Whether
+  the endpoint really serves the generated document is now checked by `mix xcribe.serve` alone,
+  once the endpoint is running, and it reports separately that the document has not been
+  generated yet and that the endpoint did not return it.
 - **Breaking.** `Xcribe.Information`, the `xcribe_info` DSL and the `information_source` config key
   are removed. They required consumers to compile a module whose only job was to hold static text,
   and the DSL had to be re-learned to change an API description. Run `mix xcribe.gen.spec` and move

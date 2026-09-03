@@ -112,8 +112,9 @@ defmodule Xcribe.FormatterTest do
 
       Application.put_env(:xcribe, Xcribe.Endpoint,
         serve: true,
+        format: :api_blueprint,
         file_path: tmp_dir,
-        output: "anywhere"
+        file_name: "api_doc.apib"
       )
 
       Recorder.add(RequestsGenerator.users_index())

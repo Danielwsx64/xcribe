@@ -5,11 +5,14 @@ defmodule Xcribe.Web.Plug do
   Add a doc scope to your router, and forward all requests to `Xcribe.Web.Plug`
 
   ```
-        scope "doc/openapi" do
+        scope "/doc/openapi" do
           forward "/", Xcribe.Web.Plug, endpoint: YourApp.Endpoint
         end
 
   ```
+
+  `mix xcribe.serve` serves the same documentation without touching your router,
+  see `Mix.Tasks.Xcribe.Serve`.
   """
 
   use Plug.Router
@@ -54,22 +57,30 @@ defmodule Xcribe.Web.Plug do
     config = Config.fetch_config(endpoint)
 
     [
-      file: Config.get_serving_path(config),
-      serving?: Keyword.get(opts, :serving?, config.serve),
-      endpoint: endpoint
+      endpoint: endpoint,
+      file: Config.serving_path(config),
+      proxy?: Keyword.get(opts, :proxy?, false),
+      serving?: Keyword.get(opts, :serving?, config.serve)
     ]
   end
 
   @doc false
-  def call(conn, file: file, serving?: serving, endpoint: endpoint) do
-    if file == String.replace_leading(conn.request_path, "/", "") do
+  def call(conn, opts) do
+    if proxy_document?(conn, opts) do
+      endpoint = Keyword.fetch!(opts, :endpoint)
+
       endpoint.call(conn, [])
     else
       conn
-      |> Conn.assign(:file, file)
-      |> Conn.assign(:serving?, serving)
+      |> Conn.assign(:file, Keyword.fetch!(opts, :file))
+      |> Conn.assign(:serving?, Keyword.fetch!(opts, :serving?))
       |> super([])
     end
+  end
+
+  defp proxy_document?(%{request_path: request_path}, opts) do
+    Keyword.fetch!(opts, :proxy?) and
+      Keyword.fetch!(opts, :file) == String.replace_leading(request_path, "/", "")
   end
 
   defp not_found(conn), do: send_resp(conn, 404, "not found")

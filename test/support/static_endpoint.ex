@@ -1,4 +1,4 @@
-defmodule Xcribe.Support.StaticEndpoint do
+defmodule Xcribe.StaticEndpoint do
   use Phoenix.Endpoint, otp_app: :xcribe
 
   plug(

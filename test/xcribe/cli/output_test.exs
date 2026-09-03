@@ -134,17 +134,16 @@ defmodule Xcribe.CLI.OutputTest do
 
     test "with a nil key and value" do
       errors = [
-        {nil, nil,
-         "When serve config is true you must confiture output to \"priv/static\" folder",
-         "You must configure output as: `config :xcribe, output: \"priv/static/doc.json\"`"}
+        {nil, nil, "Xcribe couldn't find a web server to serve the documentation with",
+         "Add Bandit or Plug.Cowboy to your dependencies: `{:bandit, \"~> 1.0\"}`"}
       ]
 
       expected_output = """
       \e[42m\e[37m  [ Xcribe ] Configuration errors                                                                \e[0m
       \e[32m┃\e[0m
-      \e[32m┃\e[0m [C] → \e[34m When serve config is true you must confiture output to \"priv/static\" folder
+      \e[32m┃\e[0m [C] → \e[34m Xcribe couldn't find a web server to serve the documentation with
       \e[38;5;100m┃\e[0m
-      \e[38;5;100m┃\e[0m        \e[38;5;100mYou must configure output as: `config :xcribe, output: \"priv/static/doc.json\"`
+      \e[38;5;100m┃\e[0m        \e[38;5;100mAdd Bandit or Plug.Cowboy to your dependencies: `{:bandit, \"~> 1.0\"}`
       \e[38;5;100m┃\e[0m
 
       """

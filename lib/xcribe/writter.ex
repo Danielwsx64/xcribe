@@ -12,7 +12,7 @@ defmodule Xcribe.Writter do
   def write(text, config, artifact \\ "documentation")
 
   def write(text, config, artifact) do
-    output_file = Config.get_output_path(config)
+    output_file = Config.output_path(config)
 
     output_file
     |> Path.dirname()

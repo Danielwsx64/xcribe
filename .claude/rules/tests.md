@@ -13,16 +13,15 @@ change — never defer tests. Coverage is reported to Codecov by CI.
 - Support code lives in `test/support`, compiled only in `:test` via `elixirc_paths(:test)`, and
   is excluded from credo and from coverage (`coveralls.json`). It is still English-only,
   formatted code, and it is **not** public API ([public-api.md](public-api.md)).
-- Infrastructure fakes are named bare `Xcribe.*` (`Xcribe.Endpoint`, `Xcribe.WebRouter`,
-  `Xcribe.ConnCase`, `Xcribe.UsersController`); data builders and helpers are `Xcribe.Support.*`
-  (`Xcribe.Support.RequestsGenerator`).
+- Infrastructure fakes — the endpoints, routers, controllers and case template the suite runs
+  against — are named bare `Xcribe.*`; data builders and helpers are `Xcribe.Support.*`.
 
 ## Structure
 
 - **`async:` is always explicit.** `async: true` is the default; use `async: false` for anything
   touching global state — `Application` env, the `Xcribe.Recorder` GenServer, captured IO, or
-  the filesystem. `config_test`, `formatter_test`, `recorder_test`, `document_test`,
-  `tasks/doc_test` and `web/plug_test` are all `async: false` for those reasons.
+  the filesystem. Config, formatter, recorder, document, mix-task and plug tests are all
+  `async: false` for those reasons.
 - Conn-based tests `use Xcribe.ConnCase` (an `ExUnit.CaseTemplate` that wires `Xcribe.Endpoint`,
   `Xcribe.WebRouter.Helpers` and a `build_conn/0` setup), not `ExUnit.Case`.
 - **One `describe` block per function, named `"fun/arity"`** — `describe "execute/2"`,
@@ -30,12 +29,24 @@ change — never defer tests. Coverage is reported to Codecov by CI.
 - Test names are lowercase declarative sentences with no "should" —
   `test "return true when env var is 1"`, `test "extract request data from an index request"`.
 - Every test asserts or refutes at least once.
+- **A test sets up everything it needs, inside its own `test` block.** No private helper
+  functions that build a config map, a fixture, a fake or an injected function — a
+  `defp full_config(overrides)` reads well when you write it and badly when you debug a
+  failure, because the reader has to leave the test to find out what it actually ran against.
+  Spell out the whole `Application.put_env/3` call, the whole map, the whole anonymous
+  function in the test, **even when it repeats the test above it almost exactly**. The
+  repetition is the point: every test is readable on its own and can be changed without
+  touching another.
+- **`setup` is for teardown, and for state a test cannot set up for itself** — the canonical
+  `on_exit` config wipe below, `Recorder.set_active/1`, the `build_conn/0` of
+  `Xcribe.ConnCase`. It is not a place to pre-build data for the tests that follow. The two
+  sanctioned kinds of shared code stay: the inline `defmodule Fake*` modules described below,
+  and the support modules under `test/support`.
 
 ## Fixtures and injection
 
 - **There is no mocking library** — no mox, no Mimic, no meck. Do not add one. Two substitutes:
-  - **Inline `defmodule Fake*` modules at the top of the test file** — `FakeEndpoint`,
-    `FakeProject`, `FakeProjectNonUmbrella`. Each implements only the
+  - **Inline `defmodule Fake*` modules at the top of the test file.** Each implements only the
     function the code under test reflects on.
   - **Pass a function into an injected argument** (see [control-flow.md](control-flow.md)):
 
@@ -43,8 +54,8 @@ change — never defer tests. Coverage is reported to Codecov by CI.
         Doc.run_task([], mix_test_fun, FakeProjectNonUmbrella)
 
 - **Request fixtures come from `Xcribe.Support.RequestsGenerator`** — one function per route in
-  `Xcribe.WebRouter` (`users_index/1`, `users_posts_update/1`). A new route case means a new
-  route in `Xcribe.WebRouter` **and** a new generator function, not a hand-built `%Request{}`.
+  the test router. A new route case means a new route in that router **and** a new generator
+  function, not a hand-built `%Request{}`.
 - **Config in tests is `Application.put_env(:xcribe, <Endpoint>, ...)`, always torn down.** The
   canonical `on_exit` wipes everything so a leak can't reach another test file:
 
