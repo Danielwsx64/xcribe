@@ -18,7 +18,7 @@ All code, comments, docstrings, test descriptions, CHANGELOG entries, and commit
 
 ## Commit messages and PRs
 
-Commit messages MUST be a single line: capitalized imperative subject stating the change and the *why* (`Handle umbrella apps path`). The old `fix:`/`chg:` prefixes are abandoned — do not reintroduce them. PR bodies follow `.github/PULL_REQUEST_TEMPLATE.md` (Motivation / Proposed solution) and stay high-level: what changes for a consumer and why, not a walkthrough of the diff. Patches target `master`; features target the current release branch (`release-X.Y.Z`).
+Commit messages MUST be a single line: capitalized imperative subject stating the change and the *why* (`Handle umbrella apps path`). The old `fix:`/`chg:` prefixes are abandoned — do not reintroduce them. PR bodies follow `.github/PULL_REQUEST_TEMPLATE.md` (Motivation / Proposed solution), stay high-level — what changes for a consumer and why, not a walkthrough of the diff — and describe **every commit the PR carries**, not just the last one. Full rule: `.claude/rules/pull-requests.md`. Patches target `master`; features target the current release branch (`release-X.Y.Z`).
 
 ## Agents — binding workflow
 
@@ -49,3 +49,4 @@ The full conventions live as focused files in `.claude/rules/`. The agents load 
 - `docs.md` — the `@moduledoc` policy, no typespecs, `iex>` is decorative, no `TODO`, which user-facing docs to update.
 - `tests.md` — path-mirrored layout, explicit `async:`, `describe "fun/arity"`, no mocking library, `Application.put_env` teardown, whole-value assertions.
 - `release.md` — the CHANGELOG entry, `make release`, SemVer against the public API, the auto-publish and version-check gates, branch flow.
+- `pull-requests.md` — the template's two sections, describing the whole PR instead of the last commit, naming breaking changes and new dependencies.
