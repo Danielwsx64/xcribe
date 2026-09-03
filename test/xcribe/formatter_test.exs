@@ -14,7 +14,8 @@ defmodule Xcribe.FormatterTest do
     Application.put_env(
       :xcribe,
       Xcribe.Endpoint,
-      output: "/tmp/test",
+      file_path: "/tmp/test",
+      file_name: "test.json",
       specification_source: "test/support/.xcribe.exs",
       format: :openapi,
       json_library: Jason
@@ -48,7 +49,8 @@ defmodule Xcribe.FormatterTest do
       File.write!(spec_file, ~s(%{\n  "missing_comma" => 1\n  "missing_comma" => 2\n}\n))
 
       Application.put_env(:xcribe, Xcribe.Endpoint,
-        output: Path.join(tmp_dir, "openapi.json"),
+        file_path: tmp_dir,
+        file_name: "openapi_doc.json",
         specification_source: spec_file,
         format: :openapi,
         json_library: Jason
@@ -63,13 +65,13 @@ defmodule Xcribe.FormatterTest do
 
       assert output =~ "Specification file errors"
       assert output =~ "invalid Elixir syntax"
-      refute File.exists?(Path.join(tmp_dir, "openapi.json"))
+      refute File.exists?(Path.join(tmp_dir, "openapi_doc.json"))
     end
 
-    @tag :tmp_dir
-    test "report an unwritable output file without taking the formatter down", %{tmp_dir: tmp_dir} do
+    test "report an unwritable output file without taking the formatter down" do
       Application.put_env(:xcribe, Xcribe.Endpoint,
-        output: tmp_dir,
+        file_path: "/root",
+        file_name: "null",
         specification_source: "test/support/.simple_example.exs",
         format: :openapi,
         json_library: Jason
@@ -92,7 +94,7 @@ defmodule Xcribe.FormatterTest do
 
       assert capture_io(fn ->
                assert Formatter.handle_cast({:suite_finished, 1, 2}, status) == {:noreply, :ok}
-             end) =~ "Xcribe documentation written in /tmp/test"
+             end) =~ "Xcribe documentation written in /tmp/test/test.json"
     end
 
     test "ignore suite_finished when is not active" do
@@ -104,10 +106,15 @@ defmodule Xcribe.FormatterTest do
              end) == ""
     end
 
-    test "Output config errors" do
+    @tag :tmp_dir
+    test "Output config errors", %{tmp_dir: tmp_dir} do
       status = [active?: true]
 
-      Application.put_env(:xcribe, Xcribe.Endpoint, serve: true, output: "anywhere")
+      Application.put_env(:xcribe, Xcribe.Endpoint,
+        serve: true,
+        file_path: tmp_dir,
+        output: "anywhere"
+      )
 
       Recorder.add(RequestsGenerator.users_index())
 

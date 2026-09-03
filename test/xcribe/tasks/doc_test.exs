@@ -52,7 +52,8 @@ defmodule Xcribe.Tasks.DocTest do
 
       Application.put_env(:xcribe, Xcribe.Tasks.DocTest.FakeEndpoint,
         specification_source: "test/support/.xcribe.exs",
-        output: output
+        file_path: Path.dirname(output),
+        file_name: Path.basename(output)
       )
 
       File.rm(output)
@@ -130,7 +131,8 @@ defmodule Xcribe.Tasks.DocTest do
 
       Application.put_env(:xcribe, Xcribe.Tasks.DocTest.FailFakeEndpoint,
         specification_source: "test/support/.xcribe.exs",
-        output: output
+        file_path: Path.dirname(output),
+        file_name: Path.basename(output)
       )
 
       mix_test_fun = fn opts ->

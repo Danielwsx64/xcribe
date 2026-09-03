@@ -5,6 +5,11 @@ defmodule Xcribe.ConnParser do
   alias Xcribe.{Request, Request.Error}
 
   @error_struct %Error{type: :parsing}
+  @phoenix_vsn_gratter_than_1_8_8 :phoenix
+                                  |> Application.spec(:vsn)
+                                  |> to_string()
+                                  |> Version.compare("1.8.8")
+                                  |> Kernel.==(:gt)
 
   @doc """
   Parse the given `Plug.Conn` and transform it to a `Xcribe.Request`. A
@@ -67,7 +72,14 @@ defmodule Xcribe.ConnParser do
 
   defp identify_route(%{method: method, host: host, path_info: path} = conn) do
     module = router_module(conn)
-    route = module.__match_route__(method, decode_uri(path), host)
+
+    match_args =
+      if(@phoenix_vsn_gratter_than_1_8_8,
+        do: [method, decode_uri(path), host],
+        else: [decode_uri(path), method, host]
+      )
+
+    route = apply(module, :__match_route__, match_args)
 
     extract_route_info(route)
   rescue

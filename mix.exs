@@ -47,7 +47,12 @@ defmodule Xcribe.MixProject do
   end
 
   defp application_mod(:test) do
-    {Xcribe.Application, test: true, children: [{Xcribe.Endpoint, []}]}
+    {Xcribe.Application,
+     test: true,
+     children: [
+       {Xcribe.Endpoint, []},
+       {Xcribe.Support.StaticEndpoint, []}
+     ]}
   end
 
   defp application_mod(_), do: {Xcribe.Application, []}
@@ -62,6 +67,7 @@ defmodule Xcribe.MixProject do
       {:plug, ">= 1.18.5 and < 2.0.0"},
 
       # Dev environment
+      {:bandit, "~> 1.12", only: :dev, runtime: false},
       {:ex_doc, "~> 0.40", only: :dev, runtime: false},
 
       # Test environment

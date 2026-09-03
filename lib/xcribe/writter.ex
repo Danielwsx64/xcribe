@@ -2,6 +2,7 @@ defmodule Xcribe.Writter do
   @moduledoc false
 
   alias Xcribe.CLI.Output
+  alias Xcribe.Config
 
   @doc """
   This writes the given text to the configured output file.
@@ -10,7 +11,9 @@ defmodule Xcribe.Writter do
   """
   def write(text, config, artifact \\ "documentation")
 
-  def write(text, %{output: output_file}, artifact) do
+  def write(text, config, artifact) do
+    output_file = Config.get_output_path(config)
+
     output_file
     |> Path.dirname()
     |> File.mkdir_p!()

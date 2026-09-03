@@ -43,8 +43,17 @@ defmodule Xcribe.ConfigTest do
 
   describe "all_endpoints/0" do
     test "return all configured endpoints" do
-      Application.put_env(:xcribe, Xcribe.Endpoint, format: :api_blueprint)
-      Application.put_env(:xcribe, NotValidEndpoint, format: :api_blueprint)
+      :xcribe
+      |> Application.get_all_env()
+      |> Keyword.keys()
+      |> Enum.each(&Application.delete_env(:xcribe, &1))
+
+      Application.put_all_env(
+        xcribe: [
+          {Xcribe.Endpoint, format: :api_blueprint},
+          {NotValidEndpoint, format: :api_blueprint}
+        ]
+      )
 
       assert Config.all_endpoints() == [Xcribe.Endpoint]
     end
@@ -53,10 +62,12 @@ defmodule Xcribe.ConfigTest do
   describe "fetch_config/1" do
     test "fetch configuration with default values" do
       assert Config.fetch_config(Xcribe.FakeEndPoint) == %{
+               endpoint: Xcribe.FakeEndPoint,
                format: :openapi,
                specification_source: ".xcribe.exs",
                json_library: Jason,
-               output: "openapi.json",
+               file_path: nil,
+               file_name: "openapi.json",
                serve: false
              }
     end
@@ -66,17 +77,59 @@ defmodule Xcribe.ConfigTest do
         format: :api_blueprint,
         specification_source: ".custom.file.exs",
         json_library: Jason,
-        output: "api_doc.apib",
+        file_name: "api_doc.apib",
         serve: true
       )
 
       assert Config.fetch_config(Xcribe.OtherEndpoint) == %{
+               endpoint: Xcribe.OtherEndpoint,
                format: :api_blueprint,
                specification_source: ".custom.file.exs",
                json_library: Jason,
-               output: "api_doc.apib",
+               file_path: nil,
+               file_name: "api_doc.apib",
                serve: true
              }
+    end
+  end
+
+  describe "get_serving_path/1" do
+    test "return serving path when file_path is nil" do
+      config = %{file_path: nil, file_name: "doc.json"}
+
+      assert Config.get_serving_path(config) == "doc.json"
+    end
+
+    test "return serving path when file_path is a string" do
+      config = %{file_path: "priv/static", file_name: "doc.json"}
+
+      assert Config.get_serving_path(config) == "doc.json"
+    end
+
+    test "for subdirectories on the Plug.Static path, use a tuple" do
+      config = %{file_path: {"priv/static", "api"}, file_name: "doc.json"}
+
+      assert Config.get_serving_path(config) == "api/doc.json"
+    end
+  end
+
+  describe "get_output_path/1" do
+    test "return serving path when file_path is nil" do
+      config = %{file_path: nil, file_name: "doc.json"}
+
+      assert Config.get_output_path(config) == "doc.json"
+    end
+
+    test "return serving path when file_path is a string" do
+      config = %{file_path: "priv/static", file_name: "doc.json"}
+
+      assert Config.get_output_path(config) == "priv/static/doc.json"
+    end
+
+    test "for subdirectories on the Plug.Static path, use a tuple" do
+      config = %{file_path: {"priv/static", "api"}, file_name: "doc.json"}
+
+      assert Config.get_output_path(config) == "priv/static/api/doc.json"
     end
   end
 
@@ -92,12 +145,15 @@ defmodule Xcribe.ConfigTest do
       assert Config.check_configurations(config) == {:ok, config}
     end
 
-    test "validate serve config" do
+    @tag :tmp_dir
+    test "validate serve config", %{tmp_dir: tmp_dir} do
       config = %{
+        endpoint: Xcribe.Support.StaticEndpoint,
         format: :openapi,
         specification_source: ".xcribe.exs",
         json_library: Jason,
-        output: "priv/static/openapi.json",
+        file_path: tmp_dir,
+        file_name: "openapi_example.json",
         serve: true
       }
 
@@ -106,19 +162,20 @@ defmodule Xcribe.ConfigTest do
 
     test "return error for invalid configurations" do
       config = %{
+        endpoint: Xcribe.Endpoint,
         format: :invalid,
         specification_source: ".invalid_one.exs",
         json_library: FakeJson,
-        output: "",
+        file_name: "",
         serve: true
       }
 
       assert Config.check_configurations(config) ==
                {:error,
                 [
-                  {:output, "",
-                   "When serve config is true you must confiture output to \"priv/static\" folder",
-                   "You must configure output as: `config :xcribe, Endpoint, output: \"priv/static/doc.json\"`"},
+                  {:file_path, "",
+                   "When serve config is true your Endpoint must be able to serve the generated document, but a request for it didn't return the file",
+                   "Make file_path and file_name match a Plug.Static in your Endpoint — the directory it serves and its `only:` allow list: `config :xcribe, Endpoint, file_path: {\"priv/static\", \"api\"}, file_name: \"openapi.json\"`"},
                   {:format, :invalid,
                    "When serve config is true you must use the :openapi format",
                    "You must use the OpenAPI format: `config :xcribe, Endpoint, format: :openapi`"},
@@ -139,7 +196,7 @@ defmodule Xcribe.ConfigTest do
         format: :swagger,
         specification_source: ".xcribe.exs",
         json_library: Jason,
-        output: "openapi.json",
+        file_name: "openapi.json",
         serve: false
       }
 
@@ -154,22 +211,55 @@ defmodule Xcribe.ConfigTest do
 
     test "validate only given keys" do
       config = %{
+        endpoint: Xcribe.Endpoint,
         format: :invalid,
         specification_source: ".xcribe.exs",
         json_library: FakeJson,
-        output: "",
+        file_name: "",
         serve: true
       }
 
       assert Config.check_configurations(config, [:serve]) ==
                {:error,
                 [
-                  {:output, "",
-                   "When serve config is true you must confiture output to \"priv/static\" folder",
-                   "You must configure output as: `config :xcribe, Endpoint, output: \"priv/static/doc.json\"`"},
+                  {:file_path, "",
+                   "When serve config is true your Endpoint must be able to serve the generated document, but a request for it didn't return the file",
+                   "Make file_path and file_name match a Plug.Static in your Endpoint — the directory it serves and its `only:` allow list: `config :xcribe, Endpoint, file_path: {\"priv/static\", \"api\"}, file_name: \"openapi.json\"`"},
                   {:format, :invalid,
                    "When serve config is true you must use the :openapi format",
                    "You must use the OpenAPI format: `config :xcribe, Endpoint, format: :openapi`"}
+                ]}
+    end
+
+    test "validate the Plug.Static configuration for the doc" do
+      config = %{
+        endpoint: Xcribe.Support.StaticEndpoint,
+        format: :openapi,
+        json_library: FakeJson,
+        file_path: "test/support/",
+        file_name: "openapi_example.json",
+        serve: true
+      }
+
+      wrong_path = %{config | file_path: {"priv/static", "api"}}
+      other_endpoint = %{config | endpoint: Xcribe.Endpoint}
+
+      assert Config.check_configurations(config, [:serve]) == {:ok, config}
+
+      assert Config.check_configurations(wrong_path, [:serve]) ==
+               {:error,
+                [
+                  {:file_path, "api/openapi_example.json",
+                   "When serve config is true your Endpoint must be able to serve the generated document, but a request for it didn't return the file",
+                   "Make file_path and file_name match a Plug.Static in your Endpoint — the directory it serves and its `only:` allow list: `config :xcribe, Endpoint, file_path: {\"priv/static\", \"api\"}, file_name: \"openapi.json\"`"}
+                ]}
+
+      assert Config.check_configurations(other_endpoint, [:serve]) ==
+               {:error,
+                [
+                  {:file_path, "openapi_example.json",
+                   "When serve config is true your Endpoint must be able to serve the generated document, but a request for it didn't return the file",
+                   "Make file_path and file_name match a Plug.Static in your Endpoint — the directory it serves and its `only:` allow list: `config :xcribe, Endpoint, file_path: {\"priv/static\", \"api\"}, file_name: \"openapi.json\"`"}
                 ]}
     end
   end

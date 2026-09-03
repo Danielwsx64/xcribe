@@ -1,22 +1,45 @@
 defmodule Xcribe.Config do
   @moduledoc false
 
+  alias Phoenix.ConnTest
+
   @valid_formats [:api_blueprint, :openapi]
 
   def default_spec_file, do: ".xcribe.exs"
   def active?, do: System.get_env("XCRIBE_ENV") in ["1", "true", "TRUE"]
 
-  def fetch_config(endpoint) when is_atom(endpoint) do
-    :xcribe
-    |> Application.get_env(endpoint, [])
-    |> apply_default_values()
-  end
+  def server_port, do: Application.get_env(:xcribe, :server_port, 4040)
+  def open_browser?, do: Application.get_env(:xcribe, :open_browser, false) in [true, "true"]
 
   def all_endpoints do
     :xcribe
     |> Application.get_all_env()
     |> Keyword.keys()
     |> Enum.filter(&valid_endpoint?/1)
+  end
+
+  def fetch_config(endpoint) when is_atom(endpoint) do
+    :xcribe
+    |> Application.get_env(endpoint, [])
+    |> apply_default_values(endpoint)
+  end
+
+  def get_serving_path(%{file_path: {_static, path}, file_name: file}) do
+    Path.join([path, file])
+  end
+
+  def get_serving_path(%{file_name: file}), do: file
+
+  def get_output_path(%{file_path: path} = config) when is_tuple(path) do
+    get_output_path(%{config | file_path: Tuple.to_list(path)})
+  end
+
+  def get_output_path(%{file_name: file_name} = config) do
+    config
+    |> Map.get(:file_path, [])
+    |> List.wrap()
+    |> Enum.concat([file_name])
+    |> Path.join()
   end
 
   @default_keys_to_validate [:format, :specification_source, :json_library, :serve]
@@ -85,16 +108,38 @@ defmodule Xcribe.Config do
     end
   end
 
-  @serve_output_message "When serve config is true you must confiture output to \"priv/static\" folder"
-  @serve_output_instructions "You must configure output as: `config :xcribe, Endpoint, output: \"priv/static/doc.json\"`"
+  @serve_output_message "When serve config is true your Endpoint must be able to serve the generated document, but a request for it didn't return the file"
+  @serve_output_instructions "Make file_path and file_name match a Plug.Static in your Endpoint — the directory it serves and its `only:` allow list: `config :xcribe, Endpoint, file_path: {\"priv/static\", \"api\"}, file_name: \"openapi.json\"`"
   defp validate_serve_output({_errors, config} = results) do
-    output = Map.fetch!(config, :output)
+    endpoint = Map.fetch!(config, :endpoint)
+    serving_path = get_serving_path(config)
 
-    if Regex.match?(~r'priv\/static\/[\.\w-]+$', output) do
-      results
-    else
-      add_error(results, :output, output, @serve_output_message, @serve_output_instructions)
+    Code.ensure_loaded(endpoint)
+    config |> get_output_path() |> File.touch()
+
+    Path.join(["/", serving_path])
+    |> then(&ConnTest.build_conn(:get, &1))
+    |> call_endpoint(endpoint)
+    |> case do
+      %{status: 200} ->
+        results
+
+      _not_found_or_error ->
+        add_error(
+          results,
+          :file_path,
+          serving_path,
+          @serve_output_message,
+          @serve_output_instructions
+        )
     end
+  end
+
+  defp call_endpoint(path, endpoint) do
+    endpoint.call(path, [])
+  rescue
+    _any ->
+      {:error, "failed to call endpoint"}
   end
 
   defp add_error({:ok, config}, key, value, msg, info) do
@@ -105,17 +150,20 @@ defmodule Xcribe.Config do
     {{:error, [{key, value, msg, info} | errs]}, config}
   end
 
-  defp apply_default_values(keyword) do
+  defp apply_default_values(keyword, endpoint) do
     format = Keyword.get(keyword, :format, :openapi)
     json_library = Keyword.get(keyword, :json_library, Jason)
-    output = Keyword.get(keyword, :output, default_output(format))
+    file_path = Keyword.get(keyword, :file_path)
+    file_name = Keyword.get(keyword, :file_name, default_output(format))
     serve = Keyword.get(keyword, :serve, false)
     specification_source = Keyword.get(keyword, :specification_source, default_spec_file())
 
     %{
+      endpoint: endpoint,
       format: format,
       json_library: json_library,
-      output: output,
+      file_path: file_path,
+      file_name: file_name,
       serve: serve,
       specification_source: specification_source
     }
@@ -130,6 +178,7 @@ defmodule Xcribe.Config do
   end
 
   defp valid_endpoint?(module) do
+    Code.ensure_loaded(module)
     function_exported?(module, :config, 1)
   end
 end

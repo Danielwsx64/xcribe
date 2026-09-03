@@ -85,29 +85,29 @@ defmodule Mix.Tasks.Xcribe.Doc do
 
   defp override_configs(options, project_module) do
     if project_module.umbrella?() do
-      fn endpoint, configs ->
+      fn endpoint, config ->
         endpoint
-        |> override_path_for_umbrella(configs, project_module)
+        |> override_path_for_umbrella(config, project_module)
         |> task_config_override(options)
       end
     else
-      fn _endpoint, configs ->
-        task_config_override(configs, options)
+      fn _endpoint, config ->
+        task_config_override(config, options)
       end
     end
   end
 
-  defp override_path_for_umbrella(endpoint, configs, project_module) do
+  defp override_path_for_umbrella(endpoint, config, project_module) do
     app_name = endpoint.config(:otp_app)
 
     case project_module.deps_paths()[app_name] do
-      nil -> configs
-      path -> %{configs | output: Path.join(path, configs.output)}
+      nil -> config
+      path -> %{config | file_path: Path.join(path, config.file_path)}
     end
   end
 
-  defp task_config_override(configs, override) do
-    Map.merge(configs, Map.take(override, [:output, :format]))
+  defp task_config_override(config, override) do
+    Map.merge(config, Map.take(override, [:file_path, :file_name, :format]))
   end
 
   defp build_options(opts, project_module) do
@@ -120,9 +120,21 @@ defmodule Mix.Tasks.Xcribe.Doc do
     options
     |> Map.new()
     |> Map.put(:ignored, rest)
+    |> split_output()
     |> validate_format()
     |> endpoint_path(project_module)
   end
+
+  defp split_output(%{output: output} = options) do
+    options
+    |> Map.delete(:output)
+    |> Map.merge(%{
+      file_path: Path.dirname(output),
+      file_name: Path.basename(output)
+    })
+  end
+
+  defp split_output(options), do: options
 
   defp validate_format(%{format: format} = options) do
     Config.check_configurations(

@@ -37,7 +37,9 @@ defmodule Xcribe.Web.Plug do
           scheme: to_string(conn.scheme)
         })
 
-      send_resp(conn, 200, swagger_ui(conn.assigns.file, uri))
+      conn
+      |> Conn.put_resp_header("content-type", "text/html; charset=utf-8")
+      |> send_resp(200, swagger_ui(conn.assigns.file, uri))
     else
       not_found(conn)
     end
@@ -51,17 +53,23 @@ defmodule Xcribe.Web.Plug do
 
     config = Config.fetch_config(endpoint)
 
-    file = String.replace_prefix(config.output, "priv/static", "")
-
-    [file: file, serving?: config.serve]
+    [
+      file: Config.get_serving_path(config),
+      serving?: Keyword.get(opts, :serving?, config.serve),
+      endpoint: endpoint
+    ]
   end
 
   @doc false
-  def call(conn, file: file, serving?: serving) do
-    conn
-    |> Conn.assign(:file, file)
-    |> Conn.assign(:serving?, serving)
-    |> super([])
+  def call(conn, file: file, serving?: serving, endpoint: endpoint) do
+    if file == String.replace_leading(conn.request_path, "/", "") do
+      endpoint.call(conn, [])
+    else
+      conn
+      |> Conn.assign(:file, file)
+      |> Conn.assign(:serving?, serving)
+      |> super([])
+    end
   end
 
   defp not_found(conn), do: send_resp(conn, 404, "not found")

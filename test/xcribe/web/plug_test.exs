@@ -1,6 +1,7 @@
 defmodule Xcribe.Web.PlugTest do
   use ExUnit.Case, async: false
 
+  alias Plug.Conn
   alias Plug.Test
   alias Xcribe.Web.Plug
 
@@ -16,7 +17,7 @@ defmodule Xcribe.Web.PlugTest do
   describe "init/1" do
     test "return file name and serving config" do
       Application.put_env(:xcribe, Xcribe.Endpoint,
-        output: "specificy_name_file.json",
+        file_name: "specificy_name_file.json",
         serve: true
       )
 
@@ -31,9 +32,12 @@ defmodule Xcribe.Web.PlugTest do
     end
 
     test "trim priv namespace" do
-      Application.put_env(:xcribe, Xcribe.Endpoint, output: "priv/static/doc.json")
+      Application.put_env(:xcribe, Xcribe.Endpoint,
+        file_name: "doc.json",
+        file_path: "priv/static/"
+      )
 
-      assert Plug.init(endpoint: Xcribe.Endpoint) == [file: "/doc.json", serving?: false]
+      assert Plug.init(endpoint: Xcribe.Endpoint) == [file: "doc.json", serving?: false]
     end
   end
 
@@ -43,6 +47,7 @@ defmodule Xcribe.Web.PlugTest do
 
       response = Plug.call(conn, file: "file.json", serving?: true)
 
+      assert Conn.get_resp_header(response, "content-type") == ["text/html; charset=utf-8"]
       assert {200, _headers, body} = Test.sent_resp(response)
 
       assert {:ok, html} = Floki.parse_document(body)
