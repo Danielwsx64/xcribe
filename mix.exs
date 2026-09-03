@@ -31,7 +31,8 @@ defmodule Xcribe.MixProject do
         "coveralls.detail": :test,
         "coveralls.post": :test,
         "coveralls.html": :test,
-        "xcribe.doc": :test
+        "xcribe.doc": :test,
+        "xcribe.serve": :test
       ]
     ]
   end
@@ -47,7 +48,12 @@ defmodule Xcribe.MixProject do
   end
 
   defp application_mod(:test) do
-    {Xcribe.Application, test: true, children: [{Xcribe.Endpoint, []}]}
+    {Xcribe.Application,
+     test: true,
+     children: [
+       {Xcribe.Endpoint, []},
+       {Xcribe.StaticEndpoint, []}
+     ]}
   end
 
   defp application_mod(_), do: {Xcribe.Application, []}
@@ -66,6 +72,7 @@ defmodule Xcribe.MixProject do
 
       # Test environment
       {:phoenix, ">= 1.8.9 and < 2.0.0", only: [:dev, :test]},
+      {:bandit, "~> 1.12", only: [:dev, :test]},
       {:floki, "~> 0.38", only: [:test]},
       {:jason, "~> 1.4", only: [:dev, :test]},
       {:excoveralls, "~> 0.18", only: :test},
@@ -100,7 +107,8 @@ defmodule Xcribe.MixProject do
     [
       Documenting: [Xcribe.Document, Xcribe.Formatter],
       "Describing the API": [Xcribe.Specification],
-      "Mix tasks": [Mix.Tasks.Xcribe.Doc, Mix.Tasks.Xcribe.Gen.Spec],
+      Configuring: [Xcribe.Config],
+      "Mix tasks": [Mix.Tasks.Xcribe.Doc, Mix.Tasks.Xcribe.Gen.Spec, Mix.Tasks.Xcribe.Serve],
       Serving: [Xcribe.Web.Plug]
     ]
   end

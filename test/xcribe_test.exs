@@ -41,7 +41,8 @@ defmodule XcribeTest do
         format: :openapi,
         specification_source: "test/support/.simple_example.exs",
         json_library: Jason,
-        output: output_path
+        file_path: tmp_dir,
+        file_name: "openapi.json"
       }
 
       io_output =
@@ -75,7 +76,8 @@ defmodule XcribeTest do
         format: :api_blueprint,
         specification_source: "test/support/.simple_example.exs",
         json_library: Jason,
-        output: output_path
+        file_path: tmp_dir,
+        file_name: "api_doc.apib"
       }
 
       io_output =
@@ -121,21 +123,21 @@ defmodule XcribeTest do
       assert message == "File not found .not_there.exs"
     end
 
-    @tag :tmp_dir
-    test "report an unwritable output file without crashing", %{tmp_dir: tmp_dir} do
+    test "report an unwritable output file without crashing" do
       records = [RequestsGenerator.users_index()]
 
       config = %{
         format: :openapi,
         specification_source: "test/support/.simple_example.exs",
         json_library: Jason,
-        output: tmp_dir
+        file_path: "/root/",
+        file_name: "null"
       }
 
       output = capture_io(fn -> assert Xcribe.document(records, config) == :error end)
 
       assert output =~ "Output file errors"
-      assert output =~ "Could not write to #{tmp_dir}"
+      assert output =~ "Could not write to /root/null"
     end
 
     test "handle  validation errors" do

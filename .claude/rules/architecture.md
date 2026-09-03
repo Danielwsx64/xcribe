@@ -24,10 +24,10 @@ Error *shapes* live in [errors.md](errors.md); config threading in [config.md](c
   verb, merges their parameters and schemas, keeps every recorded request as an
   `%Xcribe.APIModel.Example{}`, and applies the specification's ignored prefixes on the way in.
   A format reads the model and translates; it never regroups requests of its own.
-- **`Xcribe.Specification.api_specification/1` is the only reader of the `.xcribe.exs` file's
-  contents**, the way `Xcribe.Config` is the only reader of `Application.get_env`. (`Xcribe.Config`
-  stats the path to validate it exists, and reports a missing one as a configuration error with
-  instructions — it never reads it.) It normalizes the file into a map
+- **`Xcribe.Specification` is the only reader of the `.xcribe.exs` file's contents**, the way
+  `Xcribe.Config` is the only reader of `Application.get_env`. (`Xcribe.Config` stats the path to
+  validate it exists, and reports a missing one as a configuration error with instructions — it
+  never reads it.) It normalizes the file into a map
   with every key defaulted; every other module receives that map and pattern-matches the keys it
   needs. `Xcribe.document/2` calls it once, in `build_api_model/2`, and passes the map on to the
   format orchestrator alongside the model.
@@ -55,6 +55,6 @@ Error *shapes* live in [errors.md](errors.md); config threading in [config.md](c
   is the wrap subject because `DocException.exception/1` needs only a `__meta__` and an example
   carries the one of the `document/2` call that recorded it (see [errors.md](errors.md)).
   A failure while *building* the model is wrapped inside `Xcribe.APIModel`, per request.
-- A new format needs a clause in `Xcribe.Config`'s `format` validation, a default `output:`
-  filename, a bullet in `Xcribe`'s `@moduledoc`, and a golden file under `test/support`
+- A new format needs a clause in `Xcribe.Config`'s `format` validation, a default `file_name:`,
+  a bullet in `Xcribe`'s `@moduledoc`, and a golden file under `test/support`
   (see [output.md](output.md)). Adding one is a **minor** version bump.

@@ -47,7 +47,11 @@ defmodule Mix.Tasks.Xcribe.Gen.Spec do
   end
 
   defp write_specification(file, false) do
-    Writter.write(template(Specification.defaults()), %{output: file}, "specification file")
+    path_config = %{file_path: Path.dirname(file), file_name: Path.basename(file)}
+
+    Specification.defaults()
+    |> template()
+    |> Writter.write(path_config, "specification file")
   end
 
   defp template(defaults) do

@@ -25,6 +25,7 @@ The `.apib` / JSON document xcribe writes is part of the public contract
   CHANGELOG-worthy behaviour change — **never** an incidental test fixup to make a diff go
   away. If a change to `lib/` moves a golden file, say why in the CHANGELOG entry and confirm
   it is not a breaking output change (see [release.md](release.md)).
-- Output paths come from the `output:` config key with a per-format default; `Xcribe.Writter` is
+- Output paths come from the `file_path:` and `file_name:` config keys, joined by
+  `Xcribe.Config.output_path/1`, with a per-format `file_name` default; `Xcribe.Writter` is
   the only module that writes (see [architecture.md](architecture.md)). Never build a path from
   `File.cwd!/0` or an env var.

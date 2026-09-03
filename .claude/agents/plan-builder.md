@@ -5,7 +5,7 @@ description: >-
   Elixir library — anything that adds or alters an output format; changes the
   request pipeline (ConnParser, Request, Request.Validator, Recorder); adds or
   changes a config key; alters the generated .apib/JSON output; or touches any
-  of the seven public modules. Returns a step-based plan with public-API,
+  of the public modules. Returns a step-based plan with public-API,
   determinism, and release consequences already folded in. Skip for typo fixes,
   formatting, renames of private helpers, and doc-only changes.
 tools: Read, Glob, Grep
@@ -18,8 +18,8 @@ are read-only: you research and plan, you do not edit code.
 
 Two constraints outrank everything else, and every plan must answer them explicitly:
 
-- **Is this a public contract change?** Consumers pin `~> 1.0`. If the change touches the seven
-  public modules, a documented config key, `document/2`, a documented `.xcribe.exs` key, or the
+- **Is this a public contract change?** Consumers pin `~> 1.0`. If the change touches a public
+  module, a documented config key, `document/2`, a documented `.xcribe.exs` key, or the
   generated output shape, the plan must say so and name the required version bump.
 - **Does the generated output stay byte-stable?** Any new collection reaching the output needs
   an explicit sort and string keys, or a consumer's committed doc will churn.

@@ -48,17 +48,22 @@ defmodule Xcribe do
 
   ## Configuration
 
-  #### Available configurations:
+  Configuration is scoped by the endpoint module it documents, so an application
+  with more than one endpoint describes each of them on its own:
 
-    * `:format` - Format to generate documentation, allowed `:api_blueprint` and
-    `:openapi`. Default `:openapi`.
-    * `:output` - The name of the generated documentation file. The default changes
-    with the format: `"api_doc.apib"` for API Blueprint and `"openapi.json"` for OpenAPI.
-    * `:json_library` - The library to be used for json decode/encode (Jason
-    and Poison are supported). Default `Jason`.
-    * `:serve` - Enable Xcribe serve mode. Default `false`. See more `Serving doc`
-    * `:specification_source` - Path to the specification file. Default `".xcribe.exs"`.
-    See `Xcribe.Specification`.
+  ```elixir
+      config :xcribe, YourAppWeb.Endpoint,
+        format: :openapi,
+        file_path: {"priv/static", "api"},
+        file_name: "openapi.json",
+        serve: true
+  ```
+
+  Every key has a default, so generating documentation needs no configuration at
+  all. The keys are `:format`, `:file_name`, `:file_path`, `:json_library`,
+  `:serve`, `:server_port`, `:open_browser` and `:specification_source` — what
+  each one means, the values it accepts and how it behaves with each of them is
+  documented in `Xcribe.Config`.
   """
   alias Xcribe.{
     ApiBlueprint,

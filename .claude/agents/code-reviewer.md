@@ -63,6 +63,6 @@ a real failure mode. **MINOR** = style drift with no failure mode.
 ## Model note
 
 Default `sonnet` — this is well-scoped rule matching. The main session should escalate to
-`opus` when the diff touches the **public API** (`public-api.md`'s seven modules or the config
+`opus` when the diff touches the **public API** (a public module or the config
 keys), **`Xcribe.Recorder`/GenServer state**, or the **generated-output path**
 (`Xcribe.JSON`, either `Formatter`, either encoder).

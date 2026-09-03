@@ -1,6 +1,7 @@
 defmodule Xcribe.Web.PlugTest do
   use ExUnit.Case, async: false
 
+  alias Plug.Conn
   alias Plug.Test
   alias Xcribe.Web.Plug
 
@@ -14,26 +15,75 @@ defmodule Xcribe.Web.PlugTest do
   end
 
   describe "init/1" do
-    test "return file name and serving config" do
+    test "return the endpoint, the document file and the serving flags" do
       Application.put_env(:xcribe, Xcribe.Endpoint,
-        output: "specificy_name_file.json",
+        file_name: "specificy_name_file.json",
         serve: true
       )
 
       assert Plug.init(endpoint: Xcribe.Endpoint) == [
+               endpoint: Xcribe.Endpoint,
                file: "specificy_name_file.json",
+               proxy?: false,
                serving?: true
              ]
     end
 
     test "serving false" do
-      assert Plug.init(endpoint: Xcribe.Endpoint) == [file: "openapi.json", serving?: false]
+      assert Plug.init(endpoint: Xcribe.Endpoint) == [
+               endpoint: Xcribe.Endpoint,
+               file: "openapi.json",
+               proxy?: false,
+               serving?: false
+             ]
     end
 
-    test "trim priv namespace" do
-      Application.put_env(:xcribe, Xcribe.Endpoint, output: "priv/static/doc.json")
+    test "return only the file name when file_path is a directory" do
+      Application.put_env(:xcribe, Xcribe.Endpoint,
+        file_name: "doc.json",
+        file_path: "priv/static/"
+      )
 
-      assert Plug.init(endpoint: Xcribe.Endpoint) == [file: "/doc.json", serving?: false]
+      assert Plug.init(endpoint: Xcribe.Endpoint) == [
+               endpoint: Xcribe.Endpoint,
+               file: "doc.json",
+               proxy?: false,
+               serving?: false
+             ]
+    end
+
+    test "return the sub path of the file_path tuple" do
+      Application.put_env(:xcribe, Xcribe.Endpoint,
+        file_name: "doc.json",
+        file_path: {"priv/static", "api"}
+      )
+
+      assert Plug.init(endpoint: Xcribe.Endpoint) == [
+               endpoint: Xcribe.Endpoint,
+               file: "api/doc.json",
+               proxy?: false,
+               serving?: false
+             ]
+    end
+
+    test "override the serve config with the serving option" do
+      Application.put_env(:xcribe, Xcribe.Endpoint, serve: false)
+
+      assert Plug.init(endpoint: Xcribe.Endpoint, serving?: true) == [
+               endpoint: Xcribe.Endpoint,
+               file: "openapi.json",
+               proxy?: false,
+               serving?: true
+             ]
+    end
+
+    test "enable the document proxy with the proxy option" do
+      assert Plug.init(endpoint: Xcribe.Endpoint, proxy?: true) == [
+               endpoint: Xcribe.Endpoint,
+               file: "openapi.json",
+               proxy?: true,
+               serving?: false
+             ]
     end
   end
 
@@ -41,8 +91,15 @@ defmodule Xcribe.Web.PlugTest do
     test "return doc" do
       conn = Test.conn(:get, "/")
 
-      response = Plug.call(conn, file: "file.json", serving?: true)
+      response =
+        Plug.call(conn,
+          endpoint: Xcribe.Endpoint,
+          file: "file.json",
+          proxy?: false,
+          serving?: true
+        )
 
+      assert Conn.get_resp_header(response, "content-type") == ["text/html; charset=utf-8"]
       assert {200, _headers, body} = Test.sent_resp(response)
 
       assert {:ok, html} = Floki.parse_document(body)
@@ -77,7 +134,9 @@ defmodule Xcribe.Web.PlugTest do
 
     test "not found route" do
       conn = Test.conn(:get, "/invalid_route")
-      response = Plug.call(conn, file: "file", serving?: true)
+
+      response =
+        Plug.call(conn, endpoint: Xcribe.Endpoint, file: "file", proxy?: false, serving?: true)
 
       assert {404, _headers, "not found"} = Test.sent_resp(response)
     end
@@ -85,7 +144,37 @@ defmodule Xcribe.Web.PlugTest do
     test "return not found when serving is disabled" do
       conn = Test.conn(:get, "/")
 
-      response = Plug.call(conn, file: "file", serving?: false)
+      response =
+        Plug.call(conn, endpoint: Xcribe.Endpoint, file: "file", proxy?: false, serving?: false)
+
+      assert {404, _headers, "not found"} = Test.sent_resp(response)
+    end
+
+    test "proxy the document request to the endpoint" do
+      conn = Test.conn(:get, "/openapi_example.json")
+
+      response =
+        Plug.call(conn,
+          endpoint: Xcribe.StaticEndpoint,
+          file: "openapi_example.json",
+          proxy?: true,
+          serving?: true
+        )
+
+      assert {200, _headers, body} = Test.sent_resp(response)
+      assert body =~ "openapi"
+    end
+
+    test "return not found for the document when the proxy is disabled" do
+      conn = Test.conn(:get, "/openapi_example.json")
+
+      response =
+        Plug.call(conn,
+          endpoint: Xcribe.StaticEndpoint,
+          file: "openapi_example.json",
+          proxy?: false,
+          serving?: true
+        )
 
       assert {404, _headers, "not found"} = Test.sent_resp(response)
     end

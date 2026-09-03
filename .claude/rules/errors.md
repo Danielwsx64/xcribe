@@ -49,8 +49,8 @@ in [config.md](config.md).
   This is not hypothetical: a broad rescue is exactly what turned the Phoenix 1.8
   `__match_route__/3` argument swap into a silent "couldn't parse" for every request. See
   [dependencies.md](dependencies.md).
-- `lib/` contains six `rescue` blocks. Adding a seventh needs a reason; converting one to a
-  catch-all needs a very good one.
+- **`rescue` is rare in `lib/` by design** — `grep -rn rescue lib/` before you add one, and add
+  it only with a reason. Converting an existing one to a catch-all needs a very good one.
 
 ## Exceptions and reporting
 

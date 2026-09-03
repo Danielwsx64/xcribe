@@ -7,9 +7,9 @@ defmodule Xcribe.WritterTest do
 
   describe "write/2" do
     test "writes given text to set output directory" do
-      output_path = "/tmp/xcribe_test#{:rand.uniform()}"
+      config = %{file_name: "xcribe_test#{:rand.uniform()}", file_path: "/tmp/"}
 
-      config = %{output: output_path}
+      output_path = Path.join([config.file_path, config.file_name])
 
       assert capture_io(fn ->
                assert :ok == Writter.write("sample test", config)
@@ -19,7 +19,7 @@ defmodule Xcribe.WritterTest do
     end
 
     test "raises InvalidOutputDestination if output directory cannot be accessed" do
-      config = %{output: "/root/null"}
+      config = %{file_path: "/root/", file_name: "null"}
 
       assert capture_io(fn ->
                assert :error == Writter.write("sample test", config)
