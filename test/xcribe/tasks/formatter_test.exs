@@ -36,7 +36,7 @@ defmodule Xcribe.Tasks.FormatterTest do
       assert capture_io(fn ->
                assert Formatter.handle_cast({:test_finished, fake_test}, %{}) ==
                         {:noreply, %{}}
-             end) == "\e[32m┃\e[0m fake - 0.00s\n"
+             end) == "\e[32m┃\e[0m   fake - 0.00s\n"
     end
 
     test "handle test error finished with ExUnit.CLIFormatter" do

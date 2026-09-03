@@ -38,9 +38,9 @@ defmodule Xcribe.Tasks.DocTest do
     test "run task" do
       io_output = capture_io(fn -> Doc.run([]) end)
 
-      assert io_output =~ "starting capture requests"
-      assert io_output =~ "starting doc generation"
-      assert io_output =~ "Xcribe Task - finished"
+      assert io_output =~ "starting request capture"
+      assert io_output =~ "generating documentation"
+      assert io_output =~ "finished"
     end
   end
 
@@ -75,10 +75,10 @@ defmodule Xcribe.Tasks.DocTest do
 
       io_output = capture_io(fn -> Doc.run_task([], mix_test_fun, FakeProjectNonUmbrella) end)
 
-      assert io_output =~ "starting capture requests"
-      assert io_output =~ "starting doc generation"
+      assert io_output =~ "starting request capture"
+      assert io_output =~ "generating documentation"
       assert io_output =~ "documentation written in /tmp/task_tests.doc"
-      assert io_output =~ "Xcribe Task - finished"
+      assert io_output =~ "finished"
       assert File.exists?("/tmp/task_tests.doc")
       assert Recorder.pop_all() == %{errors: []}
     end
@@ -248,10 +248,10 @@ defmodule Xcribe.Tasks.DocTest do
           end
         end)
 
-      assert io_output =~ "starting capture requests"
-      assert io_output =~ "starting doc generation"
+      assert io_output =~ "starting request capture"
+      assert io_output =~ "generating documentation"
       assert io_output =~ "Parsing and validation errors"
-      assert io_output =~ "Xcribe Task - aborted"
+      assert io_output =~ "aborted"
       refute File.exists?("/tmp/task_tests.doc")
       assert Recorder.pop_all() == %{errors: []}
     end
@@ -266,7 +266,7 @@ defmodule Xcribe.Tasks.DocTest do
           Doc.run_task(["/custom/file/path", "--other", "value"], mix_test_fun, FakeProject)
         end)
 
-      assert io_output =~ "Xcribe Task - finished"
+      assert io_output =~ "finished"
     end
 
     test "invalid endpoint module" do

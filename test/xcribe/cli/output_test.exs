@@ -245,9 +245,9 @@ defmodule Xcribe.CLI.OutputTest do
     end
   end
 
-  describe "print_message/1" do
+  describe "print_message/2" do
     test "print success message" do
-      expected_output = "\e[36m >>> ok <<<\e[0m\n"
+      expected_output = "\e[36m┃ ▸\e[0m ok\n"
 
       assert capture_io(fn ->
                assert Output.print_message("ok") == :ok
@@ -255,7 +255,7 @@ defmodule Xcribe.CLI.OutputTest do
     end
 
     test "print error message" do
-      expected_output = "\e[31m >>> error <<<\e[0m\n"
+      expected_output = "\e[31m┃ ▸\e[0m \e[31merror\e[0m\n"
 
       assert capture_io(fn ->
                assert Output.print_message("error", :error) == :ok
@@ -267,7 +267,7 @@ defmodule Xcribe.CLI.OutputTest do
     test "print test info" do
       test_struct = %{name: :"test success", time: 11_111}
 
-      expected_output = "\e[32m┃\e[0m success - 0.01s\n"
+      expected_output = "\e[32m┃\e[0m   success - 0.01s\n"
 
       assert capture_io(fn ->
                assert Output.print_captured_test(test_struct) == :ok
@@ -277,7 +277,7 @@ defmodule Xcribe.CLI.OutputTest do
     test "a large time" do
       test_struct = %{name: :"test success", time: 1_111_111}
 
-      expected_output = "\e[32m┃\e[0m success - 1.1s\n"
+      expected_output = "\e[32m┃\e[0m   success - 1.1s\n"
 
       assert capture_io(fn ->
                assert Output.print_captured_test(test_struct) == :ok
@@ -285,12 +285,12 @@ defmodule Xcribe.CLI.OutputTest do
     end
   end
 
-  describe "print_capture_error/1" do
+  describe "print_captured_error/1" do
     test "print test error" do
       test_struct = %{name: :"test success"}
 
       expected_output =
-        "\e[31m┃\e[0m Test error: success\n\e[31m\e[7m  [ Xcribe ] doc tasks was aborted                                                               \e[0m\n"
+        "\e[31m┃\e[0m   Test error: success\n\e[31m\e[7m  [ Xcribe ] doc tasks was aborted                                                               \e[0m\n"
 
       assert capture_io(fn ->
                assert Output.print_captured_error(test_struct) == :ok

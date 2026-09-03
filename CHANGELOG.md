@@ -115,8 +115,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   secondary text, and green kept for a documented test that passed. Configuration errors no
   longer print under a green header, which reads as success everywhere else in a terminal, and
   the header band is drawn in reverse video so its text takes the terminal's own background
-  colour instead of a fixed white that some themes wash out. The layout, wording and box drawing
-  are unchanged.
+  colour instead of a fixed white that some themes wash out. The status lines Xcribe prints while
+  a task runs join the same `┃` rail the error boxes and the per-test lines are drawn on, instead
+  of being wrapped in `>>>` and `<<<`: the delimiters said only "this line is Xcribe's", which the
+  rail now says without competing with the message for attention, and everything Xcribe writes
+  during a run shares one left margin. The mix tasks' messages also stopped repeating
+  `Xcribe Task -` on every line, since the rail already carries that.
 
 ### Fixed
 

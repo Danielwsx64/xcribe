@@ -11,25 +11,29 @@ defmodule Xcribe.CLI.Output do
   @reset IO.ANSI.reset()
 
   @bar_size 95
+  @gutter "┃"
+  @marker "▸"
 
   alias Xcribe.{DocException, SpecificationFile}
 
-  def print_message(message, type \\ :ok) when is_binary(message) do
-    color = if type == :error, do: @red, else: @cyan
+  def print_message(message, type \\ :ok)
 
-    IO.puts("#{color} >>> #{message} <<<#{@reset}")
-  end
+  def print_message(message, :error) when is_binary(message),
+    do: IO.puts("#{status_prefix(@red)} #{@red}#{message}#{@reset}")
+
+  def print_message(message, :ok) when is_binary(message),
+    do: IO.puts("#{status_prefix(@cyan)} #{message}")
 
   def print_captured_test(%{name: name_as_atom, time: time}) do
     "test " <> name = Atom.to_string(name_as_atom)
 
-    IO.puts("#{tab(@green)} #{name} - #{format_us(normalize_us(time))}s")
+    IO.puts("#{tab(@green)}#{space(3)}#{name} - #{format_us(normalize_us(time))}s")
   end
 
   def print_captured_error(%{name: name_as_atom}) do
     "test " <> name = Atom.to_string(name_as_atom)
 
-    IO.puts("#{tab(@red)} Test error: #{name}")
+    IO.puts("#{tab(@red)}#{space(3)}Test error: #{name}")
 
     print_header_error("[ Xcribe ] doc tasks was aborted", @red)
   end
@@ -138,7 +142,9 @@ defmodule Xcribe.CLI.Output do
 
   defp format_file_path(path), do: Path.relative_to_cwd(path)
 
-  defp tab(color), do: "#{color}┃#{@reset}"
+  defp tab(color), do: "#{color}#{@gutter}#{@reset}"
+
+  defp status_prefix(color), do: "#{color}#{@gutter} #{@marker}#{@reset}"
 
   defp print_header_error(message, color),
     do: IO.puts("#{color}#{@invert}  #{message}#{space_for(message)}#{@reset}")
